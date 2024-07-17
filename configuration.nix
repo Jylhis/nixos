@@ -219,6 +219,7 @@
     curlie
     jq
     sd
+    gnumake
     git
   ];
 
