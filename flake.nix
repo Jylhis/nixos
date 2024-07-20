@@ -29,9 +29,9 @@
         specialArgs = attrs;
         modules = [
           ./configuration.nix
-          nixos-hardware.nixosModules.common-gpu-amd
-          nixos-hardware.nixosModules.common-gpu-intel
-          nixos-hardware.nixosModules.common-cpu-intel
+          #    nixos-hardware.nixosModules.common-gpu-amd
+          #    nixos-hardware.nixosModules.common-gpu-intel
+          #   nixos-hardware.nixosModules.common-cpu-intel
           nixos-hardware.nixosModules.apple-t2
         ];
       };

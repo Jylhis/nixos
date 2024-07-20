@@ -27,10 +27,24 @@
   boot = {
     loader.systemd-boot.enable = true;
     loader.efi.canTouchEfiVariables = true;
+    plymouth.enable = true;
+    plymouth.theme = "breeze";
     loader.grub.configurationLimit = 5;
     extraModprobeConfig = ''
       options snd-hda-intel model=intel-mac-auto
     '';
+    initrd.verbose = false;
+    consoleLogLevel = 0;
+    kernelParams = [
+      "quiet"
+      "splash"
+      "boot.shell_on_fail"
+      "loglevel=3"
+      "rd.systemd.show_status=false"
+      "rd.udev.log_level=3"
+      "udev.log_priority=3"
+    ];
+    loader.timeout = 0;
   };
 
   networking = {
@@ -68,7 +82,7 @@
         #  pkgs.gsettings-desktop-schemas
         #];
       };
-      videoDrivers = ["intel" "amdgpu"];
+      videoDrivers = ["intel"];
       # Configure keymap in X11
       xkb = {
         layout = "us,fi";
@@ -176,9 +190,9 @@
   };
 
   environment = {
-    etc."modprobe.d/amd-egpu-pcie-speed.conf".text = ''
-      options amdgpu pcie_gen_cap=0x40000
-    '';
+    # etc."modprobe.d/amd-egpu-pcie-speed.conf".text = ''
+    #   options amdgpu pcie_gen_cap=0x40000
+    # '';
     gnome.excludePackages =
       (with pkgs; [
         rhythmbox
