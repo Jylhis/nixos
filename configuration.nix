@@ -14,14 +14,23 @@
     _1password-shell-plugins.nixosModules.default
   ];
 
-  nix.settings.experimental-features = ["nix-command" "flakes"];
+  nix.gc = {
+    automatic = true;
+    options = "--delete-older-than 14d";
+    randomizedDelaySec = "14m";
+  };
 
+  nix.settings.experimental-features = ["nix-command" "flakes" "repl-flake"];
+  nix.settings.trusted-substituters = ["https://cache.soopy.moe"];
+  nix.settings.trusted-public-keys = ["cache.soopy.moe-1:0RZVsQeR+GOh0VQI9rvnHz55nVXkFardDqfm4+afjPo="];
   # Bootloader.
   boot = {
     loader.systemd-boot.enable = true;
-
     loader.efi.canTouchEfiVariables = true;
-    kernelPackages = pkgs.linuxPackages_latest;
+    loader.grub.configurationLimit = 5;
+    extraModprobeConfig = ''
+      options snd-hda-intel model=intel-mac-auto
+    '';
   };
 
   networking = {
@@ -34,28 +43,38 @@
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-
+  console.useXkbConfig = true;
   services = {
-    xserver.enable = true;
+    hardware.bolt.enable = true;
+    udev.extraRules = ''
+      ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
+    '';
+    xserver = {
+      enable = true;
 
-    xserver.displayManager.gdm.enable = true;
-    xserver.desktopManager.gnome.enable = true;
+      displayManager.gdm.enable = true;
+      desktopManager.gnome.enable = true;
+      # Set layout in GNOME
+      desktopManager.gnome = {
+        extraGSettingsOverrides = ''
+          [org.gnome.desktop.input-sources]
+          sources=[('xkb', 'us'), ('xkb', 'fi')]
+          xkb-options=['ctrl:swapcaps','terminate:ctrl_alt_bksp', 'lv3:ralt_switch']
 
-    # Set layout in GNOME
-    xserver.desktopManager.gnome = {
-      extraGSettingsOverrides = ''
-        [org.gnome.desktop.input-sources]
-        sources=[('xkb', 'us'), ('xkb', 'fi')]
-      '';
-      #extraGSettingsOverridePackages = [
-      #  pkgs.gsettings-desktop-schemas
-      #];
-    };
-
-    # Configure keymap in X11
-    xserver.xkb = {
-      layout = "us,fi";
-      variant = "";
+          [org.gnome.shell]
+          favorite-apps=['firefox.desktop', 'org.gnome.Console.desktop', 'emacsclient.desktop', 'spotify.desktop', '1password.desktop', 'org.gnome.Nautilus.desktop']
+        '';
+        #extraGSettingsOverridePackages = [
+        #  pkgs.gsettings-desktop-schemas
+        #];
+      };
+      videoDrivers = ["intel" "amdgpu"];
+      # Configure keymap in X11
+      xkb = {
+        layout = "us,fi";
+        variant = "";
+        options = "ctrl:swapcaps";
+      };
     };
 
     # Enable CUPS to print documents.
@@ -68,7 +87,7 @@
       pulse.enable = true;
       # If you want to use JACK applications, uncomment this
       #jack.enable = true;
-
+      audio.enable = true;
       # use the example session manager (no others are packaged yet so this is enabled by default,
       # no need to redefine it in your config for now)
       #media-session.enable = true;
@@ -149,6 +168,7 @@
             dap-mode
             lsp-ui
             lsp-mode
+            terraform-mode
             powershell
           ]
       )
@@ -156,6 +176,9 @@
   };
 
   environment = {
+    etc."modprobe.d/amd-egpu-pcie-speed.conf".text = ''
+      options amdgpu pcie_gen_cap=0x40000
+    '';
     gnome.excludePackages =
       (with pkgs; [
         rhythmbox
@@ -170,28 +193,35 @@
 
     # List packages installed in system profile. To search, run:
     # $ nix search wget
-    systemPackages = with pkgs; [
-      vim
-      bat
-      ripgrep
-      eza
-      delta
-      dust
-      duf
-      fd
-      zoxide
-      glances
-      curlie
-      jq
-      sd
-      gnumake
-      git
-    ];
+    systemPackages = with pkgs;
+      [
+        vim
+        bat
+        ripgrep
+        eza
+        delta
+        dust
+        duf
+        fd
+        zoxide
+        glances
+        curlie
+        lsof
+        jq
+        sd
+        gnumake
+        git
+        pciutils
+        solaar
+      ]
+      ++ (with pkgs.gnomeExtensions; [solaar-extension]);
   };
 
-  hardware.pulseaudio.enable = false;
+  hardware.logitech.enable = true;
+  hardware.logitech.enableGraphical = true; # for solaar to be included
+  sound.enable = true;
+  hardware.pulseaudio.enable = lib.mkForce false;
   security.rtkit.enable = true;
-
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.markus = {
     isNormalUser = true;
