@@ -29,7 +29,7 @@
     loader.efi.canTouchEfiVariables = true;
     plymouth.enable = true;
     plymouth.theme = "breeze";
-    loader.grub.configurationLimit = 5;
+    #loader.grub.configurationLimit = 5;
     extraModprobeConfig = ''
       options snd-hda-intel model=intel-mac-auto
     '';
@@ -44,7 +44,7 @@
       "rd.udev.log_level=3"
       "udev.log_priority=3"
     ];
-    loader.timeout = 0;
+    #loader.timeout = 0;
   };
 
   networking = {
@@ -117,6 +117,7 @@
             nix-mode
             markdown-mode
             markdown-toc
+            direnv
             solaire-mode
             doom-themes
             treemacs
@@ -209,8 +210,13 @@
     # $ nix search wget
     systemPackages = with pkgs;
       [
+        clang
+        clang-tools
+
         vim
         bat
+        direnv
+        nix-direnv
         ripgrep
         eza
         delta
@@ -227,12 +233,13 @@
         git
         pciutils
         solaar
+        pyright
       ]
       ++ (with pkgs.gnomeExtensions; [solaar-extension]);
   };
 
-  hardware.logitech.enable = true;
-  hardware.logitech.enableGraphical = true; # for solaar to be included
+  hardware.logitech.wireless.enable = true;
+  hardware.logitech.wireless.enableGraphical = true; # for solaar to be included
   sound.enable = true;
   hardware.pulseaudio.enable = lib.mkForce false;
   security.rtkit.enable = true;
@@ -251,7 +258,7 @@
       godef
       delve
       source-code-pro
-      clang
+
       asm-lsp
       ansible-language-server
       emacs-all-the-icons-fonts
