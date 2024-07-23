@@ -2,10 +2,21 @@
   description = "A very basic flake";
 
   inputs = {
+    # Nixpkgs
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
+
+    # Nixpkgs unstable
+    unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    # Hardware configuration
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+
+    # Generate System Images
+    nixos-generators.url = "github:nix-community/nixos-generators";
+    nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
+
     _1password-shell-plugins.url = "github:1Password/shell-plugins";
     flake-utils.url = "github:numtide/flake-utils";
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
   nixConfig = {
@@ -17,7 +28,6 @@
   };
 
   outputs = {
-    self,
     nixpkgs,
     flake-utils,
     nixos-hardware,
@@ -29,9 +39,6 @@
         specialArgs = attrs;
         modules = [
           ./configuration.nix
-          #    nixos-hardware.nixosModules.common-gpu-amd
-          #    nixos-hardware.nixosModules.common-gpu-intel
-          #   nixos-hardware.nixosModules.common-cpu-intel
           nixos-hardware.nixosModules.apple-t2
         ];
       };
@@ -39,7 +46,34 @@
     // flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
     in {
-      #inherit self nixpkgs;
       formatter = pkgs.alejandra;
+      checks = {
+        deadnix =
+          pkgs.runCommand "lint"
+          {
+            buildInputs = [pkgs.deadnix];
+          } ''
+            set -euo pipefail
+            deadnix --fail ${./.}
+            mkdir $out
+          '';
+        statix =
+          pkgs.runCommand "statix"
+          {
+            buildInputs = [pkgs.statix];
+          } ''
+            set -euo pipefail
+            static check ${./.}
+            mkdir $out
+          '';
+        shellcheck =
+          pkgs.runCommand "shellcheck"
+          {
+            buildInputs = [pkgs.shellcheck];
+          } ''
+            find ${../.} -name '*.sh' ! -name "3rdparty" | xargs shellcheck -s bash
+            mkdir $out
+          '';
+      };
     });
 }
