@@ -2,13 +2,15 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 {
-  config,
+
   lib,
   pkgs,
   _1password-shell-plugins,
   ...
-}: {
+}:
+{
   imports = [
+    ./personal-devenv.nix
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     _1password-shell-plugins.nixosModules.default
@@ -20,9 +22,15 @@
     randomizedDelaySec = "14m";
   };
 
-  nix.settings.experimental-features = ["nix-command" "flakes" "repl-flake"];
-  nix.settings.trusted-substituters = ["https://cache.soopy.moe"];
-  nix.settings.trusted-public-keys = ["cache.soopy.moe-1:0RZVsQeR+GOh0VQI9rvnHz55nVXkFardDqfm4+afjPo="];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+    "repl-flake"
+  ];
+  nix.settings.trusted-substituters = [ "https://cache.soopy.moe" ];
+  nix.settings.trusted-public-keys = [
+    "cache.soopy.moe-1:0RZVsQeR+GOh0VQI9rvnHz55nVXkFardDqfm4+afjPo="
+  ];
   # Bootloader.
   boot = {
     loader.systemd-boot.enable = true;
@@ -77,12 +85,16 @@
 
           [org.gnome.shell]
           favorite-apps=['firefox.desktop', 'org.gnome.Console.desktop', 'emacsclient.desktop', 'spotify.desktop', '1password.desktop', 'org.gnome.Nautilus.desktop']
+
+          [org.gnome.desktop.interface]
+          gtk-theme='org.gnome.desktop.interface'
+          color-scheme='prefer-dark'
         '';
         #extraGSettingsOverridePackages = [
         #  pkgs.gsettings-desktop-schemas
         #];
       };
-      videoDrivers = ["intel"];
+      videoDrivers = [ "intel" ];
       # Configure keymap in X11
       xkb = {
         layout = "us,fi";
@@ -107,90 +119,18 @@
       #media-session.enable = true;
     };
 
-    emacs.enable = true;
-
-    # Enable the GNOME Desktop Environment.
-    emacs.package = with pkgs; (
-      (emacsPackagesFor emacs).emacsWithPackages (
-        epkgs:
-          with epkgs; [
-            nix-mode
-            markdown-mode
-            markdown-toc
-            direnv
-            solaire-mode
-            doom-themes
-            treemacs
-            treemacs-projectile
-            treemacs-magit
-            treemacs-icons-dired
-            treemacs-all-the-icons
-            json-mode
-            json-snatcher
-            flycheck
-            exec-path-from-shell
-            pyenv-mode
-            lsp-pyright
-            python-black
-            blacken
-            python-insert-docstring
-            python
-            cython-mode
-            rust-mode
-            go-mode
-            editorconfig
-            editorconfig-generate
-            editorconfig-domain-specific
-            editorconfig-custom-majormode
-            yasnippet
-            yasnippet-snippets
-            magit
-            system-packages
-            use-package-ensure-system-package
-            auto-package-update
-            company
-            diminish
-            dashboard
-            tree-sitter
-            tsc
-            tree-sitter-langs
-            projectile
-            projectile-ripgrep
-            google-c-style
-            modern-cpp-font-lock
-            cmake-ide
-            cmake-mode
-            cmake-font-lock
-            sphinx-doc
-            sphinx-mode
-            highlight-indentation
-            yaml-mode
-            dash
-            diff-hl
-            copilot
-            jsonrpc
-            dtrt-indent
-            move-text
-            consult
-            helpful
-            marginalia
-            vertico
-            which-key
-            gitlab-ci-mode
-            docker-compose-mode
-            dockerfile-mode
-            lsp-treemacs
-            dap-mode
-            lsp-ui
-            lsp-mode
-            terraform-mode
-            powershell
-          ]
-      )
-    );
+  };
+  virtualisation.docker.enable = true;
+  virtualisation.docker.rootless = {
+    enable = true;
+    setSocketVariable = true;
   };
 
   environment = {
+    interactiveShellInit = ''
+      alias emax='emacsclient -t'
+      alias emaxg='emacsclient -c -a emacs'
+    '';
     # etc."modprobe.d/amd-egpu-pcie-speed.conf".text = ''
     #   options amdgpu pcie_gen_cap=0x40000
     # '';
@@ -208,16 +148,11 @@
 
     # List packages installed in system profile. To search, run:
     # $ nix search wget
-    systemPackages = with pkgs;
+    systemPackages =
+      with pkgs;
       [
-        clang
-        clang-tools
-
+        nix-ld
         vim
-        bat
-        direnv
-        nix-direnv
-        ripgrep
         eza
         delta
         dust
@@ -233,9 +168,8 @@
         git
         pciutils
         solaar
-        pyright
       ]
-      ++ (with pkgs.gnomeExtensions; [solaar-extension]);
+      ++ (with pkgs.gnomeExtensions; [ solaar-extension ]);
   };
 
   hardware.logitech.wireless.enable = true;
@@ -247,21 +181,22 @@
   users.users.markus = {
     isNormalUser = true;
     description = "Markus";
-    extraGroups = ["networkmanager" "wheel"];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "docker"
+    ];
     packages = with pkgs; [
       spotify
       alacritty
       signal-desktop
-
       nixd
       gopls
       godef
       delve
       source-code-pro
-
       asm-lsp
       ansible-language-server
-      emacs-all-the-icons-fonts
     ];
   };
 
@@ -270,14 +205,18 @@
     _1password.enable = true;
     _1password-gui = {
       enable = true;
-      polkitPolicyOwners = ["markus"];
+      polkitPolicyOwners = [ "markus" ];
     };
     _1password-shell-plugins = {
       # enable 1Password shell plugins for bash, zsh, and fish shell
       enable = true;
       # the specified packages as well as 1Password CLI will be
       # automatically installed and configured to use shell plugins
-      plugins = with pkgs; [glab cachix nodePackages.vercel];
+      plugins = with pkgs; [
+        glab
+        cachix
+        nodePackages.vercel
+      ];
     };
     # Install firefox.
     firefox.enable = true;
