@@ -6,6 +6,7 @@
   lib,
   pkgs,
   _1password-shell-plugins,
+  emacs-overlay,
   ...
 }:
 {
@@ -128,8 +129,8 @@
 
   environment = {
     interactiveShellInit = ''
-      alias emax='emacsclient -t'
-      alias emaxg='emacsclient -c -a emacs'
+      alias ec='emacsclient -t'
+      alias ecg='emacsclient -c -a emacs'
     '';
     # etc."modprobe.d/amd-egpu-pcie-speed.conf".text = ''
     #   options amdgpu pcie_gen_cap=0x40000
@@ -224,7 +225,7 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-
+  nixpkgs.overlays = [ emacs-overlay.overlay ];
   # This value determines the NixOS release from which the default
   # settings for stateful data,like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave

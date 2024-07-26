@@ -15,8 +15,13 @@
     #nixos-generators.url = "github:nix-community/nixos-generators";
     #nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
 
+    emacs-overlay.url = "github:nix-community/emacs-overlay";
+    emacs-overlay.inputs.nixpkgs.follows = "nixpkgs-unstable";
+    emacs-overlay.inputs.nixpkgs-stable.follows = "nixpkgs";
+
     _1password-shell-plugins.url = "github:1Password/shell-plugins";
     flake-utils.url = "github:numtide/flake-utils";
+
   };
 
   nixConfig = {
@@ -32,10 +37,13 @@
       nixpkgs,
       nixpkgs-unstable,
       flake-utils,
+      emacs-overlay,
       nixos-hardware,
+      self,
       ...
     }@attrs:
     {
+
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = attrs;
@@ -52,6 +60,7 @@
         unstable = nixpkgs-unstable.legacyPackages.${system};
       in
       {
+        #          nixpkgs.overlays = [(import self.inputs.emacs-overlay)];
         formatter = unstable.nixfmt-rfc-style;
         checks = {
           deadnix = pkgs.runCommand "lint" { buildInputs = [ pkgs.deadnix ]; } ''
