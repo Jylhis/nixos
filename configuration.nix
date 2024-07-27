@@ -13,6 +13,7 @@
   imports = [
     ./personal-devenv.nix
     ./pentest-reverse-engineer.nix
+    ./cachix.nix
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     _1password-shell-plugins.nixosModules.default
@@ -29,6 +30,11 @@
     "flakes"
     "repl-flake"
   ];
+  nix.settings.trusted-users = [
+    "root"
+    "markus"
+  ];
+
   nix.settings.trusted-substituters = [ "https://cache.soopy.moe" ];
   nix.settings.trusted-public-keys = [
     "cache.soopy.moe-1:0RZVsQeR+GOh0VQI9rvnHz55nVXkFardDqfm4+afjPo="
@@ -131,7 +137,10 @@
   environment = {
     interactiveShellInit = ''
       alias ec='emacsclient -t'
-      alias ecg='emacsclient -c -a emacs'
+      alias eg='emacsclient -c -a emacs'
+      alias eb='emacs -nw -Q'
+      alias ebg='emacs -Q'
+      alias open='xdg-open'
     '';
     # etc."modprobe.d/amd-egpu-pcie-speed.conf".text = ''
     #   options amdgpu pcie_gen_cap=0x40000
@@ -153,6 +162,7 @@
     systemPackages =
       with pkgs;
       [
+        bash-completion
         nix-ld
         vim
         eza
