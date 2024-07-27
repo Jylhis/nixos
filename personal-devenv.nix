@@ -18,13 +18,16 @@ in
       tree-sitter-grammars.tree-sitter-cpp
       tree-sitter-grammars.tree-sitter-cuda
       rtags
+      cppcheck
 
       # Python
+      python3
       pyright
       ruff
       tree-sitter-grammars.tree-sitter-python
 
       # Golang
+      go
       gopls
       godef
       delve
@@ -36,12 +39,14 @@ in
       tree-sitter-grammars.tree-sitter-commonlisp
 
       # Nix
+      statix
       nixd
       nixfmt-rfc-style
       tree-sitter-grammars.tree-sitter-nix
 
       # SQL
       sqls
+      sqlint
       tree-sitter-grammars.tree-sitter-sql
 
       # Haskell
@@ -56,6 +61,7 @@ in
       tree-sitter-grammars.tree-sitter-c-sharp
 
       # HTML + CSS
+      stylelint
       tree-sitter-grammars.tree-sitter-css
       tree-sitter-grammars.tree-sitter-scss
       tree-sitter-grammars.tree-sitter-html
@@ -64,6 +70,7 @@ in
       tree-sitter-grammars.tree-sitter-bash
 
       # Config languages
+      yamllint
       tree-sitter-grammars.tree-sitter-yaml
       tree-sitter-grammars.tree-sitter-toml
       tree-sitter-grammars.tree-sitter-json
@@ -83,6 +90,7 @@ in
       tree-sitter-grammars.tree-sitter-cmake
 
       # Javascript & Typescript
+      nodePackages.eslint
       typescript
       tree-sitter-grammars.tree-sitter-typescript
       nodePackages.jsdoc
@@ -101,6 +109,7 @@ in
       tree-sitter-grammars.tree-sitter-markdown
 
       # Docker
+      hadolint
       tree-sitter-grammars.tree-sitter-dockerfile
 
       # CLI + other tools

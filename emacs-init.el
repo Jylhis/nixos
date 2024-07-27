@@ -7,47 +7,50 @@
 
 ;; Produce backtraces when errors occur: can be helpful to diagnose startup issues
 ;;(setq debug-on-error t)
-(setq custom-file "~/.emacs.d/custom.el")
-(load custom-file)
+
+;; Custom file location
+(defconst custom-file (expand-file-name "custom.el" user-emacs-directory))
+(unless (file-exists-p custom-file)
+  (write-region "" nil custom-file))
+(load custom-file t)
 
 (defconst *spell-check-support-enabled* nil) ;; Enable with t if you prefer
 (defconst *is-a-mac* (eq system-type 'darwin))
 
 ;; Adjust garbage collection threshold for early startup (see use of gcmh below)
-(setq gc-cons-threshold (* 128 1024 1024))
+;;(setq gc-cons-threshold (* 128 1024 1024))
 
 
 ;; Process performance tuning
-(setq read-process-output-max (* 4 1024 1024))
-(setq process-adaptive-read-buffering nil)
+;;(setq read-process-output-max (* 4 1024 1024))
+;;(setq process-adaptive-read-buffering nil)
 
-(use-package exec-path-from-shell
-  :ensure)
+ (use-package exec-path-from-shell
+   :ensure)
 
-(with-eval-after-load 'exec-path-from-shell
-  (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "NIX_SSL_CERT_FILE" "NIX_PATH"))
-    (add-to-list 'exec-path-from-shell-variables var)))
+;; (with-eval-after-load 'exec-path-from-shell
+;;   (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "NIX_SSL_CERT_FILE" "NIX_PATH"))
+;;     (add-to-list 'exec-path-from-shell-variables var)))
 
 
-(when (or (memq window-system '(mac ns x pgtk))
-          (unless (memq system-type '(ms-dos windows-nt))
-            (daemonp)))
-  (exec-path-from-shell-initialize))
+;; (when (or (memq window-system '(mac ns x pgtk))
+;;           (unless (memq system-type '(ms-dos windows-nt))
+;;             (daemonp)))
+;;   (exec-path-from-shell-initialize))
 
 
 ;;; setup-exec-path.el ends here
 
-(setq jit-lock-defer-time 0)
+;;(setq jit-lock-defer-time 0)
 
 
-;; TODO: diminish here
 
+
+;; TODO: This has been integrated with emacs, possibly released with emacs 30
 (use-package which-key
   :ensure
   :config
   (which-key-mode))
-
-
 
 
 ;; Smoother and nicer scrolling
@@ -75,7 +78,7 @@
 ;; Resizing the Emacs frame can be a terribly expensive part of changing the
 ;; font. By inhibiting this, we easily halve startup times with fonts that are
 ;; larger than the system default.
-(setq frame-inhibit-implied-resize t)
+;;(setq frame-inhibit-implied-resize t)
 
 ;; highlight the current line
 (global-hl-line-mode t)
@@ -83,7 +86,7 @@
 (setq-default cursor-type 'bar)
 
 ;; always highlight code
-;;(global-font-lock-mode 1)
+(global-font-lock-mode 1)
 ;; refresh a buffer if changed on disk
 (global-auto-revert-mode t)
 
@@ -102,6 +105,7 @@
       vc-follow-symlinks t
       ;; quiet startup
       inhibit-startup-message t
+      inhibit-splash-screen t
       initial-scratch-message nil
        inhibit-startup-screen t
       ;; hopefully all themes we install are safe
@@ -158,42 +162,13 @@
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
 
-
-
-;;==================
-;; Sane defaults
-;;==================
-
 ;; Delete trailing spaces and add new line in the end of a file on save.
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
-
-;; use human-readable sizes in dired
-
-
-
-
-(global-set-key (kbd "C-x <up>") #'other-window)
-(global-set-key (kbd "C-x <down>") #'previous-window-any-frame)
-
-;; Move between windows with Control-Command-Arrow and with =Cmd= just like in iTerm.
-;; (use-package windmove
-;;   :ensure
-;;   :config
-;;   (global-set-key (kbd "<C-s-left>")  'windmove-left)  ;; Ctrl+Cmd+left go to left window
-;;   (global-set-key (kbd "s-[")  'windmove-left)         ;; Cmd+[ go to left window
-
-;;   (global-set-key (kbd "<C-s-right>") 'windmove-right) ;; Ctrl+Cmd+right go to right window
-;;   (global-set-key (kbd "s-]")  'windmove-right)        ;; Cmd+] go to right window
-
-;;   (global-set-key (kbd "<C-s-up>")    'windmove-up)    ;; Ctrl+Cmd+up go to upper window
-;;   (global-set-key (kbd "s-{")  'windmove-up)           ;; Cmd+Shift+[ go to upper window
-
-;;   (global-set-key (kbd "<C-s-down>")  'windmove-down)  ;; Ctrl+Cmd+down go to down window
-;;   (global-set-key (kbd "s-}")  'windmove-down))        ;; Cmd+Shift+] got to down window
-
-
-(global-set-key (kbd "M-p") 'ace-window)
+(use-package winum
+  :ensure
+  :config
+  (winum-mode))
 
 (define-key function-key-map (kbd "M-]") 'event-apply-super-modifier)
 
@@ -207,10 +182,6 @@
 
 ;; Right Alt (option) can be used to enter symbols like em dashes '—' and euros '€' and stuff.
 (setq mac-right-option-modifier 'nil)
-
-
-
-
 
 (defun smarter-move-beginning-of-line (arg)
   "Move point back to indentation of beginning of line.
@@ -252,9 +223,23 @@ point reaches the beginning or end of the buffer, stop there."
   (vertico-cycle t)
   (read-buffer-completion-ignore-case t)
   (read-file-name-completion-ignore-case t)
-  (completion-styles '(basic substring partial-completion flex))
+  ;;(completion-styles '(basic substring partial-completion flex))
   :init
   (vertico-mode))
+
+(setq read-file-name-completion-ignore-case t
+      read-buffer-completion-ignore-case t
+      completion-ignore-case t)
+
+(use-package orderless
+  :ensure
+  :custom
+  ;; Configure a custom style dispatcher (see the Consult wiki)
+  ;; (orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch))
+  ;; (orderless-component-separator #'orderless-escapable-split-on-space)
+  (completion-styles '(substring orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles partial-completion)))))
 
 ;; Improve the accessibility of Emacs documentation by placing
 ;; descriptions directly in your minibuffer. Give it a try:
@@ -272,6 +257,7 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package helpful
   :ensure
   :init
+  ;(require 'helpful)
   (require 'bind-key)
   :bind (("C-h f" . #'helpful-callable)
          ("C-h v" . #'helpful-variable)
@@ -279,9 +265,6 @@ point reaches the beginning or end of the buffer, stop there."
          ("C-c C-d" . #'helpful-at-point)
          ("C-h F" . #'helpful-function)
          ("C-h C" . #'helpful-command)))
-
-
-
 
 ;; Projectile
 (use-package projectile
@@ -293,20 +276,17 @@ point reaches the beginning or end of the buffer, stop there."
               ("s-p" . projectile-command-map)
               ("C-c p" . projectile-command-map))
   :config
-   (when (require 'magit nil t)
+  ;;(setq projectile-completion-system 'ivy)
+  (when (require 'magit nil t)
     (mapc #'projectile-add-known-project
           (mapcar #'file-name-as-directory (magit-list-repos)))
     ;; Optionally write to persistent `projectile-known-projects-file'
     (projectile-save-known-projects))
   )
 
-
-
-
 (use-package projectile-ripgrep
   :ensure
   :after projectile)
-
 
 (use-package dashboard
   :ensure
@@ -327,7 +307,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 
 ;; Show dashboard with emacsclient
-(setq initial-buffer-choice (lambda () (get-buffer-create dashboard-buffer-name)))
+;(setq initial-buffer-choice (lambda () (get-buffer-create dashboard-buffer-name)))
 
 
 (use-package direnv
@@ -360,32 +340,17 @@ point reaches the beginning or end of the buffer, stop there."
                   (let ((buffer-file-name (buffer-name)))
                     (set-auto-mode)))))
 
-;;(setq window-resize-pixelwise t)
-;;(setq frame-resize-pixelwise t)
-
-
-
-;;===============
-;; KeyBindings
-;;===============
-
-;; TODO: Map lsp-find-* to something useful
-
 ;; Move-text lines around with meta-up/down.
 (use-package move-text
   :ensure
   :config
   (move-text-default-bindings))
 
-;;===============
-;; UI
-;;===============
-
-
 ;; Enable transparent title bar on macOS
 (when (memq window-system '(mac ns))
   (add-to-list 'default-frame-alist '(ns-appearance . light)) ;; {light, dark}
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
+
 
 (set-frame-font "Source Code Pro 12")
 (defalias 'yes-or-no #'y-or-n-p)
@@ -401,34 +366,45 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package treemacs-all-the-icons
   :ensure)
 
-(use-package doom-themes
-  :ensure
-  :config
-  (load-theme 'doom-solarized-light t)
-  (load-theme 'doom-solarized-dark t)
+;(use-package doom-themes
+;  :ensure
+;  :config
+;  (load-theme 'doom-solarized-light t)
+;  (load-theme 'doom-solarized-dark t)
 
-  (setq doom-themes-treemacs-theme "doom-colors")
-  (doom-themes-treemacs-config)
+  ;(setq doom-themes-treemacs-theme "doom-colors")
+  ;(doom-themes-treemacs-config)
   ;;(enable-theme 'doom-solarized-light)
-  (enable-theme 'doom-solarized-dark)
-  )
+ ; (enable-theme 'doom-solarized-dark)
+ ; )
 
 ;;(if (display-graphic-p)
     ;;(enable-theme 'doom-solarized-light)
 ;;    (enable-theme 'doom-solarized-light)
 ;;  (enable-theme 'doom-solarized-dark))
 
+(use-package solarized-theme
+  :ensure)
 
+(use-package leuven-theme
+  :ensure
+  :config
+  ;;(load-theme 'leuven-theme t)
+  (load-theme 'leuven-dark t)
+  ;;(enable-theme 'leuven-theme)
+  )
+
+
+
+
+(use-package ace-link
+  :ensure
+  :config
+  (ace-link-setup-default))
 (use-package solaire-mode
   :ensure
   :config
   (solaire-global-mode +1))
-
-
-
-
-
-
 
 ;; Treemacs
 (use-package treemacs
@@ -538,12 +514,16 @@ point reaches the beginning or end of the buffer, stop there."
   :after (treemacs projectile)
   )
 
+;; (use-package ivy
+;;   :ensure
+;;   :config
+;;   (ivy-mode))
 
-;;================
-;; Programming
-;;================
-
-
+;; (use-package all-the-icons-ivy-rich
+;;   :ensure
+;;   :config
+;;   (all-the-icons-ivy-rich-mode 1)
+;;   (setq all-the-icons-ivy-rich-icon-size 0.8))
 ;; Automatically guess indent offsets, tab, spaces settings, etc.
 (use-package dtrt-indent
   :ensure)
@@ -551,8 +531,8 @@ point reaches the beginning or end of the buffer, stop there."
 ;; ;; Enable autocompletion by default in programming buffers
 ;;(add-hook 'prog-mode-hook #'corfu-mode)
 
-(use-package jsonrpc
-  :ensure)
+;;(use-package jsonrpc
+;;  :ensure)
 
 (use-package copilot
   :ensure
@@ -577,10 +557,6 @@ point reaches the beginning or end of the buffer, stop there."
   "\\.patch[0-9]*\\'"
   )
 
-()
-
-
-
 
 ;; (use-package make-mode
 ;;   :ensure
@@ -601,7 +577,7 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package rtags
   :ensure
   )
-(require 'subr-x) ; Workaround
+;;(require 'subr-x) ; Workaround
 (use-package cmake-ide
   :ensure
   :after rtags
@@ -609,21 +585,19 @@ point reaches the beginning or end of the buffer, stop there."
   (require 'rtags)
   (cmake-ide-setup))
 
-
-
 (use-package modern-cpp-font-lock
   :ensure
   :hook c++-mode-hook
   )
+
 (use-package google-c-style
-  :ensure
-  )
+  :ensure  )
 
 (setq-default c-basic-offset 4)
 
 (add-hook 'c-mode-common-hook
           (lambda ()
-            (company-mode)
+            ;;(company-mode)
             (make-local-variable 'standard-indent)
             (setq standard-indent 4)))
 
@@ -644,10 +618,23 @@ point reaches the beginning or end of the buffer, stop there."
           ("~/.emacs.d" . 1)))
   )
 
+(use-package magit-lfs
+  :ensure
+  :after magit)
+(use-package magit-todos
+  :ensure
+  :after magit
+  :config (magit-todos-mode 1))
+
+(use-package deadgrep
+  :ensure)
 
 (use-package dash
   :ensure)
 
+(use-package docker
+  :ensure
+  :bind ("C-c d" . docker))
 
 (use-package markdown-mode
   :ensure
@@ -666,16 +653,11 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package highlight-indentation
   :ensure)
 
-;;(use-package sphinx-mode
-;;  :ensure
-;; )
-;;(use-package sphinx-doc
-;;  :ensure)
-
 (use-package terraform-mode
   :ensure)
 
-
+(use-package lsp-java
+  :ensure)
 
 ;; lsp-mode
 (use-package lsp-mode
@@ -778,7 +760,7 @@ point reaches the beginning or end of the buffer, stop there."
   :ensure
   :defines dap-python-executable
   :functions dap-hydra/nil
-  :diminish
+  ;; :diminish
   :after (lsp-mode)
   :functions dap-hydra/nil
   :custom
@@ -817,17 +799,12 @@ point reaches the beginning or end of the buffer, stop there."
   ;;        ("M-9" . lsp-treemacs-errors-list))
   )
 
-(use-package diminish
-
-  :ensure)
-
-
 (use-package company
   :ensure
   :config
-  ;; No delay in showing suggestions.
-(setq company-idle-delay 0.1
-      company-minimum-prefix-length 2
+
+(setq company-idle-delay 0.5
+      company-minimum-prefix-length 3
       company-selection-wrap-around t
       company-tooltip-align-annotations t
       company-tooltip-annotation-padding 1
@@ -838,14 +815,13 @@ point reaches the beginning or end of the buffer, stop there."
       (add-hook 'after-init-hook 'global-company-mode)
       )
 
-(diminish 'company-mode)
-
-
 (use-package flycheck
   :ensure
-  :init (global-flycheck-mode))
+  :config
+  (global-flycheck-mode)
+  (add-hook 'after-init-hook #'global-flycheck-mode)
+  )
 
-(diminish 'flycheck-mode)
 
 (use-package dockerfile-mode
   :ensure
@@ -908,13 +884,9 @@ point reaches the beginning or end of the buffer, stop there."
   (json-snatcher)
   )
 
-;;(load "setup-jupyter")
 (use-package nix-mode
   :ensure
   :mode "\\.nix\\'")
-
-;;(load "setup-powershell")
-
 
 (use-package python
   :ensure
