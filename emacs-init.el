@@ -152,7 +152,10 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key (kbd "C-a") 'smarter-move-beginning-of-line)
 (global-set-key (kbd "s-<left>") 'smarter-move-beginning-of-line)
 (xterm-mouse-mode 1)
-(set-frame-font "Source Code Pro 12")
+
+;; (setq default-frame-alist '((font . "Source Code Pro 12")))
+(add-to-list 'default-frame-alist '(font . "Source Code Pro 12"))
+;; (set-frame-font "Source Code Pro 12")
 (defalias 'yes-or-no #'y-or-n-p)
 (setq confirm-kill-emacs #'yes-or-no-p)
 (delete-selection-mode t)
