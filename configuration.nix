@@ -12,6 +12,7 @@
 {
   imports = [
     ./personal-devenv.nix
+    ./pentest-reverse-engineer.nix
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     _1password-shell-plugins.nixosModules.default

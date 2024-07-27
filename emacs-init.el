@@ -308,7 +308,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 ;; Show dashboard with emacsclient
 ;(setq initial-buffer-choice (lambda () (get-buffer-create dashboard-buffer-name)))
-
+;;(setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
 
 (use-package direnv
   :ensure
@@ -531,8 +531,8 @@ point reaches the beginning or end of the buffer, stop there."
 ;; ;; Enable autocompletion by default in programming buffers
 ;;(add-hook 'prog-mode-hook #'corfu-mode)
 
-;;(use-package jsonrpc
-;;  :ensure)
+(use-package jsonrpc
+  :ensure)
 
 (use-package copilot
   :ensure

@@ -70,7 +70,7 @@
           '';
           statix = pkgs.runCommand "statix" { buildInputs = [ pkgs.statix ]; } ''
             set -euo pipefail
-            static check ${./.}
+            statix check ${./.}
             mkdir $out
           '';
 
