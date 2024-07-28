@@ -1,28 +1,19 @@
 ;;; package -- Init  -*- lexical-binding: t; -*-
 ;;; Commentary:
 
-;; Bootstrap config
+;; Default configs
 
 ;;; Code:
 
 ;; Produce backtraces when errors occur: can be helpful to diagnose startup issues
-(setq debug-on-error t)
-;; TODO: https://emacs-lsp.github.io/lsp-mode/page/performance/#use-plists-for-deserialization
+;;(setq debug-on-error t)
+
 ;; Custom file location
 (setq custom-file (locate-user-emacs-file "custom.el"))
 (when (file-readable-p custom-file)
   (load custom-file))
-;;(defconst custom-file (expand-file-name "custom.el" user-emacs-directory))
-;; (unless (file-exists-p custom-file)
-;;   (write-region "" nil custom-file))
-;; (load custom-file t)
 
-;;(defconst *spell-check-support-enabled* nil) ;; Enable with t if you prefer
-;;(defconst *is-a-mac* (eq system-type 'darwin))
-
-;; https://emacs-lsp.github.io/lsp-mode/page/performance
-
-;; Adjust garbage collection threshold for early startup (see use of gcmh below)
+;; Adjust garbage collection threshold for early startup
 (setq gc-cons-threshold (* 128 1024 1024))
 ;; Process performance tuning
 (setq read-process-output-max (* 4 1024 1024))
@@ -32,16 +23,13 @@
 ;;   (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "NIX_SSL_CERT_FILE" "NIX_PATH"))
 ;;     (add-to-list 'exec-path-from-shell-variables var)))
 
+(setq
+ read-file-name-completion-ignore-case t
+ read-buffer-completion-ignore-case t
+ completion-ignore-case t)
 
-;; (when (or (memq window-system '(mac ns x pgtk))
-;;           (unless (memq system-type '(ms-dos windows-nt))
-;;             (daemonp)))
-;;   (exec-path-from-shell-initialize))
+(setq-default c-basic-offset 4)
 
-
-;;; setup-exec-path.el ends here
-
-;;(setq jit-lock-defer-time 0)
 ;; Smoother and nicer scrolling
 (setq
  scroll-margin 0
@@ -49,25 +37,30 @@
  next-line-add-newlines nil
  scroll-conservatively 10000
  scroll-preserve-screen-position 1)
+
 (setq mouse-wheel-follow-mouse 't)
+
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+
 ;; Don't bother with auto save and backups.
 (setq auto-save-default nil)
+
 (setq make-backup-files nil)
+
 ;; Warn only when opening files bigger than 100MB
 (setq large-file-warning-threshold 100000000)
+
 ;; Move file to trash instead of removing.
 (setq-default delete-by-moving-to-trash t)
-;; Resizing the Emacs frame can be a terribly expensive part of changing the
-;; font. By inhibiting this, we easily halve startup times with fonts that are
-;; larger than the system default.
-;;(setq frame-inhibit-implied-resize t)
 
 ;; highlight the current line
 (global-hl-line-mode t)
+
 (setq-default cursor-type 'bar)
+
 ;; always highlight code
 (global-font-lock-mode 1)
+
 ;; refresh a buffer if changed on disk
 (global-auto-revert-mode t)
 (prefer-coding-system 'utf-8)
@@ -78,7 +71,9 @@
 (set-file-name-coding-system 'utf-8)
 (set-clipboard-coding-system 'utf-8)
 (set-buffer-file-coding-system 'utf-8)
+
 (setq require-final-newline t)
+
 (setq
  default-directory "~/"
  ;; always follow symlinks when opening files
@@ -102,33 +97,40 @@
  use-short-answers t
  backup-directory-alist '(("." . "~/MyEmacsBackups"))
  tab-width 4)
+
 (setq-default dired-listing-switches "-alh")
 ;; Remove extra UI clutter by hiding the scrollbar, menubar, and toolbar.
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+
 ;; Automatically insert closing parens
 (electric-pair-mode t)
+
 ;; Visualize matching parens
 (show-paren-mode 1)
+
 (setq ring-bell-function (lambda () ()))
-;; This is rather radical, but saves from a lot of pain in the ass.
-;; When split is automatic, always split windows vertically
-;;(setq split-height-threshold 0)
-;;(setq split-width-threshold nil)
 
 ;; Automatically save your place in files
 (save-place-mode t)
+
 ;; Save history in minibuffer to keep recent commands easily accessible
 (savehist-mode t)
+
 ;; Keep track of open files
 (recentf-mode t)
+
 ;; Keep files up-to-date when they change outside Emacs
 (global-auto-revert-mode t)
+
 ;; Display line numbers only when in programming modes
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
 ;; Delete trailing spaces and add new line in the end of a file on save.
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; Smarter move beginning of the line
 (defun smarter-move-beginning-of-line (arg)
   "Move point back to indentation of beginning of line.
 
@@ -151,55 +153,62 @@ point reaches the beginning or end of the buffer, stop there."
       (move-beginning-of-line 1))))
 (global-set-key (kbd "C-a") 'smarter-move-beginning-of-line)
 (global-set-key (kbd "s-<left>") 'smarter-move-beginning-of-line)
+
+;; Enable mouse in terminal
 (xterm-mouse-mode 1)
 
-;; (setq default-frame-alist '((font . "Source Code Pro 12")))
+;; Set font
 (add-to-list 'default-frame-alist '(font . "Source Code Pro 12"))
-;; (set-frame-font "Source Code Pro 12")
+
 (defalias 'yes-or-no #'y-or-n-p)
 (setq confirm-kill-emacs #'yes-or-no-p)
+
 (delete-selection-mode t)
+
 ;; Remove trailing whitespace in files
 (autoload 'nuke-trailing-whitespace "whitespace" nil t)
-;; PACKAGES
-(use-package
- dashboard
- :ensure
- :config
- (dashboard-setup-startup-hook)
- (setq ns-right-alternate-modifier 'none)
- (setq dashboard-items
-       '((recents . 5) (projects . 20) (bookmarks . 5)))
- (setq dashboard-navigation-cycle t)
- (setq dashboard-banner-logo-title "Teretulemast!")
- (setq dashboard-startup-banner 'logo)
- (setq dashboard-icon-type 'all-the-icons)
- ; use `all-the-icons' package
- (setq dashboard-projects-backend 'projectile))
-;; Move-text lines around with meta-up/down.
-(use-package move-text :ensure :config (move-text-default-bindings))
+
+;; Define super modifier key. This is sometimes neededn but it's not defined
+(define-key function-key-map (kbd "M-]") 'event-apply-super-modifier)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;; Mac specific stuff ;;
+;;;;;;;;;;;;;;;;;;;;;;;;
+(when (eq system-type 'darwin)
+  ;; both command keys are 'Super'
+  (setq mac-right-command-modifier 'super)
+  (setq mac-command-modifier 'super)
+
+  ;; Option or Alt is naturally 'Meta'
+  (setq mac-option-modifier 'meta)
+
+
+  ;; Right Alt (option) can be used to enter symbols like em dashes '—' and euros '€' and stuff.
+  (setq mac-right-option-modifier 'nil)
+  ;; Enable transparent title bar on macOS
+  (when (memq window-system '(mac ns))
+    (add-to-list 'default-frame-alist '(ns-appearance . light)) ;; {light, dark}
+    (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
+  )
+
+
+;;;;;;;;;;;;;;
+;; PACKAGES ;;
+;;;;;;;;;;;;;;
 (require 'treesit)
+
+;; Move current line or region by olding Meta-Up and Meta-Down
+(use-package move-text :ensure :config (move-text-default-bindings))
+
+
 ;; TODO: This has been integrated with emacs, possibly released with emacs 30
 (use-package which-key :ensure :config (which-key-mode))
-(setq
- read-file-name-completion-ignore-case t
- read-buffer-completion-ignore-case t
- completion-ignore-case t)
+
+
+;; Move between windows with numbers C-x w <num>
 (use-package winum :ensure :config (winum-mode))
-(define-key function-key-map (kbd "M-]") 'event-apply-super-modifier)
-;; both command keys are 'Super'
-;;(setq mac-right-command-modifier 'super)
-;;(setq mac-command-modifier 'super)
 
-;; Option or Alt is naturally 'Meta'
-;;(setq mac-option-modifier 'meta)
-
-
-;; Right Alt (option) can be used to enter symbols like em dashes '—' and euros '€' and stuff.
-;;(setq mac-right-option-modifier 'nil)
-
-
-;;(setq max-lisp-eval-depth 10000)
 
 ;; Minibuffer completion is essential to your Emacs workflow and
 ;; Vertico is currently one of the best out there. There's a lot to
@@ -216,6 +225,7 @@ point reaches the beginning or end of the buffer, stop there."
  (read-file-name-completion-ignore-case t)
  ;;(completion-styles '(basic substring partial-completion flex))
  :init (vertico-mode))
+
 (use-package
  orderless
  :ensure
@@ -227,6 +237,8 @@ point reaches the beginning or end of the buffer, stop there."
  (completion-category-defaults nil)
  (completion-category-overrides
   '((file (styles partial-completion)))))
+
+
 ;; Improve the accessibility of Emacs documentation by placing
 ;; descriptions directly in your minibuffer. Give it a try:
 ;; "M-x find-file".
@@ -235,6 +247,8 @@ point reaches the beginning or end of the buffer, stop there."
  :after vertico
  :ensure
  :init (marginalia-mode))
+
+
 ;; Adds intellisense-style code completion at point that works great
 ;; Add extra context to Emacs documentation to help make it easier to
 ;; search and understand. This configuration uses the keybindings
@@ -252,27 +266,12 @@ point reaches the beginning or end of the buffer, stop there."
   ("C-c C-d" . #'helpful-at-point)
   ("C-h F" . #'helpful-function)
   ("C-h C" . #'helpful-command)))
-;; Projectile
-(use-package
- projectile
- :ensure
- :init (require 'bind-key) (projectile-mode +1)
- :bind
- (:map
-  projectile-mode-map
-  ("s-p" . projectile-command-map)
-  ("C-c p" . projectile-command-map))
- :config
- ;;(setq projectile-completion-system 'ivy)
- (when (require 'magit nil t)
-   (mapc
-    #'projectile-add-known-project
-    (mapcar #'file-name-as-directory (magit-list-repos)))
-   ;; Optionally write to persistent `projectile-known-projects-file'
-   (projectile-save-known-projects)))
-(use-package projectile-ripgrep :ensure :after projectile)
+
+
 (use-package direnv :ensure :config (direnv-mode))
+
 (use-package org :ensure)
+
 ;; Extended completion utilities
 (use-package
  consult
@@ -292,33 +291,11 @@ point reaches the beginning or end of the buffer, stop there."
                 (unless buffer-file-name
                   (let ((buffer-file-name (buffer-name)))
                     (set-auto-mode)))))
-;; Enable transparent title bar on macOS
-;; (when (memq window-system '(mac ns))
-;;   (add-to-list 'default-frame-alist '(ns-appearance . light)) ;; {light, dark}
-;;   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
+
 (use-package all-the-icons :ensure)
 (use-package all-the-icons-dired :ensure)
 (use-package treemacs-all-the-icons :ensure)
-;(use-package doom-themes
-;  :ensure
-;  :config
-;  (load-theme 'doom-solarized-light t)
-;  (load-theme 'doom-solarized-dark t)
 
-;(setq doom-themes-treemacs-theme "doom-colors")
-;(doom-themes-treemacs-config)
-;;(enable-theme 'doom-solarized-light)
-; (enable-theme 'doom-solarized-dark)
-; )
-
-;;(if (display-graphic-p)
-;;(enable-theme 'doom-solarized-light)
-;;    (enable-theme 'doom-solarized-light)
-;;  (enable-theme 'doom-solarized-dark))
-
-(use-package elisp-autofmt :ensure)
-;;(use-package solarized-theme
-;;  :ensure)
 (use-package
  leuven-theme
  :ensure
@@ -327,8 +304,11 @@ point reaches the beginning or end of the buffer, stop there."
  (load-theme 'leuven-dark t)
  ;;(enable-theme 'leuven-theme)
  )
+
 (use-package ace-link :ensure :config (ace-link-setup-default))
+
 (use-package solaire-mode :ensure :config (solaire-global-mode +1))
+
 ;; Treemacs
 (use-package
  treemacs
@@ -338,13 +318,11 @@ point reaches the beginning or end of the buffer, stop there."
  :init
  (with-eval-after-load 'winum
    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
- :config (define-key treemacs-mode-map [drag-mouse-1] nil)
+ :config
+ ;;(define-key treemacs-mode-map [drag-mouse-1] nil)
  (progn
    (setq
-    treemacs-collapse-dirs
-    (if treemacs-python-executable
-        3
-      0)
+    treemacs-collapse-dirs (if treemacs-python-executable 3 0)
     treemacs-deferred-git-apply-delay 0.5
     treemacs-directory-name-transformer #'identity
     treemacs-display-in-side-window t
@@ -421,38 +399,34 @@ point reaches the beginning or end of the buffer, stop there."
   ("C-x t B" . treemacs-bookmark)
   ("C-x t C-t" . treemacs-find-file)
   ("C-x t M-t" . treemacs-find-tag)))
+
 (use-package
  treemacs-icons-dired
  :hook (dired-mode . treemacs-icons-dired-enable-once)
  :ensure)
+
 (use-package treemacs-magit :after (treemacs magit) :ensure)
-(use-package treemacs-projectile :ensure :after (treemacs projectile))
+
 ;; Automatically guess indent offsets, tab, spaces settings, etc.
 (use-package dtrt-indent :ensure)
-;; ;; Enable autocompletion by default in programming buffers
-;;(add-hook 'prog-mode-hook #'corfu-mode)
-
-
-;; (use-package copilot
-;;   :ensure
-;;   :config
-;;   (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-;; (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
-;;   )
 
 ;;; Indication of local VCS changes
 (use-package
  diff-hl
  :ensure
  :config (add-hook 'prog-mode-hook #'diff-hl-mode))
+
 (use-package diff-mode :ensure nil :mode "\\.patch[0-9]*\\'")
+
 (use-package cmake-font-lock :ensure)
+
 (use-package
  cmake-mode
  :ensure
  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
+
 (use-package rtags :ensure)
-;;(require 'subr-x) ; Workaround
+
 (use-package
  cmake-ide
  :ensure
@@ -460,15 +434,10 @@ point reaches the beginning or end of the buffer, stop there."
  :init
  (require 'rtags)
  (cmake-ide-setup))
-(use-package modern-cpp-font-lock :ensure :hook c++-mode-hook)
-(use-package google-c-style :ensure)
-(setq-default c-basic-offset 4)
-;; (add-hook 'c-mode-common-hook
-;;           (lambda ()
-;;             ;;(company-mode)
-;;             (make-local-variable 'standard-indent)
-;;             (setq standard-indent 4)))
 
+(use-package modern-cpp-font-lock :ensure :hook c++-mode-hook)
+
+(use-package google-c-style :ensure)
 
 ;; An extremely feature-rich git client. Activate it with "C-c g".
 (use-package
@@ -484,20 +453,31 @@ point reaches the beginning or end of the buffer, stop there."
          ("~/Developer" . 2)
          ;; Specific project root directory
          ("~/nixos-config" . 1))))
+
 (use-package magit-lfs :ensure :after magit)
+
 (use-package
  magit-todos
  :ensure
  :after magit
  :config (magit-todos-mode 1))
+
 (use-package deadgrep :ensure)
+
 (use-package dash :ensure)
+
 (use-package docker :ensure :bind ("C-c d" . docker))
+
 (use-package markdown-mode :ensure :after dash)
+
 (use-package markdown-toc :ensure :after markdown-mode)
+
 (use-package yaml-mode :ensure)
+
 (use-package highlight-indentation :ensure)
-(use-package terraform-mode :ensure)
+
+;;(use-package terraform-mode :ensure)
+
 (use-package
  company
  :ensure
@@ -523,111 +503,45 @@ point reaches the beginning or end of the buffer, stop there."
  (c-mode . eglot-ensure)
  (c++-mode . eglot-ensure)
  (nix-mode . eglot-ensure))
-;; (use-package flycheck
-;;   :ensure
-;;   :config
-;;   (global-flycheck-mode)
-;;   (add-hook 'after-init-hook #'global-flycheck-mode)
-;;   )
+
 (use-package flymake :ensure)
-;; (use-package flymake-shellcheck
-;;   :ensure)
-;; (use-package flymake-shell
-;;   :ensure)
-;; (use-package flymake-nasm
-;;   :ensure)
-;; (use-package flymake-json
-;;   :ensure)
-;; (use-package flymake-hadolint
-;;   :ensure)
-;; (use-package flymake-go
-;;   :ensure)
-;; (use-package flymake-eslint
-;;   :ensure)
-;; (use-package flymake-css
-;;   :ensure)
+
 (use-package dockerfile-mode :ensure)
+
 (use-package docker-compose-mode :ensure)
 ;; EditorConfig
 (use-package editorconfig :ensure :config (editorconfig-mode 1))
+
 (use-package editorconfig-generate :ensure)
+
 (use-package editorconfig-domain-specific :ensure)
+
 (use-package editorconfig-custom-majormode :ensure)
+
 (use-package gitlab-ci-mode :ensure)
+
 (use-package
  go-mode
  :ensure
-
-
  :bind (:map go-mode-map ("C-c C-f" . 'gofmt))
  ;:hook (before-save . gofmt-before-save)
  :config (add-hook 'go-mode-hook #'yas-minor-mode))
-(require 'pp)
+
 (use-package json-snatcher :ensure)
+
 (use-package
  json-mode
  :ensure
  :mode "\\.json\\'"
  :after (json-snatcher))
+
 (use-package nix-mode :ensure :mode "\\.nix\\'")
-;; (use-package python
-;;   :ensure
-;;   :after
-;;   (highlight-indentation)
-;;   :init
-;;   (progn
-;;     (add-hook 'python-mode-hook 'highlight-indentation-mode)
-;;     ;; (add-hook 'python-mode-hook 'eldoc-mode)
-;;     ;;    (add-hook 'python-mode-hook 'sphinx-doc-mode))
-;;     )
-;;   :bind (:map python-mode-map
-;; 	      (
-;;                ("C-c i" . python-insert-docstring-with-google-style-at-point)
-;;                ))
-;;   :config
 
-;;   (when (executable-find "ipython")
-;;     (setq
-;;      python-shell-interpreter "ipython"
-;;      python-shell-interpreter-args ""
-;;      python-shell-prompt-regexp "In \\[[0-9]+\\]: "
-;;      python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
-;;      python-shell-completion-setup-code
-;;      "from IPython.core.completerlib import module_completion"
-;;      python-shell-completion-string-code
-;;      "';'.join(module_completion('''%s'''))\n"
-;;      python-shell-completion-string-code
-;;      "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
-;;   )
 (use-package ruff-format :ensure)
-;; (use-package lsp-pyright
-;;   :ensure
-;;   :after lsp-mode
 
-
-;;   :custom
-;;   (lsp-pyright-auto-import-completions nil)
-;;   (lsp-pyright-typechecking-mode "off")
-;;   (lsp-pyright-python-executable-cmd "python3")
-
-;;   )
 (use-package
  yasnippet
  :ensure
  :config (yas-reload-all) (add-hook 'prog-mode-hook #'yas-minor-mode))
+
 (use-package yasnippet-snippets :ensure :after (yasnippet))
-;; (use-package tree-sitter
-;;   :ensure
-;;   ;;:ensure-system-package tree-sitter
-;;   :init
-;;   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
-;;   :config
-;;   (global-tree-sitter-mode)
-;;   )
-
-
-;; (use-package tree-sitter-langs
-;;   :ensure)
-
-
-;;; init.el ends here
