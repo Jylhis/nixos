@@ -201,6 +201,18 @@ point reaches the beginning or end of the buffer, stop there."
 ;; Move current line or region by olding Meta-Up and Meta-Down
 (use-package move-text :ensure :config (move-text-default-bindings))
 
+;; Highlight comments
+  (use-package hl-todo
+    :hook (prog-mode . hl-todo-mode)
+    :config
+    (setq hl-todo-highlight-punctuation ":"
+          hl-todo-keyword-faces
+          `(("TODO"       warning bold)
+            ("FIXME"      error bold)
+            ("HACK"       font-lock-constant-face bold)
+            ("REVIEW"     font-lock-keyword-face bold)
+            ("NOTE"       success bold)
+            ("DEPRECATED" font-lock-doc-face bold))))
 
 ;; TODO: This has been integrated with emacs, possibly released with emacs 30
 (use-package which-key :ensure :config (which-key-mode))
