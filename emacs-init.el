@@ -291,7 +291,11 @@ point reaches the beginning or end of the buffer, stop there."
   (setq org-tag-alist '(
 			("@work" . ?w)
 			("@home" . ?h)
-			)))
+			))
+	(setq org-directory "~/Org"))
+(setq org-default-notes-file (concat org-directory "/notes.org")
+      (setq org-link-descriptive t)
+  )
 
 ;; Extended completion utilities
 (use-package
