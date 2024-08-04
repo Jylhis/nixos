@@ -282,7 +282,16 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package direnv :ensure :config (direnv-mode))
 
-(use-package org :ensure)
+(use-package org :ensure
+  :bind
+  (("C-c l" . #'org-store-link)
+   ("C-c a" . #'org-agenda)
+   ("C-c c" . #'org-capture))
+  :config
+  (setq org-tag-alist '(
+			("@work" . ?w)
+			("@home" . ?h)
+			)))
 
 ;; Extended completion utilities
 (use-package
@@ -494,6 +503,8 @@ point reaches the beginning or end of the buffer, stop there."
  company
  :ensure
  :bind ("M-m" . company-complete)
+ :init (add-hook 'after-init-hook 'global-company-mode)
+ ;;:hook (prog-mode . company-mode)
  :config
  (setq
   company-idle-delay 0.2
@@ -506,7 +517,8 @@ point reaches the beginning or end of the buffer, stop there."
   company-dabbrev-other-buffers t
   company-dabbrev-ignore-case t
   company-text-face-extra-attributes '(:weight bold :slant italic))
- (add-hook 'after-init-hook 'global-company-mode))
+ )
+
 (use-package
  eglot
  :ensure

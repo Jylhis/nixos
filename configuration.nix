@@ -79,6 +79,13 @@
     udev.extraRules = ''
       ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
     '';
+
+    syncthing = {
+      enable = true;
+      user = "markus";
+      dataDir = "/home/markus/syncthing";
+      configDir = "/home/markus/.local/state/syncthing";
+    };
     xserver = {
       enable = true;
 
@@ -162,6 +169,9 @@
     systemPackages =
       with pkgs;
       [
+        pandoc
+        synology-drive-client
+        syncthing
         bash-completion
         nix-ld
         vim
