@@ -56,11 +56,18 @@
     // flake-utils.lib.eachDefaultSystem (
       system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+
+        pkgs = (nixpkgs.legacyPackages.${system}.extend emacs-overlay.overlay);
         unstable = nixpkgs-unstable.legacyPackages.${system};
       in
       {
-        #          nixpkgs.overlays = [(import self.inputs.emacs-overlay)];
+
+        packages.emacs-ide = pkgs.callPackage ./emacs-ide.nix {
+          inherit (pkgs) emacsWithPackagesFromUsePackage;
+          inherit (pkgs.nodePackages) eslint jsdoc;
+          inherit (pkgs.python3Packages) python-lsp-server;
+          emacs = pkgs.emacs-unstable;
+        };
         formatter = unstable.nixfmt-rfc-style;
         checks = {
           deadnix = pkgs.runCommand "lint" { buildInputs = [ pkgs.deadnix ]; } ''
