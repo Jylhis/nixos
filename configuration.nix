@@ -79,7 +79,9 @@
     udev.extraRules = ''
       ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
     '';
-
+    udev.packages = [
+      pkgs.gnome.gnome-settings-daemon
+    ];
     syncthing = {
       enable = true;
       user = "markus";
@@ -169,6 +171,7 @@
     systemPackages =
       with pkgs;
       [
+
         pandoc
         synology-drive-client
         syncthing
@@ -191,7 +194,10 @@
         pciutils
         solaar
       ]
-      ++ (with pkgs.gnomeExtensions; [ solaar-extension ]);
+      ++ (with pkgs.gnomeExtensions; [
+        solaar-extension
+        appindicator
+      ]);
   };
 
   hardware.logitech.wireless.enable = true;
