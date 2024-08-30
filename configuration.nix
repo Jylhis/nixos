@@ -75,6 +75,7 @@
   i18n.defaultLocale = "en_US.UTF-8";
   console.useXkbConfig = true;
   services = {
+    tailscale.enable = true;
     hardware.bolt.enable = true;
     udev.extraRules = ''
       ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
@@ -171,7 +172,8 @@
     systemPackages =
       with pkgs;
       [
-
+        tailscale
+        vivaldi
         pandoc
         synology-drive-client
         syncthing
@@ -216,7 +218,6 @@
     ];
     packages = with pkgs; [
       spotify
-      alacritty
       signal-desktop
       nixd
       gopls

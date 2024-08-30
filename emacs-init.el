@@ -296,7 +296,9 @@ point reaches the beginning or end of the buffer, stop there."
 	(setq org-directory "~/Org")
 (setq org-default-notes-file (concat org-directory "/notes.org"))
       (setq org-link-descriptive t)
-  
+
+(use-package web-mode
+  :ensure)
 
 ;; Extended completion utilities
 (use-package
