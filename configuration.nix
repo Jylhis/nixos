@@ -172,6 +172,7 @@
     systemPackages =
       with pkgs;
       [
+        planify
         tailscale
         vivaldi
         pandoc
@@ -241,11 +242,11 @@
       enable = true;
       # the specified packages as well as 1Password CLI will be
       # automatically installed and configured to use shell plugins
-      plugins = with pkgs; [
-        glab
-        cachix
-        nodePackages.vercel
-      ];
+      # plugins = with pkgs; [
+      #   glab
+      #   cachix
+      #   nodePackages.vercel
+      # ];
     };
     # Install firefox.
     firefox.enable = true;
