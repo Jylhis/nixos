@@ -300,6 +300,11 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package web-mode
   :ensure)
 
+(use-package vala-mode
+  :ensure)
+
+(use-package flymake-vala
+  :ensure)
 ;; Extended completion utilities
 (use-package
  consult

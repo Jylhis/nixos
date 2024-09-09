@@ -30,6 +30,8 @@
   stylelint,
   yamllint,
   nasm,
+  vala,
+  vala-lint,
   asm-lsp,
   cmake,
   gnumake,
@@ -89,6 +91,10 @@
         statix
         nixd
         nixfmt-rfc-style
+
+        # vala
+        vala
+        vala-lint
 
         # SQL
         sqls
