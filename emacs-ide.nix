@@ -85,8 +85,6 @@
         godef
         delve
 
-        # Elisp/lisp
-
         # Nix
         statix
         nixd

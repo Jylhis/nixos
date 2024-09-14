@@ -39,13 +39,24 @@
   nix.settings.trusted-public-keys = [
     "cache.soopy.moe-1:0RZVsQeR+GOh0VQI9rvnHz55nVXkFardDqfm4+afjPo="
   ];
+
+  # Multimonitor
+  # systemd.tmpfiles.rules =
+  #   let
+  #     # cp ~/.config/monitors.xml .
+  #     monitorsXmlContent = builtins.readFile ./monitors.xml;
+  #     monitorsConfig = pkgs.writeText "gdm_monitors.xml" monitorsXmlContent;
+  #   in
+  #   [
+  #     "L+ /run/gdm/.config/monitors.xml - - - - ${monitorsConfig}"
+  #   ];
   # Bootloader.
   boot = {
     loader.systemd-boot.enable = true;
+    loader.systemd-boot.configurationLimit = 5;
     loader.efi.canTouchEfiVariables = true;
     plymouth.enable = true;
     plymouth.theme = "breeze";
-    #loader.grub.configurationLimit = 5;
     extraModprobeConfig = ''
       options snd-hda-intel model=intel-mac-auto
     '';
@@ -60,6 +71,9 @@
       "rd.udev.log_level=3"
       "udev.log_priority=3"
     ];
+    # Hide the OS choice for bootloaders.
+    # It's still possible to open the bootloader list by pressing any key
+    # It will just not appear on screen unless a key is pressed
     #loader.timeout = 0;
   };
 
@@ -84,7 +98,7 @@
       pkgs.gnome.gnome-settings-daemon
     ];
     syncthing = {
-      enable = true;
+      enable = false;
       user = "markus";
       dataDir = "/home/markus/syncthing";
       configDir = "/home/markus/.local/state/syncthing";
@@ -101,16 +115,10 @@
           sources=[('xkb', 'us'), ('xkb', 'fi')]
           xkb-options=['ctrl:swapcaps','terminate:ctrl_alt_bksp', 'lv3:ralt_switch']
 
-          [org.gnome.shell]
-          favorite-apps=['firefox.desktop', 'org.gnome.Console.desktop', 'emacsclient.desktop', 'spotify.desktop', '1password.desktop', 'org.gnome.Nautilus.desktop']
-
           [org.gnome.desktop.interface]
           gtk-theme='org.gnome.desktop.interface'
           color-scheme='prefer-dark'
         '';
-        #extraGSettingsOverridePackages = [
-        #  pkgs.gsettings-desktop-schemas
-        #];
       };
       videoDrivers = [ "intel" ];
       # Configure keymap in X11
@@ -122,7 +130,15 @@
     };
 
     # Enable CUPS to print documents.
-    printing.enable = true;
+    printing = {
+      enable = true;
+      drivers = [ pkgs.gutenprint ];
+    };
+    avahi = {
+      enable = true;
+      nssmdns4 = true;
+      openFirewall = true;
+    };
 
     pipewire = {
       enable = true;
@@ -172,14 +188,28 @@
     systemPackages =
       with pkgs;
       [
-        planify
-        tailscale
-        vivaldi
-        pandoc
-        synology-drive-client
-        syncthing
+        # CLI
+        starship
         bash-completion
-        nix-ld
+        pandoc
+        tailscale
+
+        # Dev stuff
+        direnv
+        nix-direnv
+        docker
+        k9s
+        gnumake
+        git
+
+        # GUI Apps
+        planify
+        vlc
+        synology-drive-client
+        solaar
+        gnome.gnome-tweaks
+
+        # Utils
         vim
         eza
         delta
@@ -187,15 +217,14 @@
         duf
         fd
         zoxide
-        glances
+        btop
         curlie
         lsof
         jq
         sd
-        gnumake
-        git
+
+        nix-ld
         pciutils
-        solaar
       ]
       ++ (with pkgs.gnomeExtensions; [
         solaar-extension
@@ -250,6 +279,8 @@
     };
     # Install firefox.
     firefox.enable = true;
+    java.enable = true;
+    starship.enable = true;
   };
 
   # Allow unfree packages
