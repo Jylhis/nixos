@@ -19,39 +19,64 @@
     _1password-shell-plugins.nixosModules.default
   ];
 
-  nix.gc = {
-    automatic = true;
-    options = "--delete-older-than 14d";
-    randomizedDelaySec = "14m";
+  nix = {
+
+    gc = {
+      automatic = true;
+      options = "--delete-older-than 14d";
+      randomizedDelaySec = "14m";
+    };
+    optimise.automatic = true;
+
+    settings = {
+      auto-optimise-store = true;
+      keep-outputs = true;
+      experimental-features = [
+        "nix-command"
+        "flakes"
+        "repl-flake"
+      ];
+      trusted-users = [
+        "root"
+        "markus"
+      ];
+
+      accept-flake-config = true;
+      extra-substituters = [
+        "https://cache.soopy.moe"
+      ];
+      extra-trusted-public-keys = [
+        "cache.soopy.moe-1:0RZVsQeR+GOh0VQI9rvnHz55nVXkFardDqfm4+afjPo="
+      ];
+      extra-trusted-substituters = [
+        "https://cache.soopy.moe"
+      ];
+    };
   };
 
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-    "repl-flake"
-  ];
-  nix.settings.trusted-users = [
-    "root"
-    "markus"
-  ];
+  # Disable the GNOME3/GDM auto-suspend feature that cannot be disabled in GUI!
+  # If no user is logged in, the machine will power down after 20 minutes.
+  systemd = {
+    services.NetworkManager-wait-online.enable = false;
+    targets.sleep.enable = false;
+    targets.suspend.enable = false;
+    targets.hibernate.enable = false;
+    targets.hybrid-sleep.enable = false;
+    # Multimonitor
+    tmpfiles.rules =
+      let
+        # cp ~/.config/monitors.xml .
+        monitorsXmlContent = builtins.readFile ./monitors.xml;
+        monitorsConfig = pkgs.writeText "gdm_monitors.xml" monitorsXmlContent;
+      in
+      [
+        "L+ /run/gdm/.config/monitors.xml - - - - ${monitorsConfig}"
+      ];
+  };
 
-  nix.settings.trusted-substituters = [ "https://cache.soopy.moe" ];
-  nix.settings.trusted-public-keys = [
-    "cache.soopy.moe-1:0RZVsQeR+GOh0VQI9rvnHz55nVXkFardDqfm4+afjPo="
-  ];
-
-  # Multimonitor
-  # systemd.tmpfiles.rules =
-  #   let
-  #     # cp ~/.config/monitors.xml .
-  #     monitorsXmlContent = builtins.readFile ./monitors.xml;
-  #     monitorsConfig = pkgs.writeText "gdm_monitors.xml" monitorsXmlContent;
-  #   in
-  #   [
-  #     "L+ /run/gdm/.config/monitors.xml - - - - ${monitorsConfig}"
-  #   ];
   # Bootloader.
   boot = {
+    # binfmt.emulatedSystems =["aarch64-linux"];
     loader.systemd-boot.enable = true;
     loader.systemd-boot.configurationLimit = 5;
     loader.efi.canTouchEfiVariables = true;
@@ -60,6 +85,15 @@
     extraModprobeConfig = ''
       options snd-hda-intel model=intel-mac-auto
     '';
+    kernel.sysctl = {
+      "vm.swappiness" = 1;
+      # https://wiki.archlinux.org/title/Sysctl#Virtual_memory
+      "vm.dirty_background_bytes" = 4194304;
+      "vm.dirty_bytes" = 4194304;
+    };
+    initrd.systemd.enable = true;
+
+    # Enable "Silent Boot"
     initrd.verbose = false;
     consoleLogLevel = 0;
     kernelParams = [
@@ -89,6 +123,7 @@
   i18n.defaultLocale = "en_US.UTF-8";
   console.useXkbConfig = true;
   services = {
+    fstrim.enable = true;
     tailscale.enable = true;
     hardware.bolt.enable = true;
     udev.extraRules = ''
@@ -97,12 +132,7 @@
     udev.packages = [
       pkgs.gnome.gnome-settings-daemon
     ];
-    syncthing = {
-      enable = false;
-      user = "markus";
-      dataDir = "/home/markus/syncthing";
-      configDir = "/home/markus/.local/state/syncthing";
-    };
+
     xserver = {
       enable = true;
 
@@ -188,48 +218,57 @@
     systemPackages =
       with pkgs;
       [
-        # CLI
-        starship
         bash-completion
-        pandoc
-        tailscale
-
-        # Dev stuff
-        direnv
-        nix-direnv
-        docker
-        k9s
-        gnumake
-        git
-
-        # GUI Apps
-        planify
-        vlc
-        synology-drive-client
-        solaar
-        gnome.gnome-tweaks
-
-        # Utils
-        vim
-        eza
-        delta
-        dust
-        duf
-        fd
-        zoxide
         btop
+        cloud-utils
         curlie
-        lsof
+        delta
+        devenv
+        direnv
+        docker
+        duf
+        dust
+        eza
+        fd
+        gimp
+        git
+        git-lfs
+        glances
+        gnome.gnome-tweaks
+        gnumake
+        htop
+        iotop
         jq
-        sd
-
+        k9s
+        kubectl
+        lsof
+        nix-direnv
         nix-ld
+        nvidia-docker
+        openssl
+        pandoc
         pciutils
+        planify
+        python3Packages.mlflow
+        sd
+        slack
+        solaar
+        sshpass
+        starship
+        tailscale
+        vim
+        vlc
+        yq
+        zoxide
       ]
       ++ (with pkgs.gnomeExtensions; [
         solaar-extension
         appindicator
       ]);
+  };
+  hardware.opengl = {
+    enable = true;
+    driSupport32Bit = true;
   };
 
   hardware.logitech.wireless.enable = true;
@@ -279,7 +318,12 @@
     };
     # Install firefox.
     firefox.enable = true;
+    chromium.enable = true;
     java.enable = true;
+    direnv.enable = true;
+    ccache.enable = true;
+    git.lfs.enable = true;
+    appimage.enable = true;
     starship.enable = true;
   };
 

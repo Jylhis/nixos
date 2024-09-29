@@ -1,4 +1,4 @@
-;;; package -- Init  -*- lexical-binding: t; -*-
+;;; Personal configuration  -*- lexical-binding: t; -*-
 ;;; Commentary:
 
 ;; Default configs
@@ -8,9 +8,9 @@
 ;; Produce backtraces when errors occur: can be helpful to diagnose startup issues
 ;;(setq debug-on-error t)
 
-;; Custom file location
+;; Store automatic customisation options elsewhere
 (setq custom-file (locate-user-emacs-file "custom.el"))
-(when (file-readable-p custom-file)
+(when (file-exists-p custom-file)
   (load custom-file))
 
 ;; Adjust garbage collection threshold for early startup
@@ -158,7 +158,8 @@ point reaches the beginning or end of the buffer, stop there."
 (xterm-mouse-mode 1)
 
 ;; Set font
-(add-to-list 'default-frame-alist '(font . "Source Code Pro 12"))
+(set-face-attribute 'default nil :font "Source Code Pro 12")
+;;(add-to-list 'default-frame-alist '(font . "Source Code Pro 12"))
 
 (defalias 'yes-or-no #'y-or-n-p)
 (setq confirm-kill-emacs #'yes-or-no-p)
@@ -192,6 +193,7 @@ point reaches the beginning or end of the buffer, stop there."
     (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
   )
 
+(setq frame-resize-pixelwise t)
 
 ;;;;;;;;;;;;;;
 ;; PACKAGES ;;
@@ -235,8 +237,11 @@ point reaches the beginning or end of the buffer, stop there."
  (vertico-cycle t)
  (read-buffer-completion-ignore-case t)
  (read-file-name-completion-ignore-case t)
+ (define-key vertico-map (kbd "RET") #'vertico-directory-enter)
+  (define-key vertico-map (kbd "DEL") #'vertico-directory-delete-word)
+  (define-key vertico-map (kbd "M-d") #'vertico-directory-delete-char)
  ;;(completion-styles '(basic substring partial-completion flex))
- :init (vertico-mode))
+ :init (vertico-mode t))
 
 (use-package
  orderless
@@ -317,10 +322,11 @@ point reaches the beginning or end of the buffer, stop there."
   read-buffer-completion-ignore-case t
   read-file-name-completion-ignore-case t
   completion-ignore-case t))
+
+
 ;; Miscellaneous options
-(setq-default major-mode8
-              (lambda ()
-                ; guess major mode from file name
+(setq-default major-mode
+              (lambda () ; guess major mode from file name
                 (unless buffer-file-name
                   (let ((buffer-file-name (buffer-name)))
                     (set-auto-mode)))))
@@ -341,6 +347,8 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package ace-link :ensure :config (ace-link-setup-default))
 
 (use-package solaire-mode :ensure :config (solaire-global-mode +1))
+
+(setq window-resize-pixelwise t)
 
 ;; Treemacs
 (use-package
@@ -509,28 +517,60 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package highlight-indentation :ensure)
 
-;;(use-package terraform-mode :ensure)
+;; (use-package
+;;  company
+;;  :ensure
+;;  :bind ("M-m" . company-complete)
+;;  :init (add-hook 'after-init-hook 'global-company-mode)
+;;  ;;:hook (prog-mode . company-mode)
+;;  :config
+;;  (setq
+;;   company-idle-delay 0.2
+;;   company-minimum-prefix-length 3
+;;   company-selection-wrap-around t
+;;   company-tooltip-align-annotations t
+;;   company-tooltip-annotation-padding 1
+;;   company-tooltip-flip-when-above t
+;;   company-dabbrev-code-other-buffers t
+;;   company-dabbrev-other-buffers t
+;;   company-dabbrev-ignore-case t
+;;   company-text-face-extra-attributes '(:weight bold :slant italic))
+;;  )
 
-(use-package
- company
- :ensure
- :bind ("M-m" . company-complete)
- :init (add-hook 'after-init-hook 'global-company-mode)
- ;;:hook (prog-mode . company-mode)
- :config
- (setq
-  company-idle-delay 0.2
-  company-minimum-prefix-length 3
-  company-selection-wrap-around t
-  company-tooltip-align-annotations t
-  company-tooltip-annotation-padding 1
-  company-tooltip-flip-when-above t
-  company-dabbrev-code-other-buffers t
-  company-dabbrev-other-buffers t
-  company-dabbrev-ignore-case t
-  company-text-face-extra-attributes '(:weight bold :slant italic))
- )
 
+;;; Pop-up completion
+(use-package corfu
+  :ensure
+  :custom
+  (corfu-cycle t)
+  (corfu-auto t)
+  :init
+  (global-corfu-mode))
+
+;; Add extensions
+(use-package cape
+  :ensure
+  ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
+  ;; Press C-c p ? to for help.
+  :bind ("C-c p" . cape-prefix-map) ;; Alternative keys: M-p, M-+, ...
+  ;; Alternatively bind Cape commands individually.
+  ;; :bind (("C-c p d" . cape-dabbrev)
+  ;;        ("C-c p h" . cape-history)
+  ;;        ("C-c p f" . cape-file)
+  ;;        ...)
+  :init
+  ;; Add to the global default value of `completion-at-point-functions' which is
+  ;; used by `completion-at-point'.  The order of the functions matters, the
+  ;; first function returning a result wins.  Note that the list of buffer-local
+  ;; completion functions takes precedence over the global list.
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  ;; (add-hook 'completion-at-point-functions #'cape-history)
+  ;; ...
+)
+
+;;; LSP Support
 (use-package
  eglot
  :ensure
@@ -538,9 +578,19 @@ point reaches the beginning or end of the buffer, stop there."
  (python-mode . eglot-ensure)
  (c-mode . eglot-ensure)
  (c++-mode . eglot-ensure)
- (nix-mode . eglot-ensure))
+ (nix-mode . eglot-ensure)
+ :init
+ (add-hook 'prog-mode-hook #'eglot-ensure)
+ )
 
-(use-package flymake :ensure)
+;; Display messages when idle, without prompting
+(setq help-at-pt-display-when-idle t)
+
+;; Enabled inline static analysis
+(use-package flymake :ensure
+  :init
+  (add-hook 'prog-mode-hook #'flymake-mode)
+  )
 
 (use-package dockerfile-mode :ensure)
 
@@ -555,6 +605,12 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package editorconfig-custom-majormode :ensure)
 
 (use-package gitlab-ci-mode :ensure)
+
+(use-package avy
+:ensure
+:config
+(global-set-key (kbd "C-c z") #'avy-goto-word-1)
+(setq avy-all-windows 'all-frames))
 
 (use-package
  go-mode
