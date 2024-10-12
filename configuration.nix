@@ -63,15 +63,15 @@
     targets.hibernate.enable = false;
     targets.hybrid-sleep.enable = false;
     # Multimonitor
-    tmpfiles.rules =
-      let
-        # cp ~/.config/monitors.xml .
-        monitorsXmlContent = builtins.readFile ./monitors.xml;
-        monitorsConfig = pkgs.writeText "gdm_monitors.xml" monitorsXmlContent;
-      in
-      [
-        "L+ /run/gdm/.config/monitors.xml - - - - ${monitorsConfig}"
-      ];
+    # tmpfiles.rules =
+    #   let
+    #     # cp ~/.config/monitors.xml .
+    #     monitorsXmlContent = builtins.readFile ./monitors.xml;
+    #     monitorsConfig = pkgs.writeText "gdm_monitors.xml" monitorsXmlContent;
+    #   in
+    #   [
+    #     "L+ /run/gdm/.config/monitors.xml - - - - ${monitorsConfig}"
+    #   ];
   };
 
   # Bootloader.
