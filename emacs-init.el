@@ -23,6 +23,14 @@
 ;;   (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "NIX_SSL_CERT_FILE" "NIX_PATH"))
 ;;     (add-to-list 'exec-path-from-shell-variables var)))
 
+(use-package emacs
+  :custom
+  ;; Hide commands in M-x which do not work in the current mode.  Vertico
+  ;; commands are hidden in normal buffers. This setting is useful beyond
+  ;; Vertico.
+  (read-extended-command-predicate #'command-completion-default-include-p)
+  )
+
 (setq
  read-file-name-completion-ignore-case t
  read-buffer-completion-ignore-case t
@@ -116,7 +124,11 @@
 (save-place-mode t)
 
 ;; Save history in minibuffer to keep recent commands easily accessible
-(savehist-mode t)
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
+  :init
+  (savehist-mode))
+
 
 ;; Keep track of open files
 (recentf-mode t)
@@ -241,29 +253,82 @@ point reaches the beginning or end of the buffer, stop there."
   (define-key vertico-map (kbd "DEL") #'vertico-directory-delete-word)
   (define-key vertico-map (kbd "M-d") #'vertico-directory-delete-char)
  ;;(completion-styles '(basic substring partial-completion flex))
- :init (vertico-mode t))
+ :init (vertico-mode))
+
+;; Use `consult-completion-in-region' if Vertico is enabled.
+;; Otherwise use the default `completion--in-region' function.
+(setq completion-in-region-function
+      (lambda (&rest args)
+        (apply (if vertico-mode
+                   #'consult-completion-in-region
+                 #'completion--in-region)
+               args)))
 
 (use-package
  orderless
  :ensure
+ :config
+ (defun +orderless--consult-suffix ()
+    "Regexp which matches the end of string with Consult tofu support."
+    (if (and (boundp 'consult--tofu-char) (boundp 'consult--tofu-range))
+        (format "[%c-%c]*$"
+                consult--tofu-char
+                (+ consult--tofu-char consult--tofu-range -1))
+      "$"))
+
+  ;; Recognizes the following patterns:
+  ;; * .ext (file extension)
+  ;; * regexp$ (regexp matching at end)
+  (defun +orderless-consult-dispatch (word _index _total)
+    (cond
+     ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
+     ((string-suffix-p "$" word)
+      `(orderless-regexp . ,(concat (substring word 0 -1) (+orderless--consult-suffix))))
+     ;; File extensions
+     ((and (or minibuffer-completing-file-name
+               (derived-mode-p 'eshell-mode))
+           (string-match-p "\\`\\.." word))
+      `(orderless-regexp . ,(concat "\\." (substring word 1) (+orderless--consult-suffix))))))
+
+  ;; Define orderless style with initialism by default
+  (orderless-define-completion-style +orderless-with-initialism
+    (orderless-matching-styles '(orderless-initialism orderless-literal orderless-regexp)))
+
+
+
+  ;; Certain dynamic completion tables (completion-table-dynamic) do not work
+  ;; properly with orderless. One can add basic as a fallback.  Basic will only
+  ;; be used when orderless fails, which happens only for these special
+  ;; tables. Also note that you may want to configure special styles for special
+  ;; completion categories, e.g., partial-completion for files.
+  (setq completion-styles '(substring orderless basic)
+        completion-category-defaults nil
+        ;;; Enable partial-completion for files.
+        ;;; Either give orderless precedence or partial-completion.
+        ;;; Note that completion-category-overrides is not really an override,
+        ;;; but rather prepended to the default completion-styles.
+        ;; completion-category-overrides '((file (styles orderless partial-completion))) ;; orderless is tried first
+        completion-category-overrides '((file (styles partial-completion)) ;; partial-completion is tried first
+                                        ;; enable initialism by default for symbols
+                                        (command (styles +orderless-with-initialism))
+                                        (variable (styles +orderless-with-initialism))
+                                        (symbol (styles +orderless-with-initialism))
+					(eglot (styles orderless))
+                                      (eglot-capf (styles orderless)))
+        orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
+        orderless-style-dispatchers (list #'+orderless-consult-dispatch
+                                          #'orderless-affix-dispatch))
  :custom
  ;; Configure a custom style dispatcher (see the Consult wiki)
  ;; (orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch))
  ;; (orderless-component-separator #'orderless-escapable-split-on-space)
- (completion-styles '(substring orderless basic))
- (completion-category-defaults nil)
- (completion-category-overrides
-  '((file (styles partial-completion)))))
+ ;(completion-styles '(substring orderless basic))
+ ;(completion-category-defaults nil)
+; (completion-category-overrides
+ ; '((file (styles partial-completion))))
+)
 
 
-;; Improve the accessibility of Emacs documentation by placing
-;; descriptions directly in your minibuffer. Give it a try:
-;; "M-x find-file".
-(use-package
- marginalia
- :after vertico
- :ensure
- :init (marginalia-mode))
 
 
 ;; Adds intellisense-style code completion at point that works great
@@ -310,7 +375,9 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package flymake-vala
   :ensure)
+
 ;; Extended completion utilities
+;; https://github.com/minad/consult?tab=readme-ov-file#use-package-example
 (use-package
  consult
  :ensure
@@ -323,6 +390,51 @@ point reaches the beginning or end of the buffer, stop there."
   read-file-name-completion-ignore-case t
   completion-ignore-case t))
 
+
+;; Improve the accessibility of Emacs documentation by placing
+;; descriptions directly in your minibuffer. Give it a try:
+;; "M-x find-file".
+(use-package
+ marginalia
+ :after vertico
+ :ensure
+ :init (marginalia-mode))
+
+(use-package embark
+  :ensure t
+
+  :bind
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+  :init
+
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+  ;; Show the Embark target at point via Eldoc. You may adjust the
+  ;; Eldoc strategy, if you want to see the documentation from
+  ;; multiple providers. Beware that using this can be a little
+  ;; jarring since the message shown in the minibuffer can be more
+  ;; than one line, causing the modeline to move up and down:
+
+  ;; (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
+  ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
+
+  :config
+
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+;; Consult users will also want the embark-consult package.
+(use-package embark-consult
+  :ensure t ; only need to install it, embark loads it after consult if found
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
 
 ;; Miscellaneous options
 (setq-default major-mode
@@ -339,9 +451,8 @@ point reaches the beginning or end of the buffer, stop there."
  leuven-theme
  :ensure
  :config
- ;;(load-theme 'leuven-theme t)
- (load-theme 'leuven-dark t)
- ;;(enable-theme 'leuven-theme)
+ (load-theme 'leuven-theme t)
+ ;;(load-theme 'leuven-dark t)
  )
 
 (use-package ace-link :ensure :config (ace-link-setup-default))
@@ -468,13 +579,13 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package rtags :ensure)
 
-(use-package
- cmake-ide
- :ensure
- :after rtags
- :init
- (require 'rtags)
- (cmake-ide-setup))
+;; (use-package
+;;  cmake-ide
+;;  :ensure
+;;  :after rtags
+;;  :init
+;;  (require 'rtags)
+;;  (cmake-ide-setup))
 
 (use-package modern-cpp-font-lock :ensure :hook c++-mode-hook)
 
@@ -569,6 +680,8 @@ point reaches the beginning or end of the buffer, stop there."
   ;; (add-hook 'completion-at-point-functions #'cape-history)
   ;; ...
 )
+
+(advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
 ;;; LSP Support
 (use-package
