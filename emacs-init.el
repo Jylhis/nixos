@@ -125,9 +125,8 @@
 
 ;; Save history in minibuffer to keep recent commands easily accessible
 ;; Persist history over Emacs restarts. Vertico sorts by history position.
-(use-package savehist
-  :init
-  (savehist-mode))
+
+  (savehist-mode)
 
 
 ;; Keep track of open files
@@ -318,7 +317,7 @@ point reaches the beginning or end of the buffer, stop there."
         orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
         orderless-style-dispatchers (list #'+orderless-consult-dispatch
                                           #'orderless-affix-dispatch))
- :custom
+ ;;:custom
  ;; Configure a custom style dispatcher (see the Consult wiki)
  ;; (orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch))
  ;; (orderless-component-separator #'orderless-escapable-split-on-space)
@@ -451,7 +450,7 @@ point reaches the beginning or end of the buffer, stop there."
  leuven-theme
  :ensure
  :config
- (load-theme 'leuven-theme t)
+ (load-theme 'leuven t)
  ;;(load-theme 'leuven-dark t)
  )
 
