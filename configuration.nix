@@ -215,9 +215,11 @@
 
     # List packages installed in system profile. To search, run:
     # $ nix search wget
+    # NOTE: Install packages system wide
     systemPackages =
       with pkgs;
       [
+        unzip
         bash-completion
         btop
         cloud-utils
@@ -295,6 +297,23 @@
       source-code-pro
       asm-lsp
       ansible-language-server
+    ];
+  };
+
+  users.users.sara = {
+    isNormalUser = true;
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "docker"
+    ];
+    packages = with pkgs; [
+      spotify
+      signal-desktop
+      microsoft-edge
+      vscode
+      affine
+
     ];
   };
 
