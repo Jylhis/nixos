@@ -1,9 +1,10 @@
+ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 build:
-	nixos-rebuild --flake /etc/nixos build
+	nixos-rebuild --flake $(ROOT_DIR) build
 
 switch:
-	nixos-rebuild --flake /etc/nixos --use-remote-sudo switch
+	nixos-rebuild --flake $(ROOT_DIR) --use-remote-sudo switch
 
 clean:
 	nix store gc; nix-collect-garbage -d ; nix store optimise
