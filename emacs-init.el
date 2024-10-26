@@ -28,7 +28,8 @@
   ;; Hide commands in M-x which do not work in the current mode.  Vertico
   ;; commands are hidden in normal buffers. This setting is useful beyond
   ;; Vertico.
-  (read-extended-command-predicate #'command-completion-default-include-p)
+  (read-extended-command-predicate
+   #'command-completion-default-include-p)
   )
 
 (setq
@@ -216,7 +217,8 @@ point reaches the beginning or end of the buffer, stop there."
 
 ;; Highlight comments
   (use-package hl-todo
-    :hook (prog-mode . hl-todo-mode)
+    :hook
+    (prog-mode . hl-todo-mode)
     :config
     (setq hl-todo-highlight-punctuation ":"
           hl-todo-keyword-faces
@@ -269,7 +271,9 @@ point reaches the beginning or end of the buffer, stop there."
  :config
  (defun +orderless--consult-suffix ()
     "Regexp which matches the end of string with Consult tofu support."
-    (if (and (boundp 'consult--tofu-char) (boundp 'consult--tofu-range))
+    (if
+	(and (boundp 'consult--tofu-char)
+	     (boundp 'consult--tofu-range))
         (format "[%c-%c]*$"
                 consult--tofu-char
                 (+ consult--tofu-char consult--tofu-range -1))
@@ -282,16 +286,20 @@ point reaches the beginning or end of the buffer, stop there."
     (cond
      ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
      ((string-suffix-p "$" word)
-      `(orderless-regexp . ,(concat (substring word 0 -1) (+orderless--consult-suffix))))
+      `(orderless-regexp
+	. ,(concat (substring word 0 -1) (+orderless--consult-suffix))))
      ;; File extensions
      ((and (or minibuffer-completing-file-name
                (derived-mode-p 'eshell-mode))
            (string-match-p "\\`\\.." word))
-      `(orderless-regexp . ,(concat "\\." (substring word 1) (+orderless--consult-suffix))))))
+      `(orderless-regexp
+	. ,(concat "\\." (substring word 1)
+		   (+orderless--consult-suffix))))))
 
   ;; Define orderless style with initialism by default
   (orderless-define-completion-style +orderless-with-initialism
-    (orderless-matching-styles '(orderless-initialism orderless-literal orderless-regexp)))
+    (orderless-matching-styles
+     '(orderless-initialism orderless-literal orderless-regexp)))
 
 
 
@@ -307,15 +315,24 @@ point reaches the beginning or end of the buffer, stop there."
         ;;; Note that completion-category-overrides is not really an override,
         ;;; but rather prepended to the default completion-styles.
         ;; completion-category-overrides '((file (styles orderless partial-completion))) ;; orderless is tried first
-        completion-category-overrides '((file (styles partial-completion)) ;; partial-completion is tried first
+        completion-category-overrides
+	'((file (styles partial-completion)) ;; partial-completion is tried first
                                         ;; enable initialism by default for symbols
-                                        (command (styles +orderless-with-initialism))
-                                        (variable (styles +orderless-with-initialism))
-                                        (symbol (styles +orderless-with-initialism))
+                                        (command
+					 (styles
+					  +orderless-with-initialism))
+                                        (variable
+					 (styles
+					  +orderless-with-initialism))
+                                        (symbol
+					 (styles
+					  +orderless-with-initialism))
 					(eglot (styles orderless))
                                       (eglot-capf (styles orderless)))
-        orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
-        orderless-style-dispatchers (list #'+orderless-consult-dispatch
+        orderless-component-separator
+	#'orderless-escapable-split-on-space ;; allow escaping space with backslash!
+        orderless-style-dispatchers (list
+				     #'+orderless-consult-dispatch
                                           #'orderless-affix-dispatch))
  ;;:custom
  ;; Configure a custom style dispatcher (see the Consult wiki)
@@ -380,7 +397,7 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package
  consult
  :ensure
-   ;; Enable automatic preview at point in the *Completions* buffer. This is
+ ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
  :hook (completion-list-mode . consult-preview-at-point-mode)
 :bind (;; C-c bindings in `mode-specific-map'
@@ -434,7 +451,8 @@ point reaches the beginning or end of the buffer, stop there."
          ;; Minibuffer history
          :map minibuffer-local-map
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+         ("M-r" . consult-history))
+;; orig. previous-matching-history-element
 
  :config
  ;; Optionally configure preview. The default value
@@ -477,17 +495,20 @@ point reaches the beginning or end of the buffer, stop there."
 ;; "M-x find-file".
 (use-package
  marginalia
- :after vertico
+ :after
+ vertico
  :ensure
  :init (marginalia-mode))
 
 (use-package embark
-  :ensure t
+  :ensure
+  t
 
   :bind
   (("C-." . embark-act)         ;; pick some comfortable binding
    ("C-;" . embark-dwim)        ;; good alternative: M-.
-   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+   ("C-h B" . embark-bindings))
+  ;; alternative for `describe-bindings'
 
   :init
 
@@ -513,7 +534,8 @@ point reaches the beginning or end of the buffer, stop there."
 
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
-  :ensure t ; only need to install it, embark loads it after consult if found
+  :ensure
+  t ; only need to install it, embark loads it after consult if found
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
@@ -580,7 +602,8 @@ point reaches the beginning or end of the buffer, stop there."
     treemacs-no-png-images nil
     treemacs-no-delete-other-windows t
     treemacs-project-follow-cleanup nil
-    treemacs-persist-file (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+    treemacs-persist-file
+    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
     treemacs-position 'left
     treemacs-read-string-input 'from-child-frame
     treemacs-recenter-distance 0.1
@@ -635,7 +658,8 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package
  treemacs-icons-dired
- :hook (dired-mode . treemacs-icons-dired-enable-once)
+ :hook
+ (dired-mode . treemacs-icons-dired-enable-once)
  :ensure)
 
 (use-package treemacs-magit :after (treemacs magit) :ensure)
