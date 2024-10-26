@@ -2,7 +2,7 @@
 ;;; Commentary:
 
 ;; Default configs
-
+;; TODO: https://justinbarclay.ca/posts/from-zero-to-ide-with-emacs-and-lsp/
 ;;; Code:
 
 ;; Produce backtraces when errors occur: can be helpful to diagnose startup issues
@@ -24,6 +24,13 @@
 ;;     (add-to-list 'exec-path-from-shell-variables var)))
 
 (use-package emacs
+  :init
+
+  (tool-bar-mode -1)
+  (when scroll-bar-mode
+    (scroll-bar-mode -1))
+  (menu-bar-mode -1)
+  (set-face-attribute 'default nil :font "Source Code Pro 12")
   :custom
   ;; Hide commands in M-x which do not work in the current mode.  Vertico
   ;; commands are hidden in normal buffers. This setting is useful beyond
@@ -48,6 +55,7 @@
  scroll-preserve-screen-position 1)
 
 (setq mouse-wheel-follow-mouse 't)
+(setq column-number-mode t)
 
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 
@@ -108,10 +116,6 @@
  tab-width 4)
 
 (setq-default dired-listing-switches "-alh")
-;; Remove extra UI clutter by hiding the scrollbar, menubar, and toolbar.
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
 
 ;; Automatically insert closing parens
 (electric-pair-mode t)
@@ -169,8 +173,8 @@ point reaches the beginning or end of the buffer, stop there."
 ;; Enable mouse in terminal
 (xterm-mouse-mode 1)
 
-;; Set font
-(set-face-attribute 'default nil :font "Source Code Pro 12")
+
+
 ;;(add-to-list 'default-frame-alist '(font . "Source Code Pro 12"))
 
 (defalias 'yes-or-no #'y-or-n-p)
@@ -210,7 +214,19 @@ point reaches the beginning or end of the buffer, stop there."
 ;;;;;;;;;;;;;;
 ;; PACKAGES ;;
 ;;;;;;;;;;;;;;
-(require 'treesit)
+(use-package treesit
+  :ensure nil
+  :custom
+  (treesit-font-lock-level 4)
+  (major-mode-remap-alist '((c-mode    . c-ts-mode)
+                            (c++-mode  . c++-ts-mode)
+                            (go-mode   . go-ts-mode)
+                            (html-mode . html-ts-mde)
+                            (bash-mode . bash-ts-mode)
+                            (python-mode . python-ts-mode)
+                            ))
+  )
+
 
 ;; Move current line or region by olding Meta-Up and Meta-Down
 (use-package move-text :ensure :config (move-text-default-bindings))
@@ -389,8 +405,6 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package vala-mode
   :ensure)
 
-(use-package flymake-vala
-  :ensure)
 
 ;; Extended completion utilities
 ;; https://github.com/minad/consult?tab=readme-ov-file#use-package-example
@@ -691,7 +705,7 @@ point reaches the beginning or end of the buffer, stop there."
 ;;  :init
 ;;  (require 'rtags)
 ;;  (cmake-ide-setup))
-
+;; TODO: https://github.com/redguardtoo/cpputils-cmake
 (use-package modern-cpp-font-lock :ensure :hook c++-mode-hook)
 
 (use-package google-c-style :ensure)
@@ -789,26 +803,46 @@ point reaches the beginning or end of the buffer, stop there."
 (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
 ;;; LSP Support
-(use-package
- eglot
+(use-package eglot
  :ensure
- :hook
- (python-mode . eglot-ensure)
- (c-mode . eglot-ensure)
- (c++-mode . eglot-ensure)
- (nix-mode . eglot-ensure)
- :init
- (add-hook 'prog-mode-hook #'eglot-ensure)
- )
+ :hook (prog-mode . eglot-ensure)
+;; :init
+;; (add-hook 'prog-mode-hook #'eglot-ensure)
+)
+
+(use-package eldoc
+  :init
+  (global-eldoc-mode))
 
 ;; Display messages when idle, without prompting
 (setq help-at-pt-display-when-idle t)
 
 ;; Enabled inline static analysis
-(use-package flymake :ensure
+(use-package flymake
+  :ensure
   :init
-  (add-hook 'prog-mode-hook #'flymake-mode)
+  :hook (prog-mode . flymake-mode)
   )
+
+
+(use-package flymake-vala
+  :ensure)
+(use-package flymake-shellcheck
+  :ensure
+  :commands flymake-shellcheck-load
+  :init
+  (add-hook 'sh-mode-hook 'flymake-shellcheck-load))
+
+
+(use-package flymake-ruff
+  :ensure t
+  :hook (eglot-managed-mode . flymake-ruff-load))
+
+
+;; https://github.com/ROCKTAKEY/flymake-elisp-config
+(use-package flymake-elisp-config
+  :ensure)
+
 
 (use-package dockerfile-mode :ensure)
 
