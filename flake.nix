@@ -28,8 +28,12 @@
     extra-substituters = [
       # "https://hydra.soopy.moe"
       "https://cache.soopy.moe" # toggle these if this one doesn't work.
+      "https://devenv.cachix.org"
     ];
-    extra-trusted-public-keys = [ "hydra.soopy.moe:IZ/bZ1XO3IfGtq66g+C85fxU/61tgXLaJ2MlcGGXU8Q=" ];
+    extra-trusted-public-keys = [
+      "hydra.soopy.moe:IZ/bZ1XO3IfGtq66g+C85fxU/61tgXLaJ2MlcGGXU8Q="
+      "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
+    ];
     auto-optimise-store = true;
     fallback = true;
     keep-going = true;
@@ -43,6 +47,7 @@
       emacs-overlay,
       nixos-hardware,
       self,
+
       ...
     }@attrs:
     {

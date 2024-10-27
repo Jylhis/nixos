@@ -229,7 +229,10 @@ point reaches the beginning or end of the buffer, stop there."
 
 
 ;; Move current line or region by olding Meta-Up and Meta-Down
-(use-package move-text :ensure :config (move-text-default-bindings))
+(use-package move-text
+  :ensure
+  :init
+  (move-text-default-bindings))
 
 ;; Highlight comments
   (use-package hl-todo
@@ -798,7 +801,7 @@ point reaches the beginning or end of the buffer, stop there."
   (add-hook 'completion-at-point-functions #'cape-elisp-block)
   ;; (add-hook 'completion-at-point-functions #'cape-history)
   ;; ...
-)
+  )
 
 (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
@@ -889,3 +892,7 @@ point reaches the beginning or end of the buffer, stop there."
  :config (yas-reload-all) (add-hook 'prog-mode-hook #'yas-minor-mode))
 
 (use-package yasnippet-snippets :ensure :after (yasnippet))
+
+;; Local Variables:
+;; bute-compile-warnings: (not free-vars)
+;; End:
