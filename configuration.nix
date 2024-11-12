@@ -105,10 +105,7 @@
       "rd.udev.log_level=3"
       "udev.log_priority=3"
     ];
-    # Hide the OS choice for bootloaders.
-    # It's still possible to open the bootloader list by pressing any key
-    # It will just not appear on screen unless a key is pressed
-    #loader.timeout = 0;
+    loader.timeout = 5;
   };
 
   networking = {
@@ -347,7 +344,10 @@
   };
 
   # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config = {
+    allowUnfree = true;
+    warnUndeclaredOptions = true;
+  };
   nixpkgs.overlays = [ emacs-overlay.overlay ];
   # This value determines the NixOS release from which the default
   # settings for stateful data,like file locations and database versions
