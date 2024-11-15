@@ -556,6 +556,14 @@ point reaches the beginning or end of the buffer, stop there."
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
+
+(use-package consult-eglot
+  :ensure)
+
+(use-package consult-eglot-embark
+  :ensure)
+
+
 ;; Miscellaneous options
 (setq-default major-mode
               (lambda () ; guess major mode from file name
