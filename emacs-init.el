@@ -30,7 +30,7 @@
   (when scroll-bar-mode
     (scroll-bar-mode -1))
   (menu-bar-mode -1)
-  (set-face-attribute 'default nil :font "Source Code Pro 12")
+  ;;(set-face-attribute 'default nil :font "Source Code Pro 12")
   :custom
   ;; Hide commands in M-x which do not work in the current mode.  Vertico
   ;; commands are hidden in normal buffers. This setting is useful beyond
@@ -175,7 +175,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 
 
-;;(add-to-list 'default-frame-alist '(font . "Source Code Pro 12"))
+(add-to-list 'default-frame-alist '(font . "Source Code Pro 12"))
 
 (defalias 'yes-or-no #'y-or-n-p)
 (setq confirm-kill-emacs #'yes-or-no-p)
@@ -224,6 +224,7 @@ point reaches the beginning or end of the buffer, stop there."
                             (html-mode . html-ts-mde)
                             (bash-mode . bash-ts-mode)
                             (python-mode . python-ts-mode)
+			    (typescript-mode . typescript-ts-mode)
                             ))
   )
 
@@ -561,6 +562,9 @@ point reaches the beginning or end of the buffer, stop there."
   :ensure)
 
 (use-package consult-eglot-embark
+  :ensure)
+
+(use-package typescript-mode
   :ensure)
 
 
