@@ -2,6 +2,7 @@
   lib,
   emacsWithPackagesFromUsePackage,
   emacs,
+  terraform-ls,
   clang-tools,
   gcc14,
   gdb,
