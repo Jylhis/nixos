@@ -142,6 +142,8 @@
         # Extra LSP, linters etc.
         marksman
 
+        terraform-ls
+
         # Emacs support packages
         emacs-all-the-icons-fonts
         source-code-pro

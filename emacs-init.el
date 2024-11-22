@@ -256,6 +256,8 @@ point reaches the beginning or end of the buffer, stop there."
 ;; Move between windows with numbers C-x w <num>
 (use-package winum :ensure :config (winum-mode))
 
+(use-package terraform-mode
+  :ensure)
 
 ;; Minibuffer completion is essential to your Emacs workflow and
 ;; Vertico is currently one of the best out there. There's a lot to
