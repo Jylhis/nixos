@@ -145,6 +145,9 @@
           [org.gnome.desktop.interface]
           gtk-theme='org.gnome.desktop.interface'
           color-scheme='prefer-dark'
+
+          [org.freedesktop.ibus.panel.emoji]
+          hotkey="[]"
         '';
       };
       videoDrivers = [ "intel" ];
@@ -216,6 +219,7 @@
     systemPackages =
       with pkgs;
       [
+        sniffnet
         unzip
         bash-completion
         btop

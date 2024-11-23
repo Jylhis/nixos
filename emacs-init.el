@@ -17,20 +17,15 @@
 (setq gc-cons-threshold (* 128 1024 1024))
 ;; Process performance tuning
 (setq read-process-output-max (* 4 1024 1024))
-;;(setq process-adaptive-read-buffering nil)
+
 (use-package exec-path-from-shell :ensure)
-;; (with-eval-after-load 'exec-path-from-shell
-;;   (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "NIX_SSL_CERT_FILE" "NIX_PATH"))
-;;     (add-to-list 'exec-path-from-shell-variables var)))
 
 (use-package emacs
   :init
-
   (tool-bar-mode -1)
   (when scroll-bar-mode
     (scroll-bar-mode -1))
   (menu-bar-mode -1)
-  ;;(set-face-attribute 'default nil :font "Source Code Pro 12")
   :custom
   ;; Hide commands in M-x which do not work in the current mode.  Vertico
   ;; commands are hidden in normal buffers. This setting is useful beyond
@@ -130,9 +125,7 @@
 
 ;; Save history in minibuffer to keep recent commands easily accessible
 ;; Persist history over Emacs restarts. Vertico sorts by history position.
-
-  (savehist-mode)
-
+(savehist-mode)
 
 ;; Keep track of open files
 (recentf-mode t)
@@ -522,16 +515,12 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package embark
   :ensure
-  t
-
   :bind
   (("C-." . embark-act)         ;; pick some comfortable binding
    ("C-;" . embark-dwim)        ;; good alternative: M-.
    ("C-h B" . embark-bindings))
   ;; alternative for `describe-bindings'
-
   :init
-
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
 
@@ -545,7 +534,6 @@ point reaches the beginning or end of the buffer, stop there."
   ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
 
   :config
-
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
@@ -554,8 +542,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
-  :ensure
-  t ; only need to install it, embark loads it after consult if found
+  :ensure ; only need to install it, embark loads it after consult if found
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
@@ -585,8 +572,8 @@ point reaches the beginning or end of the buffer, stop there."
  leuven-theme
  :ensure
  :config
- (load-theme 'leuven t)
- ;;(load-theme 'leuven-dark t)
+ ;;(load-theme 'leuven t)
+ (load-theme 'leuven-dark t)
  )
 
 (use-package ace-link :ensure :config (ace-link-setup-default))
@@ -739,8 +726,7 @@ point reaches the beginning or end of the buffer, stop there."
  (setq magit-repository-directories
        '( ;; Directory containing project root directories
          ("~/Developer" . 2)
-         ;; Specific project root directory
-         ("~/nixos-config" . 1))))
+	 )))
 
 (use-package magit-lfs :ensure :after magit)
 
@@ -763,27 +749,6 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package yaml-mode :ensure)
 
 (use-package highlight-indentation :ensure)
-
-;; (use-package
-;;  company
-;;  :ensure
-;;  :bind ("M-m" . company-complete)
-;;  :init (add-hook 'after-init-hook 'global-company-mode)
-;;  ;;:hook (prog-mode . company-mode)
-;;  :config
-;;  (setq
-;;   company-idle-delay 0.2
-;;   company-minimum-prefix-length 3
-;;   company-selection-wrap-around t
-;;   company-tooltip-align-annotations t
-;;   company-tooltip-annotation-padding 1
-;;   company-tooltip-flip-when-above t
-;;   company-dabbrev-code-other-buffers t
-;;   company-dabbrev-other-buffers t
-;;   company-dabbrev-ignore-case t
-;;   company-text-face-extra-attributes '(:weight bold :slant italic))
-;;  )
-
 
 ;;; Pop-up completion
 (use-package corfu
@@ -823,8 +788,6 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package eglot
  :ensure
  :hook (prog-mode . eglot-ensure)
-;; :init
-;; (add-hook 'prog-mode-hook #'eglot-ensure)
 )
 
 (use-package eldoc

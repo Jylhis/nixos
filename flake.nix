@@ -57,6 +57,9 @@
         specialArgs = attrs;
         modules = [
           ./configuration.nix
+          nixos-hardware.nixosModules.common-cpu-intel
+          nixos-hardware.nixosModules.common-pc
+          nixos-hardware.nixosModules.common-pc-ssd
           nixos-hardware.nixosModules.apple-t2
         ];
       };
@@ -74,7 +77,7 @@
           inherit (pkgs) emacsWithPackagesFromUsePackage;
           inherit (pkgs.nodePackages) eslint jsdoc;
           inherit (pkgs.python3Packages) python-lsp-server;
-          emacs = pkgs.emacs-unstable;
+          emacs = pkgs.emacs;
         };
         formatter = unstable.nixfmt-rfc-style;
         checks = {
