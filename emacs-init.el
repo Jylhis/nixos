@@ -4,6 +4,10 @@
 ;; Default configs
 ;; TODO: https://justinbarclay.ca/posts/from-zero-to-ide-with-emacs-and-lsp/
 ;;; Code:
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
+(add-to-list 'package-archives
+             '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 
 ;; Produce backtraces when errors occur: can be helpful to diagnose startup issues
 ;;(setq debug-on-error t)
@@ -869,6 +873,14 @@ point reaches the beginning or end of the buffer, stop there."
  :config (yas-reload-all) (add-hook 'prog-mode-hook #'yas-minor-mode))
 
 (use-package yasnippet-snippets :ensure :after (yasnippet))
+
+
+;; Schema
+
+(use-package paredit
+  :ensure)
+(use-package geiser :ensure)
+(use-package racket-mode :ensure)
 
 ;; Local Variables:
 ;; bute-compile-warnings: (not free-vars)
