@@ -1,6 +1,11 @@
 ;;; Personal configuration  -*- lexical-binding: t; -*-
 ;;; Commentary:
 
+;; Always load newest byte code
+(setq load-prefer-newer t)
+
+
+;(setq debug-on-error t)
 ;; Default configs
 ;; TODO: https://justinbarclay.ca/posts/from-zero-to-ide-with-emacs-and-lsp/
 ;;; Code:
@@ -8,9 +13,17 @@
 
 (add-to-list 'package-archives
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-
+(package-initialize)
 ;; Produce backtraces when errors occur: can be helpful to diagnose startup issues
-;;(setq debug-on-error t)
+
+;; (use-package benchmark-init
+;;   :ensure t
+;;   :config
+;;   ;; To disable collection of benchmark data after init is done.
+;;   (add-hook 'after-init-hook 'benchmark-init/deactivate))
+
+(add-to-list 'load-path "~/.emacs.d/lisp")
+
 
 ;; Store automatic customisation options elsewhere
 (setq custom-file (locate-user-emacs-file "custom.el"))
@@ -18,13 +31,14 @@
   (load custom-file))
 
 ;; Adjust garbage collection threshold for early startup
-(setq gc-cons-threshold (* 128 1024 1024))
+(setq gc-cons-threshold most-positive-fixnum)
 ;; Process performance tuning
 (setq read-process-output-max (* 4 1024 1024))
 
 (use-package exec-path-from-shell :ensure)
 
 (use-package emacs
+
   :init
   (tool-bar-mode -1)
   (when scroll-bar-mode
@@ -45,6 +59,19 @@
 
 (setq-default c-basic-offset 4)
 
+
+(use-package powershell
+  :ensure)
+
+
+(use-package centered-cursor-mode
+  :ensure
+  :config
+  ;; Optional, enables centered-cursor-mode in all buffers.
+  (global-centered-cursor-mode))
+
+
+
 ;; Smoother and nicer scrolling
 (setq
  scroll-margin 0
@@ -56,12 +83,8 @@
 (setq mouse-wheel-follow-mouse 't)
 (setq column-number-mode t)
 
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+;;(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 
-;; Don't bother with auto save and backups.
-(setq auto-save-default nil)
-
-(setq make-backup-files nil)
 
 ;; Warn only when opening files bigger than 100MB
 (setq large-file-warning-threshold 100000000)
@@ -102,17 +125,28 @@
  ;; hopefully all themes we install are safe
  custom-safe-themes t
  ;; simple lock/backup file management
- create-lockfiles nil
  backup-by-copying t
  delete-old-versions t
+ kept-new-versions 6
+ kept-old-versions 2
+ version-control t
  ;; when quiting emacs, just kill processes
  confirm-kill-processes nil
  ;; ask if local variables are safe once.
  enable-local-variables t
  ;; life is too short to type yes or no
  use-short-answers t
- backup-directory-alist '(("." . "~/MyEmacsBackups"))
  tab-width 4)
+
+(setq backup-directory-alist
+           `(("." . "~/.emacs-saves")))
+;;(setq auto-save-file-name-transforms   `((".*",(concat user-emacs-directory "auto-saves") t)))
+
+(defun my/diff-auto-save-file ()
+      "Get auto-save #file# difference with current buffer."
+      (interactive)
+      (diff (make-auto-save-file-name) (current-buffer) nil 'noasync))
+
 
 (setq-default dired-listing-switches "-alh")
 
@@ -172,7 +206,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 
 
-(add-to-list 'default-frame-alist '(font . "Source Code Pro 12"))
+;;(add-to-list 'default-frame-alist '(font . "Source Code Pro 12"))
 
 (defalias 'yes-or-no #'y-or-n-p)
 (setq confirm-kill-emacs #'yes-or-no-p)
@@ -185,28 +219,9 @@ point reaches the beginning or end of the buffer, stop there."
 ;; Define super modifier key. This is sometimes neededn but it's not defined
 (define-key function-key-map (kbd "M-]") 'event-apply-super-modifier)
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;
-;; Mac specific stuff ;;
-;;;;;;;;;;;;;;;;;;;;;;;;
 (when (eq system-type 'darwin)
-  ;; both command keys are 'Super'
-  (setq mac-right-command-modifier 'super)
-  (setq mac-command-modifier 'super)
+  (require 'mj-macos))
 
-  ;; Option or Alt is naturally 'Meta'
-  (setq mac-option-modifier 'meta)
-
-
-  ;; Right Alt (option) can be used to enter symbols like em dashes '—' and euros '€' and stuff.
-  (setq mac-right-option-modifier 'nil)
-  ;; Enable transparent title bar on macOS
-  (when (memq window-system '(mac ns))
-    (add-to-list 'default-frame-alist '(ns-appearance . light)) ;; {light, dark}
-    (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
-  )
-
-(setq frame-resize-pixelwise t)
 
 ;;;;;;;;;;;;;;
 ;; PACKAGES ;;
@@ -233,18 +248,18 @@ point reaches the beginning or end of the buffer, stop there."
   (move-text-default-bindings))
 
 ;; Highlight comments
-  (use-package hl-todo
-    :hook
-    (prog-mode . hl-todo-mode)
-    :config
-    (setq hl-todo-highlight-punctuation ":"
-          hl-todo-keyword-faces
-          `(("TODO"       warning bold)
-            ("FIXME"      error bold)
-            ("HACK"       font-lock-constant-face bold)
-            ("REVIEW"     font-lock-keyword-face bold)
-            ("NOTE"       success bold)
-            ("DEPRECATED" font-lock-doc-face bold))))
+  ;; (use-package hl-todo
+  ;;   :hook
+  ;;   (prog-mode . hl-todo-mode)
+  ;;   :config
+  ;;   (setq hl-todo-highlight-punctuation ":"
+  ;;         hl-todo-keyword-faces
+  ;;         `(("TODO"       warning bold)
+  ;;           ("FIXME"      error bold)
+  ;;           ("HACK"       font-lock-constant-face bold)
+  ;;           ("REVIEW"     font-lock-keyword-face bold)
+  ;;           ("NOTE"       success bold)
+  ;;           ("DEPRECATED" font-lock-doc-face bold))))
 
 ;; TODO: This has been integrated with emacs, possibly released with emacs 30
 (use-package which-key :ensure :config (which-key-mode))
@@ -385,6 +400,10 @@ point reaches the beginning or end of the buffer, stop there."
   ("C-h C" . #'helpful-command)))
 
 
+(use-package expand-region
+  :ensure
+   :bind ("C-=" . er/expand-region))
+
 (use-package direnv :ensure :config (direnv-mode))
 
 (use-package org :ensure
@@ -409,6 +428,33 @@ point reaches the beginning or end of the buffer, stop there."
   :ensure)
 
 
+
+(defun dn--consult-line-thing-at-point ()
+  "Do incremental search forward for the \"thing\" found near point.
+Like ordinary incremental search except that the \"thing\" found at point
+is added to the search string initially.  The \"thing\" is defined by
+`bounds-of-thing-at-point'.  You can customize the variable
+`isearch-forward-thing-at-point' to define a list of symbols to try
+to find a \"thing\" at point.  For example, when the list contains
+the symbol `region' and the region is active, then text from the
+active region is added to the search string."
+  (interactive)
+  (let ((bounds (seq-some (lambda (thing)
+                            (bounds-of-thing-at-point thing))
+                          isearch-forward-thing-at-point)))
+    (cond
+     (bounds
+      (when (use-region-p)
+        (deactivate-mark))
+      (when (< (car bounds) (point))
+	(goto-char (car bounds)))
+      (consult-line
+       (buffer-substring-no-properties (car bounds) (cdr bounds))))
+     (t
+      (setq isearch-error "No thing at point")
+      (consult-line))))
+  )
+
 ;; Extended completion utilities
 ;; https://github.com/minad/consult?tab=readme-ov-file#use-package-example
 (use-package
@@ -417,7 +463,10 @@ point reaches the beginning or end of the buffer, stop there."
  ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
  :hook (completion-list-mode . consult-preview-at-point-mode)
-:bind (;; C-c bindings in `mode-specific-map'
+ :bind (
+
+	 ("C-s" . consult-line)
+	;; C-c bindings in `mode-specific-map'
          ("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
          ("C-c k" . consult-kmacro)
@@ -433,9 +482,9 @@ point reaches the beginning or end of the buffer, stop there."
          ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
          ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
          ;; Custom M-# bindings for fast register access
-         ("M-#" . consult-register-load)
-         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-         ("C-M-#" . consult-register)
+         ;;("M-#" . consult-register-load)
+         ;;("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ;;("C-M-#" . consult-register)
          ;; Other custom bindings
          ("M-y" . consult-yank-pop)                ;; orig. yank-pop
          ;; M-g bindings in `goto-map'
@@ -449,12 +498,14 @@ point reaches the beginning or end of the buffer, stop there."
          ("M-g i" . consult-imenu)
          ("M-g I" . consult-imenu-multi)
          ;; M-s bindings in `search-map'
-         ("M-s d" . consult-find)                  ;; Alternative: consult-fd
+	 ("M-s ." . dn--consult-line-thing-at-point)
+         ("M-s d" . consult-fd)                  ;; Alternative: consult-fd
+	 ("M-s f" . consult-find)
          ("M-s c" . consult-locate)
          ("M-s g" . consult-grep)
          ("M-s G" . consult-git-grep)
          ("M-s r" . consult-ripgrep)
-         ("M-s l" . consult-line)
+         ;;("M-s l" . consult-line)
          ("M-s L" . consult-line-multi)
          ("M-s k" . consult-keep-lines)
          ("M-s u" . consult-focus-lines)
@@ -469,7 +520,6 @@ point reaches the beginning or end of the buffer, stop there."
          :map minibuffer-local-map
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
          ("M-r" . consult-history))
-;; orig. previous-matching-history-element
 
  :config
  ;; Optionally configure preview. The default value
@@ -501,6 +551,16 @@ point reaches the beginning or end of the buffer, stop there."
   ;; `consult-register-store' and the Emacs built-ins.
   (setq register-preview-delay 0.5
         register-preview-function #'consult-register-format)
+
+;; Optionally tweak the register preview window.
+  ;; This adds thin lines, sorting and hides the mode line of the window.
+  (advice-add #'register-preview :override #'consult-register-window)
+
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
     ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
   :hook (completion-list-mode . consult-preview-at-point-mode)
@@ -534,7 +594,7 @@ point reaches the beginning or end of the buffer, stop there."
   ;; jarring since the message shown in the minibuffer can be more
   ;; than one line, causing the modeline to move up and down:
 
-  ;; (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
+   (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
   ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
 
   :config
@@ -556,6 +616,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package consult-eglot-embark
   :ensure)
+(use-package consult-yasnippet :ensure)
 
 (use-package typescript-mode
   :ensure)
@@ -678,6 +739,11 @@ point reaches the beginning or end of the buffer, stop there."
   ("C-x t C-t" . treemacs-find-file)
   ("C-x t M-t" . treemacs-find-tag)))
 
+
+
+;; Make script file executable by default
+(add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
+
 (use-package
  treemacs-icons-dired
  :hook
@@ -760,6 +826,7 @@ point reaches the beginning or end of the buffer, stop there."
   :custom
   (corfu-cycle t)
   (corfu-auto t)
+  (corfu-auto-delay 1)
   :init
   (global-corfu-mode))
 
@@ -821,13 +888,15 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package flymake-ruff
   :ensure t
   :hook (eglot-managed-mode . flymake-ruff-load))
-
+(use-package flymake-racket :ensure)
+(use-package flymake-guile :ensure)
+(use-package flymake-go :ensure)
 
 ;; https://github.com/ROCKTAKEY/flymake-elisp-config
 (use-package flymake-elisp-config
   :ensure)
 
-
+(use-package flymake-ansible-lint :ensure)
 (use-package dockerfile-mode :ensure)
 
 (use-package docker-compose-mode :ensure)
@@ -857,6 +926,9 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package json-snatcher :ensure)
 
+(use-package terraform-mode
+  :ensure)
+
 (use-package
  json-mode
  :ensure
@@ -879,8 +951,12 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package paredit
   :ensure)
-(use-package geiser :ensure)
+
 (use-package racket-mode :ensure)
+(use-package geiser :ensure)
+(use-package geiser-racket :ensure)
+(use-package geiser-guile :ensure)
+
 
 ;; Local Variables:
 ;; bute-compile-warnings: (not free-vars)
