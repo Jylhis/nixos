@@ -3,7 +3,10 @@
   emacsWithPackagesFromUsePackage,
   emacs,
   terraform-ls,
+  powershell,
+  clang_18,
   clang-tools,
+  lldb_18,
   gcc14,
   gdb,
   rr,
@@ -39,10 +42,12 @@
   eslint,
   typescript,
   jsdoc,
-  nodejs_20,
+  nodejs_22,
   jdk,
   hadolint,
+  bat,
   direnv,
+  fd,
   nix-direnv,
   ripgrep,
   git,
@@ -126,7 +131,7 @@
         eslint
         typescript
         jsdoc
-        nodejs_20
+        nodejs_22
 
         # Java
         jdk
@@ -135,15 +140,17 @@
         hadolint
 
         # CLI + other tools
+        bat
         direnv
         nix-direnv
         ripgrep
         git
+        fd
 
         # Extra LSP, linters etc.
         marksman
 
-        terraform-ls
+        powershell
 
         # Emacs support packages
         emacs-all-the-icons-fonts

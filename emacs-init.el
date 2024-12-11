@@ -1,29 +1,53 @@
-;;; Personal configuration  -*- lexical-binding: t; -*-
+;;; init.el --- General emacs config
 ;;; Commentary:
+"General emacs config"
 
-;; Always load newest byte code
-(setq load-prefer-newer t)
+;;;; Customizations:
 
+(defcustom mj-setup-elpa nil
+  "Setup package repositories Not needed with Nix."
+  :group 'mj
+  :type 'boolean)
 
-;(setq debug-on-error t)
-;; Default configs
-;; TODO: https://justinbarclay.ca/posts/from-zero-to-ide-with-emacs-and-lsp/
+(defcustom mj-debug-run nil
+  "Run Emacs with benchmark and 'debug-on-error'."
+  :group 'mj
+  :type 'boolean)
+
+(defcustom mj-theme-color 'dark
+  "Choose theme color."
+  :type '(choice (const :tag "Light" light)
+                 (const :tag "Dark" dark))
+  :group 'mj
+  )
+
 ;;; Code:
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
-(add-to-list 'package-archives
+
+
+;;;; Rest of the code:
+(when mj-setup-elpa
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
+  (add-to-list 'package-archives
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-(package-initialize)
-;; Produce backtraces when errors occur: can be helpful to diagnose startup issues
+  (package-initialize)
+  )
 
-;; (use-package benchmark-init
-;;   :ensure t
-;;   :config
-;;   ;; To disable collection of benchmark data after init is done.
-;;   (add-hook 'after-init-hook 'benchmark-init/deactivate))
+(when mj-debug-run
 
-(add-to-list 'load-path "~/.emacs.d/lisp")
+  (setq debug-on-error t) ; Produce backtraces when errors occur: can be helpful to diagnose startup issues
+   (use-package benchmark-init
+   :ensure t
+   :config
+   ;; To disable collection of benchmark data after init is done.
+   (add-hook 'after-init-hook 'benchmark-init/deactivate))
+  )
 
+
+;;; Bootstrap
+
+(add-to-list 'load-path (locate-user-emacs-file "lisp"))
 
 ;; Store automatic customisation options elsewhere
 (setq custom-file (locate-user-emacs-file "custom.el"))
@@ -31,19 +55,18 @@
   (load custom-file))
 
 ;; Adjust garbage collection threshold for early startup
-(setq gc-cons-threshold most-positive-fixnum)
+(setq gc-cons-threshold (* 128 1024 1024))
 ;; Process performance tuning
 (setq read-process-output-max (* 4 1024 1024))
-
-(use-package exec-path-from-shell :ensure)
+(setq process-adaptive-read-buffering nil)
 
 (use-package emacs
-
   :init
   (tool-bar-mode -1)
   (when scroll-bar-mode
     (scroll-bar-mode -1))
   (menu-bar-mode -1)
+
   :custom
   ;; Hide commands in M-x which do not work in the current mode.  Vertico
   ;; commands are hidden in normal buffers. This setting is useful beyond
@@ -57,48 +80,6 @@
  read-buffer-completion-ignore-case t
  completion-ignore-case t)
 
-(setq-default c-basic-offset 4)
-
-
-(use-package powershell
-  :ensure)
-
-
-(use-package centered-cursor-mode
-  :ensure
-  :config
-  ;; Optional, enables centered-cursor-mode in all buffers.
-  (global-centered-cursor-mode))
-
-
-
-;; Smoother and nicer scrolling
-(setq
- scroll-margin 0
- scroll-step 1
- next-line-add-newlines nil
- scroll-conservatively 10000
- scroll-preserve-screen-position 1)
-
-(setq mouse-wheel-follow-mouse 't)
-(setq column-number-mode t)
-
-;;(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
-
-
-;; Warn only when opening files bigger than 100MB
-(setq large-file-warning-threshold 100000000)
-
-;; Move file to trash instead of removing.
-(setq-default delete-by-moving-to-trash t)
-
-;; highlight the current line
-(global-hl-line-mode t)
-
-(setq-default cursor-type 'bar)
-
-;; always highlight code
-(global-font-lock-mode 1)
 
 ;; refresh a buffer if changed on disk
 (global-auto-revert-mode t)
@@ -111,7 +92,129 @@
 (set-clipboard-coding-system 'utf-8)
 (set-buffer-file-coding-system 'utf-8)
 
+
+;; Warn only when opening files bigger than 100MB
+(setq large-file-warning-threshold 100000000)
+
+;; Move file to trash instead of removing.
+(setq-default delete-by-moving-to-trash t)
+
+;;;; Autosave backup and history
+
+(setq
+
+ backup-by-copying t
+ delete-old-versions t
+ kept-new-versions 6
+ kept-old-versions 2
+ version-control t)
+
+(setq backup-directory-alist
+           `(("." . "~/.emacs-saves")))
+;;(setq auto-save-file-name-transforms   `((".*",(concat user-emacs-directory "auto-saves") t)))
+
+(defun my/diff-auto-save-file ()
+      "Get auto-save #file# difference with current buffer."
+      (interactive)
+      (diff (make-auto-save-file-name) (current-buffer) nil 'noasync))
+
+
+
+;; Automatically save your place in files
+(save-place-mode t)
+
+;; Save history in minibuffer to keep recent commands easily accessible
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(savehist-mode)
+
+;; Keep track of open files
+(recentf-mode t)
+
+;;;; GUI/UX
+
+;; Move current line or region by olding Meta-Up and Meta-Down
+(use-package move-text
+  :ensure
+  :init
+  (move-text-default-bindings))
+
+(use-package
+ leuven-theme
+ :ensure
+ :config
+ (if (eq mj-theme-color 'light)
+     (load-theme 'leuven t)
+     (load-theme 'leuven-dark t))
+
+ )
+
+(use-package centered-cursor-mode
+  :ensure
+  :config
+  ;; Optional, enables centered-cursor-mode in all buffers.
+  (global-centered-cursor-mode))
+
+(setq ring-bell-function (lambda () ()))
+
+;; Smoother and nicer scrolling
+(setq
+ scroll-margin 0
+ scroll-step 1
+ next-line-add-newlines nil
+ scroll-conservatively 10000
+ scroll-preserve-screen-position 1)
+
+(setq mouse-wheel-follow-mouse 't)
+
+;;(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+
+;; Enable mouse in terminal
+(xterm-mouse-mode 1)
+
+(add-to-list 'default-frame-alist '(font . "Source Code Pro 12"))
+
+
 (setq require-final-newline t)
+
+;; highlight the current line
+(global-hl-line-mode t)
+
+(setq-default cursor-type 'bar)
+
+;; always highlight code
+(global-font-lock-mode 1)
+
+
+;;;;; Modelint
+(setq column-number-mode t)
+
+;;;;; Minibuffer
+
+
+
+
+;;;; Programming
+
+
+;;;;; C/C++
+(setq-default c-basic-offset 4)
+
+;;;;; Powershell
+(use-package powershell
+  :ensure)
+
+;;;;; Web
+(use-package web-mode
+  :ensure)
+
+;;;;; Vala
+(use-package vala-mode
+  :ensure)
+
+
+
+;;; Unordered
+
 
 (setq
  default-directory "~/"
@@ -124,12 +227,7 @@
  inhibit-startup-screen t
  ;; hopefully all themes we install are safe
  custom-safe-themes t
- ;; simple lock/backup file management
- backup-by-copying t
- delete-old-versions t
- kept-new-versions 6
- kept-old-versions 2
- version-control t
+
  ;; when quiting emacs, just kill processes
  confirm-kill-processes nil
  ;; ask if local variables are safe once.
@@ -137,15 +235,6 @@
  ;; life is too short to type yes or no
  use-short-answers t
  tab-width 4)
-
-(setq backup-directory-alist
-           `(("." . "~/.emacs-saves")))
-;;(setq auto-save-file-name-transforms   `((".*",(concat user-emacs-directory "auto-saves") t)))
-
-(defun my/diff-auto-save-file ()
-      "Get auto-save #file# difference with current buffer."
-      (interactive)
-      (diff (make-auto-save-file-name) (current-buffer) nil 'noasync))
 
 
 (setq-default dired-listing-switches "-alh")
@@ -156,20 +245,8 @@
 ;; Visualize matching parens
 (show-paren-mode 1)
 
-(setq ring-bell-function (lambda () ()))
 
-;; Automatically save your place in files
-(save-place-mode t)
 
-;; Save history in minibuffer to keep recent commands easily accessible
-;; Persist history over Emacs restarts. Vertico sorts by history position.
-(savehist-mode)
-
-;; Keep track of open files
-(recentf-mode t)
-
-;; Keep files up-to-date when they change outside Emacs
-(global-auto-revert-mode t)
 
 ;; Display line numbers only when in programming modes
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
@@ -201,12 +278,7 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key (kbd "C-a") 'smarter-move-beginning-of-line)
 (global-set-key (kbd "s-<left>") 'smarter-move-beginning-of-line)
 
-;; Enable mouse in terminal
-(xterm-mouse-mode 1)
 
-
-
-;;(add-to-list 'default-frame-alist '(font . "Source Code Pro 12"))
 
 (defalias 'yes-or-no #'y-or-n-p)
 (setq confirm-kill-emacs #'yes-or-no-p)
@@ -218,9 +290,6 @@ point reaches the beginning or end of the buffer, stop there."
 
 ;; Define super modifier key. This is sometimes neededn but it's not defined
 (define-key function-key-map (kbd "M-]") 'event-apply-super-modifier)
-
-(when (eq system-type 'darwin)
-  (require 'mj-macos))
 
 
 ;;;;;;;;;;;;;;
@@ -241,25 +310,21 @@ point reaches the beginning or end of the buffer, stop there."
   )
 
 
-;; Move current line or region by olding Meta-Up and Meta-Down
-(use-package move-text
-  :ensure
-  :init
-  (move-text-default-bindings))
+
 
 ;; Highlight comments
-  ;; (use-package hl-todo
-  ;;   :hook
-  ;;   (prog-mode . hl-todo-mode)
-  ;;   :config
-  ;;   (setq hl-todo-highlight-punctuation ":"
-  ;;         hl-todo-keyword-faces
-  ;;         `(("TODO"       warning bold)
-  ;;           ("FIXME"      error bold)
-  ;;           ("HACK"       font-lock-constant-face bold)
-  ;;           ("REVIEW"     font-lock-keyword-face bold)
-  ;;           ("NOTE"       success bold)
-  ;;           ("DEPRECATED" font-lock-doc-face bold))))
+  (use-package hl-todo
+    :hook
+    (prog-mode . hl-todo-mode)
+    :config
+    (setq hl-todo-highlight-punctuation ":"
+          hl-todo-keyword-faces
+          `(("TODO"       warning bold)
+            ("FIXME"      error bold)
+            ("HACK"       font-lock-constant-face bold)
+            ("REVIEW"     font-lock-keyword-face bold)
+            ("NOTE"       success bold)
+            ("DEPRECATED" font-lock-doc-face bold))))
 
 ;; TODO: This has been integrated with emacs, possibly released with emacs 30
 (use-package which-key :ensure :config (which-key-mode))
@@ -399,12 +464,14 @@ point reaches the beginning or end of the buffer, stop there."
   ("C-h F" . #'helpful-function)
   ("C-h C" . #'helpful-command)))
 
-
 (use-package expand-region
   :ensure
    :bind ("C-=" . er/expand-region))
 
-(use-package direnv :ensure :config (direnv-mode))
+(use-package direnv
+  :ensure
+  :config (direnv-mode)
+  )
 
 (use-package org :ensure
   :bind
@@ -420,12 +487,6 @@ point reaches the beginning or end of the buffer, stop there."
 	(setq org-directory "~/Org")
 (setq org-default-notes-file (concat org-directory "/notes.org"))
       (setq org-link-descriptive t)
-
-(use-package web-mode
-  :ensure)
-
-(use-package vala-mode
-  :ensure)
 
 
 
@@ -551,8 +612,7 @@ active region is added to the search string."
   ;; `consult-register-store' and the Emacs built-ins.
   (setq register-preview-delay 0.5
         register-preview-function #'consult-register-format)
-
-;; Optionally tweak the register preview window.
+  ;; Optionally tweak the register preview window.
   ;; This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
 
@@ -563,7 +623,8 @@ active region is added to the search string."
 
     ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
-  :hook (completion-list-mode . consult-preview-at-point-mode)
+  :hook
+  (completion-list-mode . consult-preview-at-point-mode)
  )
 
 
@@ -630,127 +691,24 @@ active region is added to the search string."
                     (set-auto-mode)))))
 
 (use-package all-the-icons :ensure)
-(use-package all-the-icons-dired :ensure)
-(use-package treemacs-all-the-icons :ensure)
-
-(use-package
- leuven-theme
- :ensure
- :config
- ;;(load-theme 'leuven t)
- (load-theme 'leuven-dark t)
+(use-package all-the-icons-dired
+  :ensure
+  :after dired
+  :hook (dired-mode . all-the-icons-dired-mode)
+  :config (setq all-the-icons-dired-monochrome nil)
  )
+
+
+
 
 (use-package ace-link :ensure :config (ace-link-setup-default))
 
-(use-package solaire-mode :ensure :config (solaire-global-mode +1))
 
-(setq window-resize-pixelwise t)
-
-;; Treemacs
-(use-package
- treemacs
- :ensure
- ;;:defer t
- :commands (treemacs)
- :init
- (with-eval-after-load 'winum
-   (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
- :config
- ;;(define-key treemacs-mode-map [drag-mouse-1] nil)
- (progn
-   (setq
-    treemacs-collapse-dirs (if treemacs-python-executable 3 0)
-    treemacs-deferred-git-apply-delay 0.5
-    treemacs-directory-name-transformer #'identity
-    treemacs-display-in-side-window t
-    treemacs-eldoc-display 'simple
-    treemacs-file-event-delay 2000
-    treemacs-file-extension-regex treemacs-last-period-regex-value
-    treemacs-file-follow-delay 0.2
-    treemacs-file-name-transformer #'identity
-    treemacs-follow-after-init t
-    treemacs-expand-after-init t
-    treemacs-find-workspace-method 'find-for-file-or-pick-first
-    treemacs-git-command-pipe ""
-    treemacs-goto-tag-strategy 'refetch-index
-    treemacs-header-scroll-indicators '(nil . "^^^^^^")
-    treemacs-hide-dot-git-directory t
-    treemacs-indentation 2
-    treemacs-indentation-string " "
-    treemacs-is-never-other-window nil
-    treemacs-max-git-entries 5000
-    treemacs-missing-project-action 'ask
-    treemacs-move-forward-on-expand nil
-    treemacs-no-png-images nil
-    treemacs-no-delete-other-windows t
-    treemacs-project-follow-cleanup nil
-    treemacs-persist-file
-    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
-    treemacs-position 'left
-    treemacs-read-string-input 'from-child-frame
-    treemacs-recenter-distance 0.1
-    treemacs-recenter-after-file-follow nil
-    treemacs-recenter-after-tag-follow nil
-    treemacs-recenter-after-project-jump 'always
-    treemacs-recenter-after-project-expand 'on-distance
-    treemacs-litter-directories '("/node_modules" "/.venv" "/.cask")
-    treemacs-project-follow-into-home nil
-    treemacs-show-cursor nil
-    treemacs-show-hidden-files t
-    treemacs-silent-filewatch nil
-    treemacs-silent-refresh nil
-    treemacs-sorting 'alphabetic-asc
-    treemacs-select-when-already-in-treemacs 'move-back
-    treemacs-space-between-root-nodes t
-    treemacs-tag-follow-cleanup t
-    treemacs-tag-follow-delay 0
-    treemacs-text-scale nil
-    treemacs-user-mode-line-format nil
-    treemacs-user-header-line-format nil
-    treemacs-wide-toggle-width 70
-    treemacs-width 35
-    treemacs-width-increment 1
-    treemacs-width-is-initially-locked t
-    treemacs-workspace-switch-cleanup nil)
-   ;; The default width and height of the icons is 22 pixels. If you are
-   ;; using a Hi-DPI display, uncomment this to double the icon size.
-   ;;(treemacs-resize-icons 44)
-   (treemacs-follow-mode t)
-   ; This causes the focus to jump
-   (treemacs-filewatch-mode t)
-   (treemacs-fringe-indicator-mode 'always)
-   (when treemacs-python-executable
-     (treemacs-git-commit-diff-mode t))
-   (pcase (cons
-           (not (null (executable-find "git")))
-           (not (null treemacs-python-executable)))
-     (`(t . t) (treemacs-git-mode 'deferred))
-     (`(t . _) (treemacs-git-mode 'simple)))
-   (treemacs-hide-gitignored-files-mode nil))
- :bind
- (:map
-  global-map
-  ("M-0" . treemacs-select-window)
-  ("C-x t 1" . treemacs-delete-other-windows)
-  ("C-x t t" . treemacs)
-  ("C-x t d" . treemacs-select-directory)
-  ("C-x t B" . treemacs-bookmark)
-  ("C-x t C-t" . treemacs-find-file)
-  ("C-x t M-t" . treemacs-find-tag)))
-
+;; (setq window-resize-pixelwise t)
 
 
 ;; Make script file executable by default
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
-
-(use-package
- treemacs-icons-dired
- :hook
- (dired-mode . treemacs-icons-dired-enable-once)
- :ensure)
-
-(use-package treemacs-magit :after (treemacs magit) :ensure)
 
 ;; Automatically guess indent offsets, tab, spaces settings, etc.
 (use-package dtrt-indent :ensure)
@@ -785,8 +743,7 @@ active region is added to the search string."
 (use-package google-c-style :ensure)
 
 ;; An extremely feature-rich git client. Activate it with "C-c g".
-(use-package
- magit
+(use-package magit
  :ensure
  :init (require 'bind-key)
  :bind (("C-c g" . magit-status))
@@ -827,6 +784,7 @@ active region is added to the search string."
   (corfu-cycle t)
   (corfu-auto t)
   (corfu-auto-delay 1)
+
   :init
   (global-corfu-mode))
 
@@ -861,6 +819,15 @@ active region is added to the search string."
  :hook (prog-mode . eglot-ensure)
 )
 
+(use-package copilot
+  :ensure
+:bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word))
+  )
+
 (use-package eldoc
   :init
   (global-eldoc-mode))
@@ -890,7 +857,7 @@ active region is added to the search string."
   :hook (eglot-managed-mode . flymake-ruff-load))
 (use-package flymake-racket :ensure)
 (use-package flymake-guile :ensure)
-(use-package flymake-go :ensure)
+
 
 ;; https://github.com/ROCKTAKEY/flymake-elisp-config
 (use-package flymake-elisp-config
@@ -935,7 +902,7 @@ active region is added to the search string."
  :mode "\\.json\\'"
  :after (json-snatcher))
 
-(use-package nix-mode :ensure :mode "\\.nix\\'")
+(use-package nix-ts-mode :ensure :mode "\\.nix\\'")
 
 (use-package ruff-format :ensure)
 
@@ -957,7 +924,9 @@ active region is added to the search string."
 (use-package geiser-racket :ensure)
 (use-package geiser-guile :ensure)
 
-
 ;; Local Variables:
 ;; bute-compile-warnings: (not free-vars)
 ;; End:
+
+(provide 'emacs-init)
+;;; emacs-init.el ends here
