@@ -47,7 +47,6 @@
       emacs-overlay,
       nixos-hardware,
       self,
-
       ...
     }@attrs:
     {
@@ -68,16 +67,15 @@
       system:
       let
 
-        pkgs = (nixpkgs.legacyPackages.${system}.extend emacs-overlay.overlay);
+        pkgs = nixpkgs.legacyPackages.${system}.extend emacs-overlay.overlay;
         unstable = nixpkgs-unstable.legacyPackages.${system};
       in
       {
 
         packages.emacs-ide = pkgs.callPackage ./emacs-ide.nix {
-          inherit (pkgs) emacsWithPackagesFromUsePackage;
+          inherit (pkgs) emacsWithPackagesFromUsePackage emacs;
           inherit (pkgs.nodePackages) eslint jsdoc;
           inherit (pkgs.python3Packages) python-lsp-server;
-          emacs = pkgs.emacs;
         };
         formatter = unstable.nixfmt-rfc-style;
         checks = {

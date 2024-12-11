@@ -206,7 +206,7 @@
         rhythmbox
         epiphany
       ])
-      ++ (with pkgs.gnome; [
+      ++ (with pkgs; [
         geary
         gnome-weather
         gnome-maps
@@ -276,7 +276,6 @@
 
   hardware.logitech.wireless.enable = true;
   hardware.logitech.wireless.enableGraphical = true; # for solaar to be included
-  sound.enable = true;
   hardware.pulseaudio.enable = lib.mkForce false;
   security.rtkit.enable = true;
   # Define a user account. Don't forget to set a password with ‘passwd’.
