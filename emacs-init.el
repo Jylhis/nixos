@@ -215,6 +215,10 @@
 
 ;;; Unordered
 
+(use-package adoc-mode
+  :ensure)
+
+
 
 (setq
  default-directory "~/"
