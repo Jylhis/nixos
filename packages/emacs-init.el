@@ -219,6 +219,7 @@
   :ensure)
 
 
+(use-package vterm :ensure)
 
 (setq
  default-directory "~/"
