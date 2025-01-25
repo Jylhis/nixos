@@ -68,9 +68,9 @@
     loader.efi.canTouchEfiVariables = true;
     plymouth.enable = true;
     plymouth.theme = "breeze";
-    extraModprobeConfig = ''
-      options snd-hda-intel model=intel-mac-auto
-    '';
+    #extraModprobeConfig = ''
+    #  options snd-hda-intel model=intel-mac-auto
+    #'';
     kernel.sysctl = {
       "vm.swappiness" = 1;
       # https://wiki.archlinux.org/title/Sysctl#Virtual_memory
@@ -151,7 +151,7 @@
           hotkey="[]"
         '';
       };
-      videoDrivers = [ "intel" ];
+      #videoDrivers = [ "modesetting" ];
       # Configure keymap in X11
       xkb = {
         layout = "us,fi";
@@ -331,7 +331,7 @@
       enable = true;
       enableGraphical = true; # for solaar to be included
     };
-    pulseaudio.enable = lib.mkForce false;
+    #pulseaudio.enable = lib.mkForce false;
   };
 
   security.rtkit.enable = true;
