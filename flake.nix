@@ -73,7 +73,7 @@
       in
       {
 
-        packages.emacs-ide = pkgs.callPackage ./emacs-ide.nix {
+        packages.emacs-ide = pkgs.callPackage ./emacs.nix {
           inherit (pkgs) emacsWithPackagesFromUsePackage;
           inherit (pkgs.nodePackages) eslint jsdoc;
           inherit (pkgs.python3Packages) python-lsp-server;

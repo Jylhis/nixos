@@ -52,7 +52,18 @@
 }:
 (emacsWithPackagesFromUsePackage {
   package = emacs;
-  config = ./emacs-init.el;
+  config = let
+
+    readRecursively = dir:
+            builtins.concatStringsSep "\n"
+              (lib.mapAttrsToList (name: value: if value == "regular"
+                                                then builtins.readFile (dir + "/${name}")
+                                                else (if value == "directory"
+                                                      then readRecursively (dir + "/${name}")
+                                                      else [ ]))
+                                  (builtins.readDir dir));
+
+    in readRecursively ./emacs;
   defaultInitFile = true;
   alwaysEnsure = true;
   extraEmacsPackages =
