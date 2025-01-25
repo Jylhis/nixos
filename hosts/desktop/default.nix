@@ -2,25 +2,23 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 {
-
+  self,
   lib,
   pkgs,
+  config,
   _1password-shell-plugins,
   emacs-overlay,
   ...
 }:
 {
   imports = [
-    ./personal-devenv.nix
-    ./pentest-reverse-engineer.nix
-    ./cachix.nix
+    ../../cachix.nix
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     _1password-shell-plugins.nixosModules.default
   ];
 
   nix = {
-
     gc = {
       automatic = true;
       options = "--delete-older-than 14d";
@@ -29,19 +27,18 @@
     optimise.automatic = true;
 
     settings = {
+      accept-flake-config = true;
       auto-optimise-store = true;
       keep-outputs = true;
       experimental-features = [
         "nix-command"
         "flakes"
-        "repl-flake"
       ];
       trusted-users = [
-        "root"
-        "markus"
+        config.users.users.root.name
+        config.users.users.markus.name
       ];
 
-      accept-flake-config = true;
       extra-substituters = [
         "https://cache.soopy.moe"
       ];
@@ -62,12 +59,10 @@
     targets.suspend.enable = false;
     targets.hibernate.enable = false;
     targets.hybrid-sleep.enable = false;
-
   };
 
   # Bootloader.
   boot = {
-    # binfmt.emulatedSystems =["aarch64-linux"];
     loader.systemd-boot.enable = true;
     loader.systemd-boot.configurationLimit = 5;
     loader.efi.canTouchEfiVariables = true;
@@ -108,18 +103,34 @@
   time.timeZone = "Europe/Zurich";
   powerManagement.cpuFreqGovernor = "performance";
   # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
+  i18n = {
+    defaultLocale = "en_US.UTF-8";
+    extraLocaleSettings = {
+      LC_ADDRESS = "de_CH.UTF-8";
+      LC_IDENTIFICATION = "de_CH.UTF-8";
+      LC_MEASUREMENT = "de_CH.UTF-8";
+      LC_MONETARY = "de_CH.UTF-8";
+      LC_NAME = "de_CH.UTF-8";
+      LC_NUMERIC = "de_CH.UTF-8";
+      LC_PAPER = "de_CH.UTF-8";
+      LC_TELEPHONE = "de_CH.UTF-8";
+      LC_TIME = "de_CH.UTF-8";
+    };
+  };
+
   console.useXkbConfig = true;
+
   services = {
-    fstrim.enable = true;
-    tailscale.enable = true;
     hardware.bolt.enable = true;
+    tailscale.enable = true;
+    fstrim.enable = true;
     udev.extraRules = ''
       ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
     '';
     udev.packages = [
-      pkgs.gnome.gnome-settings-daemon
+      pkgs.gnome-settings-daemon
     ];
+    fwupd.enable = true;
 
     xserver = {
       enable = true;
@@ -131,7 +142,6 @@
         extraGSettingsOverrides = ''
           [org.gnome.desktop.input-sources]
           sources=[('xkb', 'us'), ('xkb', 'fi')]
-          xkb-options=['ctrl:swapcaps','terminate:ctrl_alt_bksp', 'lv3:ralt_switch']
 
           [org.gnome.desktop.interface]
           gtk-theme='org.gnome.desktop.interface'
@@ -175,34 +185,53 @@
     };
 
   };
-  virtualisation.docker.enable = true;
-  virtualisation.docker.rootless = {
-    enable = true;
-    setSocketVariable = true;
+
+  documentation = {
+    nixos.enable = true;
+    man.enable = true;
+    dev.enable = true;
+  };
+
+  virtualisation = {
+
+    containers.enable = true;
+    libvirtd = {
+      enable = true;
+      qemu = {
+        package = pkgs.qemu_kvm;
+        runAsRoot = true;
+        swtpm.enable = true;
+        ovmf = {
+          enable = true;
+          packages = [
+            (pkgs.OVMF.override {
+              secureBoot = true;
+              tpmSupport = true;
+            }).fd
+          ];
+        };
+      };
+    };
+    docker = {
+      enable = true;
+      enableOnBoot = true;
+      rootless.enable = lib.mkForce false; # Necessary for CDI injection, see https://github.com/NixOS/nixpkgs/issues/337873#issuecomment-2332332343
+    };
   };
 
   environment = {
-    interactiveShellInit = ''
-      alias ec='emacsclient -t'
-      alias eg='emacsclient -c -a emacs'
-      alias eb='emacs -nw -Q'
-      alias ebg='emacs -Q'
-      alias open='xdg-open'
-    '';
-    # etc."modprobe.d/amd-egpu-pcie-speed.conf".text = ''
-    #   options amdgpu pcie_gen_cap=0x40000
-    # '';
-    gnome.excludePackages =
-      (with pkgs; [
-        rhythmbox
+
+    gnome.excludePackages = (
+      with pkgs;
+      [
         epiphany
-      ])
-      ++ (with pkgs; [
+        rhythmbox
         geary
-        gnome-weather
         gnome-maps
         gnome-music
-      ]);
+        gnome-weather
+      ]
+    );
 
     # List packages installed in system profile. To search, run:
     # $ nix search wget
@@ -210,48 +239,80 @@
     systemPackages =
       with pkgs;
       [
-        sniffnet
+        # General
         unzip
         bash-completion
-        btop
+
+        # Development
         cloud-utils
         curlie
         delta
         devenv
         direnv
-        docker
         duf
         dust
         eza
         fd
-        gimp
-        git
         git-lfs
-        glances
-        gnome.gnome-tweaks
+        git
         gnumake
+        clang-tools
+        gcc14
+        gdb
+        rr
+        pkg-config
+        rtags
+        cppcheck
+        valgrind
+        python3
+        nodejs_22
+        jdk
+        git
+
+        # Monitoring
+        sniffnet
+        btop
+        glances
         htop
         iotop
-        jq
+
+        # Applications
+        gimp
+        gnome-tweaks
+        pandoc
+        planify
+        vlc
+
+        # Kubernetes
         k9s
         kubectl
-        lsof
+
+        # Nix
         nix-direnv
         nix-ld
-        nvidia-docker
+        nix-output-monitor
+
+        # Other
+        file
+        man
+        man-pages
+        linux-manual
+        man-pages-posix
+        clang-manpages
+        stdmanpages
+        jq
+        lsof
         openssl
-        pandoc
+
         pciutils
-        planify
-        python3Packages.mlflow
+
         sd
-        slack
+
         solaar
         sshpass
         starship
         tailscale
         vim
-        vlc
         yq
         zoxide
       ]
@@ -260,64 +321,241 @@
         appindicator
       ]);
   };
-  hardware.opengl = {
-    enable = true;
-    driSupport32Bit = true;
+
+  hardware = {
+    graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
+    logitech.wireless = {
+      enable = true;
+      enableGraphical = true; # for solaar to be included
+    };
+    pulseaudio.enable = lib.mkForce false;
   };
 
-  hardware.logitech.wireless.enable = true;
-  hardware.logitech.wireless.enableGraphical = true; # for solaar to be included
-  hardware.pulseaudio.enable = lib.mkForce false;
   security.rtkit.enable = true;
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.markus = {
-    isNormalUser = true;
-    description = "Markus";
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-      "docker"
-    ];
-    packages = with pkgs; [
-      spotify
-      signal-desktop
-      nixd
-      gopls
-      godef
-      delve
-      source-code-pro
-      asm-lsp
-      ansible-language-server
-    ];
+
+  users = {
+
+    # Define a user account. Don't forget to set a password with ‘passwd’.
+    users = {
+
+      markus = {
+        isNormalUser = true;
+        description = "Markus";
+        extraGroups = [
+          config.users.groups.networkmanager.name # For managing network connections
+          config.users.groups.wheel.name # For sudo
+          config.users.groups.docker.name
+          "libvirtd"
+          "qemu-libvirtd"
+        ];
+        packages = with pkgs; [
+          # General applications
+          spotify
+          signal-desktop
+
+          # Dev tools
+          nix-diff
+          ansible-language-server
+          asm-lsp
+          moreutils
+          delve
+          godef
+          gopls
+          nixd
+          source-code-pro
+
+          wget
+          planify
+          starship
+          tailscale
+          jetbrains.datagrip
+          minio-client
+
+          # CLI utils
+          bat
+          direnv
+          nix-direnv
+          git
+
+          # Emacs support packages
+          emacs-all-the-icons-fonts
+          source-code-pro
+
+          # Devtools (moved from emacs-markus)
+
+          marksman
+          ## Common
+          ripgrep
+
+          ## python
+          python3Packages.python-lsp-server
+          ruff
+
+          ## Go
+          # Golang
+          go
+          gopls
+          godef
+          delve
+
+          # Nix
+          statix
+          nixd
+          nixfmt-rfc-style
+
+          # vala
+          vala
+          vala-lint
+
+          # SQL
+          sqls
+          sqlint
+
+          # Haskell
+          ghc
+          haskell-language-server
+          cabal-install
+
+          # C# dotnet
+          dotnet-sdk
+          csharp-ls
+
+          # HTML + CSS
+          stylelint
+
+          # Config languages
+          yamllint
+
+          # Assembly
+          nasm
+          asm-lsp
+
+          # Build tools
+          cmake
+          gnumake
+
+          # Javascript & Typescript
+          eslint
+          typescript
+          nodePackages.jsdoc
+
+          # Docker
+          hadolint
+        ];
+      };
+
+      sara = {
+        isNormalUser = true;
+        extraGroups = [
+          "networkmanager"
+          "wheel"
+          "docker"
+        ];
+        packages = with pkgs; [
+          spotify
+          signal-desktop
+          microsoft-edge
+          vscode
+          affine
+
+        ];
+      };
+    };
   };
 
-  users.users.sara = {
-    isNormalUser = true;
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-      "docker"
-    ];
-    packages = with pkgs; [
-      spotify
-      signal-desktop
-      microsoft-edge
-      vscode
-      affine
+  home-manager.users.markus =
+    {
+      config,
+      nixosConfig,
+      pkgs,
+      ...
+    }:
+    {
+      services = {
+        emacs = {
+          enable = true;
+          package = self.outputs.packages.x86_64-linux.emacs-markus;
+          client.enable = true;
+          client.arguments = [
+            "-c"
+            "-a"
+            "emacs"
+          ];
+          defaultEditor = true;
+          socketActivation.enable = true;
+        };
+      };
+      programs = {
+        bash.enable = true;
+        readline = {
+          enable = true;
+          variables = {
+            colored-completion-prefix = true; # Enable coloured highlighting of completions
+            completion-ignore-case = true; # Auto-complete files with the wrong case
+            revert-all-at-newline = true; # Don't save edited commands until run
+            show-all-if-ambiguous = true;
+          };
+        };
+        git = {
+          enable = true;
+          userEmail = lib.mkForce "markus@jylhis.com";
+          userName = "Jylhis";
+          ignores = [
+            "*~"
+            "\#*\#"
+            "*.elc"
+            ".\#*"
+            "[._]*.sw[a-p]"
+          ];
 
-    ];
-  };
+        };
+        emacs = {
+          enable = true;
+          package = self.outputs.packages.x86_64-linux.emacs-markus;
+        };
+        direnv.enable = true;
+        starship.enable = true;
+        ssh.enable = true;
+        ssh.extraConfig = ''
+          IdentityAgent ~/.1password/agent.sock
+        '';
+
+      };
+
+      home = {
+        keyboard = {
+          options = [
+            "ctrl:swapcaps"
+            "terminate:ctrl_alt_bksp"
+            "lv3:ralt_switch"
+          ];
+        };
+        shellAliases = {
+          ec = "emacsclient -t";
+          eg = "emacsclient -c -a emacs";
+          eb = "emacs -nw -Q";
+          ebg = "emacs -Q";
+          open = "xdg-open";
+        };
+
+        stateVersion = "24.11";
+      };
+    };
 
   programs = {
-    #nh.enable = true;
+    command-not-found.enable = false;
+    nix-index.enable = true;
     _1password.enable = true;
     _1password-gui = {
       enable = true;
-      polkitPolicyOwners = [ "markus" ];
+      polkitPolicyOwners = [ config.users.users.markus.name ];
     };
     _1password-shell-plugins = {
       # enable 1Password shell plugins for bash, zsh, and fish shell
-      enable = true;
+      enable = false;
       # the specified packages as well as 1Password CLI will be
       # automatically installed and configured to use shell plugins
       # plugins = with pkgs; [
@@ -327,12 +565,40 @@
       # ];
     };
     # Install firefox.
-    firefox.enable = true;
+    firefox = {
+      enable = true;
+      policies = {
+        "@testpilot-containers" = {
+          install_url = "https://addons.mozilla.org/firefox/downloads/latest/multi-account-containers/latest.xpi";
+          installation_mode = "normal_installed";
+        };
+        "search@kagi.com" = {
+          # Kagi
+          install_url = "https://addons.mozilla.org/firefox/downloads/latest/kagi-search-for-firefox/latest.xpi";
+          installation_mode = "normal_installed";
+        };
+        "{d634138d-c276-4fc8-924b-40a0ea21d284}" = {
+          # 1Password: Password Manager
+          install_url = "https://addons.mozilla.org/firefox/downloads/latest/1password-x-password-manager/latest.xpi";
+          installation_mode = "normal_installed";
+        };
+        PopupBlocking.Allow = [
+          "http://hsrvepp1.lgs-net.com:50100" # SAP
+          "http://geonet.lgs-net.com"
+          "https://geonet.lgs-net.com"
+        ];
+
+      };
+    };
     chromium.enable = true;
     java.enable = true;
     direnv.enable = true;
     ccache.enable = true;
-    git.lfs.enable = true;
+    nix-ld.enable = true;
+    git = {
+      enable = true;
+      lfs.enable = true;
+    };
     appimage.enable = true;
     starship.enable = true;
   };

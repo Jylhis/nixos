@@ -32,11 +32,11 @@
     (pkgs.stdenvNoCC.mkDerivation (final: {
       name = "brcm-firmware";
       src = pkgs.requireFile {
-	    #  nix store add-file --name macbook-air-firmware.tar.gz
-            name = "macbook-air-firmware.tar.gz";
-	    message = "asdf";
-            hash = "sha256-kbBB0HgbUBwDMqTJwLo3ykDs1mmx8dj1JUXbXGLVQss=";
-          };
+        #  nix store add-file --name macbook-air-firmware.tar.gz
+        name = "macbook-air-firmware.tar.gz";
+        message = "asdf";
+        hash = "sha256-kbBB0HgbUBwDMqTJwLo3ykDs1mmx8dj1JUXbXGLVQss=";
+      };
       unpackPhase = ''
         mkdir -p $out/lib/firmware/brcm
         tar xzf $src --dir "$out/lib/firmware/brcm"
