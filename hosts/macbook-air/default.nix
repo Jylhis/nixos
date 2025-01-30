@@ -14,7 +14,7 @@
 {
   imports = [
     # Include the results of the hardware scan.
-    ../../personal-devenv.nix
+
     ../../pentest-reverse-engineer.nix
     ../../cachix.nix
     ./hardware-configuration.nix
@@ -175,17 +175,14 @@
     # etc."modprobe.d/amd-egpu-pcie-speed.conf".text = ''
     #   options amdgpu pcie_gen_cap=0x40000
     # '';
-    gnome.excludePackages = (
-      with pkgs;
-      [
-        rhythmbox
-        geary
-        gnome-weather
-        gnome-maps
-        gnome-music
-        epiphany
-      ]
-    );
+    gnome.excludePackages = with pkgs; [
+      rhythmbox
+      geary
+      gnome-weather
+      gnome-maps
+      gnome-music
+      epiphany
+    ];
 
     # List packages installed in system profile. To search, run:
     # $ nix search wget
@@ -244,8 +241,12 @@
       ]);
   };
 
-  hardware.logitech.wireless.enable = true;
-  hardware.logitech.wireless.enableGraphical = true; # for solaar to be included
+  hardware = {
+    logitech.wireless = {
+      enable = true;
+      enableGraphical = true; # for solaar to be included
+    };
+  };
 
   users.users.markus = {
     isNormalUser = true;

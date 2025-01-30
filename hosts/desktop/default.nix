@@ -90,12 +90,13 @@
       "rd.systemd.show_status=false"
       "rd.udev.log_level=3"
       "udev.log_priority=3"
+      "kvm.enable_virt_at_load=0" # For virtualBox: https://github.com/NixOS/nixpkgs/issues/363887#issuecomment-2536693220
     ];
     loader.timeout = 5;
   };
 
   networking = {
-    hostName = "nixos"; # Define your hostname.
+    hostName = "mac-mini"; # Define your hostname.
     networkmanager.enable = true;
   };
 
@@ -193,25 +194,10 @@
   };
 
   virtualisation = {
-
+    virtualbox.host.enable = true;
+    #virtualbox.host.enableExtensionPack = true;
     containers.enable = true;
-    libvirtd = {
-      enable = true;
-      qemu = {
-        package = pkgs.qemu_kvm;
-        runAsRoot = true;
-        swtpm.enable = true;
-        ovmf = {
-          enable = true;
-          packages = [
-            (pkgs.OVMF.override {
-              secureBoot = true;
-              tpmSupport = true;
-            }).fd
-          ];
-        };
-      };
-    };
+
     docker = {
       enable = true;
       enableOnBoot = true;
@@ -348,8 +334,7 @@
           config.users.groups.networkmanager.name # For managing network connections
           config.users.groups.wheel.name # For sudo
           config.users.groups.docker.name
-          "libvirtd"
-          "qemu-libvirtd"
+          config.users.groups.vboxusers.name
         ];
         packages = with pkgs; [
           # General applications
@@ -489,6 +474,7 @@
         };
       };
       programs = {
+        nix-index.enable = true;
         bash.enable = true;
         readline = {
           enable = true;
@@ -567,28 +553,6 @@
     # Install firefox.
     firefox = {
       enable = true;
-      policies = {
-        "@testpilot-containers" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/latest/multi-account-containers/latest.xpi";
-          installation_mode = "normal_installed";
-        };
-        "search@kagi.com" = {
-          # Kagi
-          install_url = "https://addons.mozilla.org/firefox/downloads/latest/kagi-search-for-firefox/latest.xpi";
-          installation_mode = "normal_installed";
-        };
-        "{d634138d-c276-4fc8-924b-40a0ea21d284}" = {
-          # 1Password: Password Manager
-          install_url = "https://addons.mozilla.org/firefox/downloads/latest/1password-x-password-manager/latest.xpi";
-          installation_mode = "normal_installed";
-        };
-        PopupBlocking.Allow = [
-          "http://hsrvepp1.lgs-net.com:50100" # SAP
-          "http://geonet.lgs-net.com"
-          "https://geonet.lgs-net.com"
-        ];
-
-      };
     };
     chromium.enable = true;
     java.enable = true;
