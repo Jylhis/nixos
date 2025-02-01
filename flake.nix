@@ -51,6 +51,7 @@
 
   outputs =
     {
+      self,
       nixpkgs,
 
       nixpkgs-unstable,
@@ -99,6 +100,10 @@
     )
     // flake-utils.lib.eachDefaultSystemPassThrough (system: {
 
+      nixosModules = {
+        markus = import ./users/markus.nix;
+        sara = import ./users/sara.nix;
+      };
       nixosConfigurations = {
         mac-mini = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -113,18 +118,26 @@
             nixos-hardware.nixosModules.common-pc
             nixos-hardware.nixosModules.common-pc-ssd
             nixos-hardware.nixosModules.apple-t2
+            self.nixosModules.markus
+            self.nixosModules.sara
           ];
         };
         macbook-air = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = attrs;
           modules = [
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+            }
             ./hosts/macbook-air
             ./nix/substituter.nix
             nixos-hardware.nixosModules.common-cpu-intel
             nixos-hardware.nixosModules.common-pc-laptop
             nixos-hardware.nixosModules.common-pc-laptop-ssd
             nixos-hardware.nixosModules.apple-t2
+            self.nixosModules.markus
+            self.nixosModules.sara
           ];
         };
 
