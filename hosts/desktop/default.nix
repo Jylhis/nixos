@@ -16,38 +16,6 @@
     _1password-shell-plugins.nixosModules.default
   ];
 
-  nix = {
-    gc = {
-      automatic = true;
-      options = "--delete-older-than 14d";
-      randomizedDelaySec = "14m";
-    };
-    optimise.automatic = true;
-
-    settings = {
-      accept-flake-config = true;
-      auto-optimise-store = true;
-      keep-outputs = true;
-      experimental-features = [
-        "nix-command"
-        "flakes"
-      ];
-      trusted-users = [
-        config.users.users.root.name
-        config.users.users.markus.name
-      ];
-
-      extra-substituters = [
-        "https://cache.soopy.moe"
-      ];
-      extra-trusted-public-keys = [
-        "cache.soopy.moe-1:0RZVsQeR+GOh0VQI9rvnHz55nVXkFardDqfm4+afjPo="
-      ];
-      extra-trusted-substituters = [
-        "https://cache.soopy.moe"
-      ];
-    };
-  };
 
   # Disable the GNOME3/GDM auto-suspend feature that cannot be disabled in GUI!
   # If no user is logged in, the machine will power down after 20 minutes.
