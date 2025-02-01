@@ -35,13 +35,9 @@
 
   nixConfig = {
     extra-substituters = [
-      # "https://hydra.soopy.moe"
-      "https://cache.soopy.moe" # toggle these if this one doesn't work.
       "https://devenv.cachix.org"
     ];
     extra-trusted-public-keys = [
-      "hydra.soopy.moe:IZ/bZ1XO3IfGtq66g+C85fxU/61tgXLaJ2MlcGGXU8Q="
-      "cache.soopy.moe-1:0RZVsQeR+GOh0VQI9rvnHz55nVXkFardDqfm4+afjPo="
       "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
     ];
     auto-optimise-store = true;
@@ -103,6 +99,8 @@
       nixosModules = {
         markus = import ./users/markus.nix;
         sara = import ./users/sara.nix;
+        jyl-nix-config = import ./modules/nix-config.nix;
+        jyl-cachix = import ./modules/cachix.nix;
       };
       nixosConfigurations = {
         mac-mini = nixpkgs.lib.nixosSystem {
@@ -120,6 +118,8 @@
             nixos-hardware.nixosModules.apple-t2
             self.nixosModules.markus
             self.nixosModules.sara
+            self.nixosModules.jyl-nix-config
+            self.nixosModules.jyl-cachix
           ];
         };
         macbook-air = nixpkgs.lib.nixosSystem {
@@ -131,13 +131,15 @@
               home-manager.useGlobalPkgs = true;
             }
             ./hosts/macbook-air
-            ./nix/substituter.nix
+
             nixos-hardware.nixosModules.common-cpu-intel
             nixos-hardware.nixosModules.common-pc-laptop
             nixos-hardware.nixosModules.common-pc-laptop-ssd
             nixos-hardware.nixosModules.apple-t2
             self.nixosModules.markus
             self.nixosModules.sara
+            self.nixosModules.jyl-nix-config
+            self.nixosModules.jyl-cachix
           ];
         };
 

@@ -16,7 +16,6 @@
     # Include the results of the hardware scan.
 
     ../../pentest-reverse-engineer.nix
-    ../../cachix.nix
     ./hardware-configuration.nix
   ];
   boot = {
@@ -51,38 +50,6 @@
   ];
   powerManagement.enable = true;
 
-  nix = {
-
-    gc = {
-      automatic = true;
-      options = "--delete-older-than 14d";
-      randomizedDelaySec = "14m";
-    };
-    optimise.automatic = true;
-
-    settings = {
-      auto-optimise-store = true;
-      keep-outputs = true;
-      experimental-features = [
-        "nix-command"
-        "flakes"
-      ];
-      trusted-users = [
-        "root"
-        "markus"
-      ];
-
-      accept-flake-config = true;
-      extra-substituters = [
-        "https://cache.soopy.moe"
-      ];
-      extra-trusted-public-keys = [
-        "cache.soopy.moe-1:0RZVsQeR+GOh0VQI9rvnHz55nVXkFardDqfm4+afjPo="
-      ];
-      extra-trusted-substituters = [
-        "https://cache.soopy.moe"
-      ];
-    };
   };
 
   networking = {
@@ -308,13 +275,6 @@
     git.lfs.enable = true;
     appimage.enable = true;
     starship.enable = true;
-  };
-  nixpkgs.overlays = [ emacs-overlay.overlay ];
-
-  # Allow unfree packages
-  nixpkgs.config = {
-    allowUnfree = true;
-    warnUndeclaredOptions = true;
   };
 
   system.stateVersion = "24.11"; # Did you read the comment?
