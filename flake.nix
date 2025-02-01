@@ -75,6 +75,8 @@
             inherit (pkgs) emacsWithPackagesFromUsePackage emacs;
           };
 
+          brcm-firmware = pkgs.callPackage ./packages/brcm-firmware.nix { };
+
         };
 
         formatter = unstable.nixfmt-rfc-style;
