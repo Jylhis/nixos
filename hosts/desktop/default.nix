@@ -13,9 +13,8 @@
 
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    _1password-shell-plugins.nixosModules.default
-  ];
 
+  ];
 
   # Disable the GNOME3/GDM auto-suspend feature that cannot be disabled in GUI!
   # If no user is logged in, the machine will power down after 20 minutes.
@@ -305,17 +304,7 @@
       enable = true;
       polkitPolicyOwners = [ config.users.users.markus.name ];
     };
-    _1password-shell-plugins = {
-      # enable 1Password shell plugins for bash, zsh, and fish shell
-      enable = false;
-      # the specified packages as well as 1Password CLI will be
-      # automatically installed and configured to use shell plugins
-      # plugins = with pkgs; [
-      #   glab
-      #   cachix
-      #   nodePackages.vercel
-      # ];
-    };
+
     # Install firefox.
     firefox = {
       enable = true;
