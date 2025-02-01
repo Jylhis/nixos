@@ -102,6 +102,7 @@
         jyl-nix-config = import ./modules/nix-config.nix;
         jyl-cachix = import ./modules/cachix.nix;
       };
+
       nixosConfigurations = {
         mac-mini = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";

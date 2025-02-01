@@ -2,12 +2,10 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 {
-  self,
   lib,
   pkgs,
   config,
-  _1password-shell-plugins,
-  emacs-overlay,
+
   ...
 }:
 {
@@ -161,12 +159,10 @@
           hotkey="[]"
         '';
       };
-      #videoDrivers = [ "modesetting" ];
-      # Configure keymap in X11
+
       xkb = {
         layout = "us,fi";
         variant = "";
-        options = "ctrl:swapcaps";
       };
     };
 
@@ -213,6 +209,11 @@
       rootless.enable = lib.mkForce false; # Necessary for CDI injection, see https://github.com/NixOS/nixpkgs/issues/337873#issuecomment-2332332343
     };
   };
+
+  users.users.markus.extraGroups = [
+    config.users.groups.docker.name
+    config.users.groups.vboxusers.name
+  ];
 
   environment = {
     gnome.excludePackages = [
@@ -327,216 +328,6 @@
   };
 
   security.rtkit.enable = true;
-
-  users = {
-
-    # Define a user account. Don't forget to set a password with ‘passwd’.
-    users = {
-
-      markus = {
-        isNormalUser = true;
-        description = "Markus";
-        extraGroups = [
-          config.users.groups.networkmanager.name # For managing network connections
-          config.users.groups.wheel.name # For sudo
-          config.users.groups.docker.name
-          config.users.groups.vboxusers.name
-        ];
-        packages = with pkgs; [
-          # General applications
-          spotify
-          signal-desktop
-
-          # Dev tools
-          nix-diff
-          ansible-language-server
-          asm-lsp
-          moreutils
-          delve
-          godef
-          gopls
-          nixd
-          source-code-pro
-
-          wget
-          planify
-          starship
-          tailscale
-          jetbrains.datagrip
-          minio-client
-
-          # CLI utils
-          bat
-          direnv
-          nix-direnv
-          git
-
-          # Emacs support packages
-          emacs-all-the-icons-fonts
-          source-code-pro
-
-          # Devtools (moved from emacs-markus)
-
-          marksman
-          ## Common
-          ripgrep
-
-          ## python
-          python3Packages.python-lsp-server
-          ruff
-
-          ## Go
-          # Golang
-          go
-          gopls
-          godef
-          delve
-
-          # Nix
-          statix
-          nixd
-          nixfmt-rfc-style
-
-          # vala
-          vala
-          vala-lint
-
-          # SQL
-          sqls
-          sqlint
-
-          # Haskell
-          ghc
-          haskell-language-server
-          cabal-install
-
-          # C# dotnet
-          dotnet-sdk
-          csharp-ls
-
-          # HTML + CSS
-          stylelint
-
-          # Config languages
-          yamllint
-
-          # Assembly
-          nasm
-          asm-lsp
-
-          # Build tools
-          cmake
-          gnumake
-
-          # Javascript & Typescript
-          eslint
-          typescript
-          nodePackages.jsdoc
-
-          # Docker
-          hadolint
-        ];
-      };
-
-      sara = {
-        isNormalUser = true;
-        extraGroups = [
-          "networkmanager"
-          "wheel"
-          "docker"
-        ];
-        packages = with pkgs; [
-          spotify
-          signal-desktop
-          microsoft-edge
-          vscode
-          affine
-
-        ];
-      };
-    };
-  };
-
-  home-manager.users.markus =
-    {
-      lib,
-      #      config,
-      #     nixosConfig,
-      #    pkgs,
-      ...
-    }:
-    {
-      services = {
-        emacs = {
-          enable = true;
-          package = self.outputs.packages.x86_64-linux.emacs-markus;
-          client.enable = true;
-          client.arguments = [
-            "-c"
-            "-a"
-            "emacs"
-          ];
-          defaultEditor = true;
-          socketActivation.enable = true;
-        };
-      };
-      programs = {
-        nix-index.enable = true;
-        bash.enable = true;
-        readline = {
-          enable = true;
-          variables = {
-            colored-completion-prefix = true; # Enable coloured highlighting of completions
-            completion-ignore-case = true; # Auto-complete files with the wrong case
-            revert-all-at-newline = true; # Don't save edited commands until run
-            show-all-if-ambiguous = true;
-          };
-        };
-        git = {
-          enable = true;
-          userEmail = lib.mkForce "markus@jylhis.com";
-          userName = "Jylhis";
-          ignores = [
-            "*~"
-            "\#*\#"
-            "*.elc"
-            ".\#*"
-            "[._]*.sw[a-p]"
-          ];
-
-        };
-        emacs = {
-          enable = true;
-          package = self.outputs.packages.x86_64-linux.emacs-markus;
-        };
-        direnv.enable = true;
-        starship.enable = true;
-        ssh.enable = true;
-        ssh.extraConfig = ''
-          IdentityAgent ~/.1password/agent.sock
-        '';
-
-      };
-
-      home = {
-        keyboard = {
-          options = [
-            "ctrl:swapcaps"
-            "terminate:ctrl_alt_bksp"
-            "lv3:ralt_switch"
-          ];
-        };
-        shellAliases = {
-          ec = "emacsclient -t";
-          eg = "emacsclient -c -a emacs";
-          eb = "emacs -nw -Q";
-          ebg = "emacs -Q";
-          open = "xdg-open";
-        };
-
-        stateVersion = "24.11";
-      };
-    };
 
   programs = {
     command-not-found.enable = false;

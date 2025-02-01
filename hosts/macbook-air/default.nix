@@ -3,11 +3,11 @@
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
 {
-  config,
+  self,
+
   #  lib,
   pkgs,
-  # _1password-shell-plugins,
-  emacs-overlay,
+
   ...
 }:
 
@@ -115,7 +115,6 @@
         extraGSettingsOverrides = ''
           [org.gnome.desktop.input-sources]
           sources=[('xkb', 'us'), ('xkb', 'fi')]
-          xkb-options=['ctrl:swapcaps','terminate:ctrl_alt_bksp', 'lv3:ralt_switch']
 
           [org.gnome.desktop.interface]
           gtk-theme='org.gnome.desktop.interface'
@@ -128,7 +127,6 @@
       xkb = {
         layout = "us,fi";
         variant = "";
-        options = "ctrl:swapcaps";
       };
     };
     printing = {
@@ -138,13 +136,6 @@
   };
 
   environment = {
-    interactiveShellInit = ''
-      alias ec='emacsclient -t'
-      alias eg='emacsclient -c -a emacs'
-      alias eb='emacs -nw -Q'
-      alias ebg='emacs -Q'
-      alias open='xdg-open'
-    '';
     # etc."modprobe.d/amd-egpu-pcie-speed.conf".text = ''
     #   options amdgpu pcie_gen_cap=0x40000
     # '';
@@ -221,43 +212,6 @@
     };
   };
 
-  users.users.markus = {
-    isNormalUser = true;
-    description = "Markus";
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-      "docker"
-    ];
-    packages = with pkgs; [
-      spotify
-      signal-desktop
-      nixd
-      gopls
-      godef
-      delve
-      source-code-pro
-      asm-lsp
-      ansible-language-server
-    ];
-  };
-
-  users.users.sara = {
-    isNormalUser = true;
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-      "docker"
-    ];
-    packages = with pkgs; [
-      spotify
-      signal-desktop
-      microsoft-edge
-      vscode
-      affine
-
-    ];
-  };
   programs = {
     #nh.enable = true;
     _1password.enable = true;
