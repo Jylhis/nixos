@@ -105,7 +105,6 @@
     udev.packages = [
       pkgs.gnome-settings-daemon
     ];
-    fwupd.enable = true;
 
     xserver = {
       enable = true;

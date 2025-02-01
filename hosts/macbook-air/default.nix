@@ -176,7 +176,6 @@
         pandoc
         pciutils
         planify
-        python3Packages.mlflow
         sd
         slack
         solaar
