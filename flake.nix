@@ -101,6 +101,7 @@
       nixosModules = {
         markus = import ./users/markus.nix;
         sara = import ./users/sara.nix;
+        apple-hardware = import ./modules/apple-hardware.nix;
         jyl-nix-config = import ./modules/nix-config.nix;
         jyl-cachix = import ./modules/cachix.nix;
       };
@@ -118,7 +119,8 @@
             nixos-hardware.nixosModules.common-cpu-intel
             nixos-hardware.nixosModules.common-pc
             nixos-hardware.nixosModules.common-pc-ssd
-            nixos-hardware.nixosModules.apple-t2
+            self.nixosModules.apple-hardware
+
             self.nixosModules.markus
             self.nixosModules.sara
             self.nixosModules.jyl-nix-config
@@ -138,7 +140,8 @@
             nixos-hardware.nixosModules.common-cpu-intel
             nixos-hardware.nixosModules.common-pc-laptop
             nixos-hardware.nixosModules.common-pc-laptop-ssd
-            nixos-hardware.nixosModules.apple-t2
+            self.nixosModules.apple-hardware
+
             self.nixosModules.markus
             self.nixosModules.sara
             self.nixosModules.jyl-nix-config

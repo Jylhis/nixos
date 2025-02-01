@@ -33,23 +33,12 @@
     };
 
   };
-  hardware.firmware = [
-    (pkgs.stdenvNoCC.mkDerivation (_: {
-      name = "brcm-firmware";
-      src = pkgs.requireFile {
-        #  nix store add-file --name macbook-air-firmware.tar.gz
-        name = "macbook-air-firmware.tar.gz";
-        message = "asdf";
-        hash = "sha256-kbBB0HgbUBwDMqTJwLo3ykDs1mmx8dj1JUXbXGLVQss=";
-      };
-      unpackPhase = ''
-        mkdir -p $out/lib/firmware/brcm
-        tar xzf $src --dir "$out/lib/firmware/brcm"
-      '';
-    }))
-  ];
   powerManagement.enable = true;
 
+  apple-hardware.enableFirmware = true;
+  apple-hardware.firmware = self.outputs.packages.x86_64-linux.brcm-firmware.override {
+    name = "macbook-air-firmware.tar.gz";
+    hash = "sha256-kbBB0HgbUBwDMqTJwLo3ykDs1mmx8dj1JUXbXGLVQss=";
   };
 
   networking = {
