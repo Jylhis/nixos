@@ -1,5 +1,4 @@
 {
-  lib,
   emacsWithPackagesFromUsePackage,
   emacs,
 }:

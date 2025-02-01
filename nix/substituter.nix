@@ -1,4 +1,3 @@
-{ ... }:
 let
   substituters = [ "https://cache.soopy.moe" ];
 in

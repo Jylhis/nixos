@@ -55,19 +55,28 @@
   # If no user is logged in, the machine will power down after 20 minutes.
   systemd = {
     services.NetworkManager-wait-online.enable = false;
-    targets.sleep.enable = false;
-    targets.suspend.enable = false;
-    targets.hibernate.enable = false;
-    targets.hybrid-sleep.enable = false;
+    targets = {
+
+      sleep.enable = false;
+      suspend.enable = false;
+      hibernate.enable = false;
+      hybrid-sleep.enable = false;
+    };
   };
 
   # Bootloader.
   boot = {
-    loader.systemd-boot.enable = true;
-    loader.systemd-boot.configurationLimit = 5;
-    loader.efi.canTouchEfiVariables = true;
-    plymouth.enable = true;
-    plymouth.theme = "breeze";
+    loader = {
+
+      systemd-boot.enable = true;
+      systemd-boot.configurationLimit = 5;
+      efi.canTouchEfiVariables = true;
+    };
+    plymouth = {
+
+      enable = true;
+      theme = "breeze";
+    };
     #extraModprobeConfig = ''
     #  options snd-hda-intel model=intel-mac-auto
     #'';
@@ -167,8 +176,8 @@
       drivers = [ pkgs.gutenprint ];
     };
     avahi = {
-      enable = true;
-      nssmdns4 = true;
+      enable = false;
+      nssmdns4 = false;
       openFirewall = true;
     };
 
@@ -206,18 +215,14 @@
   };
 
   environment = {
-
-    gnome.excludePackages = (
-      with pkgs;
-      [
-        epiphany
-        rhythmbox
-        geary
-        gnome-maps
-        gnome-music
-        gnome-weather
-      ]
-    );
+    gnome.excludePackages = [
+      pkgs.epiphany
+      pkgs.rhythmbox
+      pkgs.geary
+      pkgs.gnome-maps
+      pkgs.gnome-music
+      pkgs.gnome-weather
+    ];
 
     # List packages installed in system profile. To search, run:
     # $ nix search wget
@@ -225,6 +230,7 @@
     systemPackages =
       with pkgs;
       [
+        cachix
         # General
         unzip
         bash-completion
@@ -453,9 +459,10 @@
 
   home-manager.users.markus =
     {
-      config,
-      nixosConfig,
-      pkgs,
+      lib,
+      #      config,
+      #     nixosConfig,
+      #    pkgs,
       ...
     }:
     {

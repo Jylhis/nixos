@@ -4,9 +4,9 @@
 
 {
   config,
-  lib,
+  #  lib,
   pkgs,
-  _1password-shell-plugins,
+  # _1password-shell-plugins,
   emacs-overlay,
   ...
 }:
@@ -21,15 +21,21 @@
   ];
   boot = {
     # Use the systemd-boot EFI boot loader.
-    loader.systemd-boot.enable = true;
-    loader.systemd-boot.configurationLimit = 5;
-    loader.efi.canTouchEfiVariables = true;
-    plymouth.enable = true;
-    plymouth.theme = "breeze";
-    #boot.loader.efi.efiSysMountPoint = "/boot";
+    loader = {
+
+      systemd-boot.enable = true;
+      systemd-boot.configurationLimit = 5;
+      efi.canTouchEfiVariables = true;
+    };
+    plymouth = {
+
+      enable = true;
+      theme = "breeze";
+    };
+
   };
   hardware.firmware = [
-    (pkgs.stdenvNoCC.mkDerivation (final: {
+    (pkgs.stdenvNoCC.mkDerivation (_: {
       name = "brcm-firmware";
       src = pkgs.requireFile {
         #  nix store add-file --name macbook-air-firmware.tar.gz

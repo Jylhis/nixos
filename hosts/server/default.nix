@@ -2,12 +2,12 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 {
-  self,
-  lib,
+  #  self,
+  # lib,
   pkgs,
   config,
-  _1password-shell-plugins,
-  emacs-overlay,
+  #_1password-shell-plugins,
+  #emacs-overlay,
   ...
 }:
 {
@@ -41,9 +41,14 @@
 
   # Bootloader.
   boot = {
-    loader.grub.enable = true;
-    loader.grub.device = "/dev/sda";
-    loader.grub.useOSProber = true;
+    loader = {
+      grub = {
+
+        enable = true;
+        device = "/dev/sda";
+        useOSProber = true;
+      };
+    };
 
     initrd.systemd.enable = true;
 

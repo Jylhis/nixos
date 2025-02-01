@@ -11,11 +11,6 @@
     # Hardware configuration
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
-    nixos-generators = {
-      url = "github:nix-community/nixos-generators";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     emacs-overlay = {
 
       url = "github:nix-community/emacs-overlay";
@@ -59,12 +54,12 @@
       nixpkgs,
 
       nixpkgs-unstable,
-      nixos-generators,
+
       flake-utils,
       emacs-overlay,
       nixos-hardware,
       home-manager,
-      self,
+
       sops-nix,
       ...
     }@attrs:
@@ -83,13 +78,6 @@
             inherit (pkgs) emacsWithPackagesFromUsePackage emacs;
           };
 
-          server = nixos-generators.nixosGenerate {
-            inherit system;
-            modules = [
-              ./hosts/server
-            ];
-            format = "virtualbox";
-          };
         };
 
         formatter = unstable.nixfmt-rfc-style;

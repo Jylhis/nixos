@@ -2,27 +2,30 @@
 # and may be overwritten by future invocations.  Please make changes
 # to /etc/nixos/configuration.nix instead.
 {
-  config,
+  #  config,
   lib,
-  pkgs,
-  modulesPath,
+  # pkgs,
+  #modulesPath,
   ...
 }:
 
 {
   imports = [ ];
 
-  boot.initrd.availableKernelModules = [
-    "ata_piix"
-    "ohci_pci"
-    "ehci_pci"
-    "ahci"
-    "sd_mod"
-    "sr_mod"
-  ];
-  boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ ];
-  boot.extraModulePackages = [ ];
+  boot = {
+
+    initrd.availableKernelModules = [
+      "ata_piix"
+      "ohci_pci"
+      "ehci_pci"
+      "ahci"
+      "sd_mod"
+      "sr_mod"
+    ];
+    initrd.kernelModules = [ ];
+    kernelModules = [ ];
+    extraModulePackages = [ ];
+  };
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/d8490b8f-cd8e-4565-91c7-c95a8c15593d";
