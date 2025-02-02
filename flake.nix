@@ -5,18 +5,12 @@
     # Nixpkgs
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
 
-    # Nixpkgs unstable
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-
     # Hardware configuration
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
     emacs-overlay = {
-
       url = "github:nix-community/emacs-overlay";
       inputs = {
-
-        nixpkgs.follows = "nixpkgs-unstable";
         nixpkgs-stable.follows = "nixpkgs";
       };
     };
@@ -50,8 +44,6 @@
       self,
       nixpkgs,
 
-      nixpkgs-unstable,
-
       flake-utils,
       emacs-overlay,
       nixos-hardware,
@@ -64,7 +56,6 @@
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system}.extend emacs-overlay.overlay;
-        unstable = nixpkgs-unstable.legacyPackages.${system};
 
       in
       {
@@ -79,7 +70,7 @@
 
         };
 
-        formatter = unstable.nixfmt-rfc-style;
+        formatter = pkgs.nixfmt-rfc-style;
 
         checks = {
           deadnix = pkgs.runCommand "lint" { buildInputs = [ pkgs.deadnix ]; } ''
