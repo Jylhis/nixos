@@ -39,7 +39,7 @@ in
     # Options for modules imported in "imports" can be set here.
     nix.settings = {
       extra-substituters = [
-        "https://hydra.soopy.moe"
+        #"https://hydra.soopy.moe"
         "https://cache.soopy.moe"
       ];
       extra-trusted-public-keys = [
@@ -48,7 +48,7 @@ in
       ];
       extra-trusted-substituters = [
         "https://cache.soopy.moe"
-        "https://hydra.soopy.moe"
+        #"https://hydra.soopy.moe"
       ];
     };
 

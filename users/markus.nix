@@ -3,12 +3,14 @@
   pkgs,
   config,
   home-manager,
+
   ...
 }:
 {
   imports = [
     # Paths to other modules.
     # Compose this module out of smaller ones.
+    ../modules/markus-dev.nix
   ];
 
   options = {
@@ -19,18 +21,35 @@
 
   config = {
 
+    environment.systemPackages = with pkgs; [
+      dconf2nix
+      # Emacs spelling
+      (aspellWithDicts (
+        dicts: with dicts; [
+          en
+          en-computers
+          en-science
+          sv
+          fi
+          de
+          fr
+        ]
+      ))
+    ];
     home-manager.users.markus =
       {
         lib,
-        #      config,
-        #     nixosConfig,
-        #    pkgs,
         ...
       }:
       {
+        imports = [
+          ./markus-dconf.nix
+        ];
+
         services = {
           emacs = {
             enable = true;
+            defaultEditor = true;
             package = self.outputs.packages.x86_64-linux.emacs-markus;
             client.enable = true;
             client.arguments = [
@@ -38,38 +57,143 @@
               "-a"
               "emacs"
             ];
-            defaultEditor = true;
             socketActivation.enable = true;
           };
         };
         programs = {
-          nix-index.enable = true;
-          bash.enable = true;
+
+          bash = {
+            enable = true;
+            enableCompletion = true;
+            historyControl = [
+              "ignoreboth"
+              "erasedups"
+            ];
+            historyIgnore = [
+              "ls"
+              "cd"
+              "exit"
+              "rm"
+              "cat"
+            ];
+            shellOptions = [
+              # Default
+              "checkwinsize" # Checks window size after each command.
+              "complete_fullquote"
+              "expand_aliases"
+
+              # Default from home manager
+              "checkjobs"
+              "extglob"
+              "globstar"
+              "histappend"
+
+              # Other
+              "cdspell" # Tries to fix minor errors in the directory spellings
+              "dirspell"
+              "shift_verbose"
+            ];
+          };
+
           readline = {
             enable = true;
+            bindings = {
+              # Up and down arrows search through the history for the characters before the cursor
+              "\\e[A" = "history-search-backward";
+              "\\e[B" = "history-search-forward";
+            };
+
             variables = {
               colored-completion-prefix = true; # Enable coloured highlighting of completions
               completion-ignore-case = true; # Auto-complete files with the wrong case
               revert-all-at-newline = true; # Don't save edited commands until run
               show-all-if-ambiguous = true;
+
             };
           };
           git = {
             enable = true;
+            lfs = {
+              enable = true;
+            };
             userEmail = lib.mkForce "markus@jylhis.com";
             userName = "Jylhis";
             ignores = [
               "*~"
+              # Emacs
               "\#*\#"
               "*.elc"
               ".\#*"
-              "[._]*.sw[a-p]"
-            ];
+              # Org-mode
+              ".org-id-locations"
+              "*_archive"
+              # Intellij
+              "*.iml"
+              "*.ipr"
+              "*.iws"
+              ".idea/"
+              # VIM
+              ".*.s[a-w][a-z]"
+              "*.un~"
+              "Session.vim"
+              ".netrwhist"
 
+            ];
+            extraConfig = {
+              color = {
+                ui = true;
+              };
+            };
           };
           emacs = {
             enable = true;
             package = self.outputs.packages.x86_64-linux.emacs-markus;
+
+          };
+          neovim = {
+            enable = true;
+            plugins = with pkgs.vimPlugins; [
+              vim-nix
+              vim-lastplace
+            ];
+            extraPackages = [
+              #pkgs.vim-language-server
+              pkgs.xclip # X11
+              # pkgs.wl-copy # Wayland
+            ];
+            defaultEditor = false;
+            viAlias = true;
+            vimAlias = true;
+            extraConfig = ''
+                        " your custom vimrc
+                        set nocompatible
+                        set backspace=indent,eol,start
+                        " Turn on syntax highlighting by default
+                        syntax on
+              	  set number
+                        set cursorline
+              	  set diffopt+=iwhite
+                        set wildignorecase
+              	  set copyindent
+                        set smarttab
+              	  set autoindent
+                        set smartindent
+
+                        set hlsearch "when there is a previous search pattern, highlight all its matches
+                        set incsearch "while typing a search command, show immediately where the so far typed pattern matches
+                        set ignorecase "ignore case in search patterns
+                        set smartcase "override the 'ignorecase' option if the search pattern contains uppercase characters
+                        set gdefault "imply global for new searches
+
+                        " Stuff
+
+
+                        " disable vi compatibility
+                        set nocompatible
+
+                        set encoding=utf-8
+              	  filetype plugin indent on
+            '';
           };
           direnv.enable = true;
           starship.enable = true;
@@ -81,6 +205,19 @@
         };
 
         home = {
+          language = {
+            base = "en_US.UTF-8";
+            collate = "de_CH.UTF-8";
+            ctype = "de_CH.UTF-8";
+            measurement = "de_CH.UTF-8";
+            messages = "en_US.UTF-8";
+            monetary = "de_CH.UTF-8";
+            name = "de_CH.UTF-8";
+            numeric = "de_CH.UTF-8";
+            paper = "de_CH.UTF-8";
+            telephone = "de_CH.UTF-8";
+            time = "de_CH.UTF-8";
+          };
           keyboard = {
             options = [
               "ctrl:swapcaps"
@@ -89,10 +226,10 @@
             ];
           };
           shellAliases = {
-            ec = "emacsclient -t";
-            eg = "emacsclient -c -a emacs";
-            eb = "emacs -nw -Q";
-            ebg = "emacs -Q";
+            emc = "emacsclient -t";
+            emcg = "emacsclient -c -a emacs";
+            emqg = "emacs -nw -Q";
+            emq = "emacs -Q";
             open = "xdg-open";
           };
 
@@ -119,94 +256,11 @@
         spotify
         signal-desktop
 
-        # Dev tools
-        nix-diff
-        ansible-language-server
-        asm-lsp
-        moreutils
-        delve
-        godef
-        gopls
-        nixd
-        source-code-pro
+        jetbrains.datagrip
 
-        wget
         planify
         starship
-        tailscale
-        jetbrains.datagrip
-        minio-client
 
-        # CLI utils
-        bat
-        direnv
-        nix-direnv
-        git
-
-        # Emacs support packages
-        emacs-all-the-icons-fonts
-        source-code-pro
-
-        # Devtools (moved from emacs-markus)
-
-        marksman
-        ## Common
-        ripgrep
-
-        ## python
-        python3Packages.python-lsp-server
-        ruff
-
-        ## Go
-        # Golang
-        go
-        gopls
-        godef
-        delve
-
-        # Nix
-        statix
-        nixd
-        nixfmt-rfc-style
-
-        # vala
-        vala
-        vala-lint
-
-        # SQL
-        sqls
-        sqlint
-
-        # Haskell
-        ghc
-        haskell-language-server
-        cabal-install
-
-        # C# dotnet
-        dotnet-sdk
-        csharp-ls
-
-        # HTML + CSS
-        stylelint
-
-        # Config languages
-        yamllint
-
-        # Assembly
-        nasm
-        asm-lsp
-
-        # Build tools
-        cmake
-        gnumake
-
-        # Javascript & Typescript
-        eslint
-        typescript
-        nodePackages.jsdoc
-
-        # Docker
-        hadolint
       ];
     };
   };

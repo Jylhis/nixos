@@ -11,5 +11,6 @@
     epkgs: with epkgs; [
       use-package
       treesit-grammars.with-all-grammars
+      yasnippet-snippets
     ];
 })

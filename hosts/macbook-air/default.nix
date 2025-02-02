@@ -1,33 +1,26 @@
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-
 {
   self,
-
-  #  lib,
   pkgs,
-
+  config,
   ...
 }:
 
 {
   imports = [
-    # Include the results of the hardware scan.
 
-    ../../pentest-reverse-engineer.nix
     ./hardware-configuration.nix
   ];
   boot = {
     # Use the systemd-boot EFI boot loader.
     loader = {
-
       systemd-boot.enable = true;
       systemd-boot.configurationLimit = 5;
       efi.canTouchEfiVariables = true;
     };
     plymouth = {
-
       enable = true;
       theme = "breeze";
     };
@@ -47,45 +40,32 @@
   };
 
   time.timeZone = "Europe/Zurich";
-  i18n.defaultLocale = "en_US.UTF-8";
+  i18n = {
+    defaultLocale = "en_US.UTF-8";
+    extraLocaleSettings = {
+      LC_ADDRESS = "de_CH.UTF-8";
+      LC_IDENTIFICATION = "de_CH.UTF-8";
+      LC_MEASUREMENT = "de_CH.UTF-8";
+      LC_MONETARY = "de_CH.UTF-8";
+      LC_NAME = "de_CH.UTF-8";
+      LC_NUMERIC = "de_CH.UTF-8";
+      LC_PAPER = "de_CH.UTF-8";
+      LC_TELEPHONE = "de_CH.UTF-8";
+      LC_TIME = "de_CH.UTF-8";
+    };
+  };
 
   console.useXkbConfig = true;
 
+  # NetworkManager-wait-online.service fails to start
+  # https://github.com/NixOS/nixpkgs/issues/180175
+  systemd.services.NetworkManager-wait-online.enable = false;
+  systemd.network.wait-online.enable = false;
+  boot.initrd.systemd.network.wait-online.enable = false;
+
   services = {
     thermald.enable = true;
-    # tlp = {
-    #   enable = true;
-    #   settings = {
-    #     CPU_SCALING_GOVERNOR_ON_AC = "performance";
-    #     CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
 
-    #     CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-    #     CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
-
-    #     CPU_MIN_PERF_ON_AC = 0;
-    #     CPU_MAX_PERF_ON_AC = 100;
-    #     CPU_MIN_PERF_ON_BAT = 0;
-    #     CPU_MAX_PERF_ON_BAT = 20;
-
-    #     #Optional helps save long term battery health
-    #     START_CHARGE_THRESH_BAT0 = 40; # 40 and bellow it starts to charge
-    #     STOP_CHARGE_THRESH_BAT0 = 80; # 80 and above it stops charging
-
-    #   };
-    # };
-
-    # auto-cpufreq.enable = true;
-    # auto-cpufreq.settings = {
-    #   battery = {
-    #     governor = "powersave";
-    #     turbo = "never";
-
-    #   };
-    #   charger = {
-    #     governor = "performance";
-    #     turbo = "auto";
-    #   };
-    # };
     tailscale.enable = true;
     hardware.bolt.enable = true;
 
@@ -122,13 +102,15 @@
       enable = true;
       drivers = [ pkgs.gutenprint ];
     };
+    gnome = {
+      #gnome-online-accounts.enable = true;
+      #gnome-browser-connector.enable = true;
+    };
   };
-
+  #systemd.services.NetworkManager-wait-online.enable = false;
   environment = {
-    # etc."modprobe.d/amd-egpu-pcie-speed.conf".text = ''
-    #   options amdgpu pcie_gen_cap=0x40000
-    # '';
     gnome.excludePackages = with pkgs; [
+      totem
       rhythmbox
       geary
       gnome-weather
@@ -143,49 +125,43 @@
     systemPackages =
       with pkgs;
       [
-        sniffnet
+
         unzip
         bash-completion
         btop
-        cloud-utils
+
         curlie
         delta
         devenv
         direnv
-        docker
-        duf
-        dust
-        eza
+
+        # duf
+        #dust
+        #eza
         fd
-        gimp
-        git
-        git-lfs
-        glances
+
         gnome-tweaks
         gnumake
         htop
         iotop
         jq
-        k9s
-        kubectl
+
         lsof
         nix-direnv
         nix-ld
-        nvidia-docker
+
         openssl
         pandoc
         pciutils
         planify
-        sd
-        slack
-        solaar
-        sshpass
+        #sd
+
+        #sshpass
         starship
-        tailscale
-        vim
+
         vlc
         yq
-        zoxide
+        #zoxide
       ]
       ++ (with pkgs.gnomeExtensions; [
         solaar-extension
@@ -201,22 +177,31 @@
   };
 
   programs = {
-    #nh.enable = true;
     _1password.enable = true;
     _1password-gui = {
       enable = true;
-      polkitPolicyOwners = [ "markus" ];
+      polkitPolicyOwners = [
+        config.users.users.markus.name
+        config.users.users.sara.name
+      ];
     };
 
     # Install firefox.
-    firefox.enable = true;
-    chromium.enable = true;
-    java.enable = true;
-    direnv.enable = true;
-    ccache.enable = true;
-    git.lfs.enable = true;
-    appimage.enable = true;
-    starship.enable = true;
+    firefox = {
+      enable = true;
+      languagePacks = [
+        "en-US"
+        "en-GB"
+        "fi"
+        "de"
+        "fr"
+      ];
+    };
+
+    vim = {
+      enable = true;
+    };
+
   };
 
   system.stateVersion = "24.11"; # Did you read the comment?

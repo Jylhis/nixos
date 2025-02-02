@@ -1,3 +1,4 @@
 result
 *.tar.gz
 *.qcow2
+/firmware/

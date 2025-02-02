@@ -19,9 +19,8 @@
   # Disable the GNOME3/GDM auto-suspend feature that cannot be disabled in GUI!
   # If no user is logged in, the machine will power down after 20 minutes.
   systemd = {
-    services.NetworkManager-wait-online.enable = false;
-    targets = {
 
+    targets = {
       sleep.enable = false;
       suspend.enable = false;
       hibernate.enable = false;
@@ -32,13 +31,11 @@
   # Bootloader.
   boot = {
     loader = {
-
       systemd-boot.enable = true;
       systemd-boot.configurationLimit = 5;
       efi.canTouchEfiVariables = true;
     };
     plymouth = {
-
       enable = true;
       theme = "breeze";
     };
@@ -183,6 +180,7 @@
 
   environment = {
     gnome.excludePackages = [
+      pkgs.totem
       pkgs.epiphany
       pkgs.rhythmbox
       pkgs.geary
@@ -296,29 +294,27 @@
   security.rtkit.enable = true;
 
   programs = {
-    command-not-found.enable = false;
-    nix-index.enable = true;
     _1password.enable = true;
     _1password-gui = {
       enable = true;
-      polkitPolicyOwners = [ config.users.users.markus.name ];
+      polkitPolicyOwners = [
+        config.users.users.markus.name
+        config.users.users.sara.name
+      ];
     };
 
     # Install firefox.
     firefox = {
       enable = true;
+      languagePacks = [
+        "en-US"
+        "en-GB"
+        "fi"
+        "de"
+        "fr"
+      ];
     };
-    chromium.enable = true;
-    java.enable = true;
-    direnv.enable = true;
-    ccache.enable = true;
-    nix-ld.enable = true;
-    git = {
-      enable = true;
-      lfs.enable = true;
-    };
-    appimage.enable = true;
-    starship.enable = true;
+
   };
 
   # This value determines the NixOS release from which the default

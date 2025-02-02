@@ -1,0 +1,7 @@
+= dconf
+
+nix shell nixpkgs#dconf2nix
+dconf dump / | dconf2nix > dconf.nix
+
+https://github.com/nix-community/dconf2nix
+https://nix-community.github.io/home-manager/options.xhtml#opt-dconf.settings

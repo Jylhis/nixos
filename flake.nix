@@ -114,6 +114,7 @@
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
             }
             ./hosts/desktop
             nixos-hardware.nixosModules.common-cpu-intel
@@ -134,6 +135,7 @@
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
             }
             ./hosts/macbook-air
 
