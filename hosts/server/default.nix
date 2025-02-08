@@ -2,31 +2,18 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 {
-  #  self,
-  # lib,
   pkgs,
   config,
-  sops,
   ...
 }:
 {
   imports = [
-    ./hardware-configuration.nix
+    ./disko-config.nix
+    # ./hardware-configuration.nix
   ];
 
-  sops = {
-    age.generateKey = true;
-    defaultSopsFile = ../../secrets/server.yaml;
-    # This will automatically import SSH keys as age keys
-  #sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-  # This is using an age key that is expected to already be in the filesystem
-  #sops.age.keyFile = "/var/lib/sops-nix/key.txt";
-  # This will generate a new key if the key specified above does not exist
-
-  # This is the actual specification of the secrets.
-  #sops.secrets.example-key = {};
-  #sops.secrets."myservice/my_subdir/my_secret" = {};
-  };
+  disko.devices.disk.main.device = "/dev/sda";
+  disko.devices.disk.secondary.device = "/dev/sdb";
 
   nix = {
     gc = {
@@ -56,10 +43,9 @@
   boot = {
     loader = {
       grub = {
-
         enable = true;
-        device = "/dev/sda";
-        useOSProber = true;
+        efiSupport = true;
+        efiInstallAsRemovable = true;
       };
     };
 
@@ -68,6 +54,7 @@
   };
 
   networking = {
+    hostId = "82a30203";
     firewall = {
       enable = false;
       allowPing = true;
@@ -94,26 +81,26 @@
     };
   };
 
-  console.useXkbConfig = true;
+  #console.useXkbConfig = true;
 
   services = {
     openssh.enable = true;
     tailscale = {
-      enable = true;
+      enable = false;
       useRoutingFeatures = "server";
       disableTaildrop = true;
     };
 
-    sonarr.enable = true; # port: 8989
-    radarr.enable = true; # port: 7878
-    lidarr.enable = true; # port: 8686
-    bazarr.enable = true; # port: 6767
-    prowlarr.enable = true; # port: 9696
-    readarr.enable = true; # port: 8787
-    jellyfin.enable = true; # port: https: 8920 & http: 8096
+    sonarr.enable = false; # port: 8989
+    radarr.enable = false; # port: 7878
+    lidarr.enable = false; # port: 8686
+    bazarr.enable = false; # port: 6767
+    prowlarr.enable = false; # port: 9696
+    readarr.enable = false; # port: 8787
+    jellyfin.enable = false; # port: https: 8920 & http: 8096
 
     syncthing = {
-      enable = true;
+      enable = false;
       openDefaultPorts = true;
       settings.gui = {
         user = "myuser";
@@ -125,7 +112,7 @@
 
     # port: 9090
     prometheus = {
-      enable = true;
+      enable = false;
       globalConfig.scrape_interval = "10s"; # "1m"
       scrapeConfigs = [
         {
@@ -165,7 +152,7 @@
 
     # Port: 3000
     grafana = {
-      enable = true;
+      enable = false;
       settings = {
         analytics = {
           reporting_enabled = false;
@@ -222,7 +209,7 @@
     #your_spotify.enable = true;
 
     # Reverse proxy
-    nginx.enable = true;
+    nginx.enable = false;
     nginx.virtualHosts.localhost = {
       addSSL = false;
       enableACME = false;
@@ -234,15 +221,28 @@
     };
   };
 
+  # sops = {
+  #   age = {
+  #     keyFile = "${config.users.users.root.home}/.config/sops/age/keys.txt";
+  #     generateKey = true;
+  #     # sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+  #   };
+  #   defaultSopsFile = ../../secrets/server.yaml;
+  #   #secrets = {
+  #   #  zfs_key = { };
+  #   #};
+  # };
+
   environment = {
     systemPackages = with pkgs; [
+      sops
+      age
     ];
   };
 
   # Allow unfree packages
   nixpkgs.config = {
     allowUnfree = true;
-    warnUndeclaredOptions = true;
     permittedInsecurePackages = [
       "dotnet-sdk-6.0.428"
       "aspnetcore-runtime-6.0.36"

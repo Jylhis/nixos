@@ -44,7 +44,6 @@
       overlays = [ emacs-overlay.overlay ];
       config = {
         allowUnfree = true;
-        warnUndeclaredOptions = true;
       };
     };
 

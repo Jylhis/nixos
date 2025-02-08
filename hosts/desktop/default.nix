@@ -181,6 +181,21 @@
     config.users.groups.vboxusers.name
   ];
 
+  sops = {
+    age = {
+      keyFile = "${config.users.users.markus.home}/.config/sops/age/keys.txt";
+      generateKey = true;
+      # sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    };
+    defaultSopsFile = ../../secrets/default.yaml;
+    secrets = {
+      hello = {
+        owner = config.users.users.markus.name;
+      };
+    };
+
+  };
+
   environment = {
     gnome.excludePackages = with pkgs; [
       totem
@@ -198,6 +213,8 @@
     systemPackages =
       with pkgs;
       [
+        sops
+        age
 
         # General
         unzip

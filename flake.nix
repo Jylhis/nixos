@@ -59,6 +59,7 @@
 
       sops-nix,
       disko,
+      nixos-facter-modules,
       ...
     }@attrs:
     flake-utils.lib.eachDefaultSystem (
@@ -111,10 +112,17 @@
           system = "x86_64-linux";
           specialArgs = attrs;
           modules = [
+            sops-nix.nixosModules.sops
             home-manager.nixosModules.home-manager
             {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
+              home-manager = {
+
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                sharedModules = [
+                  sops-nix.homeManagerModules.sops
+                ];
+              };
             }
             ./hosts/desktop
             nixos-hardware.nixosModules.common-cpu-intel
@@ -154,8 +162,12 @@
         server = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
-            ./hosts/server
             sops-nix.nixosModules.sops
+            nixos-facter-modules.nixosModules.facter
+            { config.facter.reportPath = ./hosts/server/facter.json; }
+            disko.nixosModules.disko
+            self.nixosModules.jyl-cachix
+            ./hosts/server
           ];
         };
       };

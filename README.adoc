@@ -38,8 +38,15 @@ $ nix-shell -p sops --run "sops updatekeys secrets/example.yaml"
 nix run github:nix-community/nixos-anywhere -- --flake $(ROOT_DIR)#server --vm-test
 ----
 
-.Deploy and generate hardware config
+.Install nixos
 [,console]
 ----
-nix run github:nix-community/nixos-anywhere -- --generate-hardware-config nixos-facter ./hosts/server/facter.json  --flake .#server --target-host root@<ip address>
+nix run github:nix-community/nixos-anywhere -- --disk-encryption-keys /tmp/disk.key ./local.key --generate-hardware-config nixos-facter ./hosts/server/facter.json  --flake .#server --target-host root@192.168.1.53
+----
+
+
+.Deploy updates
+[,console]
+----
+nixos-rebuild switch --use-remote-sudo --flake "$(ROOT_DIR)#server" --target-host root@192.168.1.53
 ----

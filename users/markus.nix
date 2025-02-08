@@ -143,6 +143,9 @@
               color = {
                 ui = true;
               };
+              diff = {
+                "sops-decrypt".textconv = "sops decrypt";
+              };
             };
           };
           emacs = {
