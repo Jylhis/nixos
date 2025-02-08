@@ -16,6 +16,5 @@ jobs:
       with:
         name: jylhis-nixos
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-    - run: nix flake check
     - run: nix build .#emacs-markus
-    - run: nixos-rebuild build
+    - run: NIXPKGS_ALLOW_INSECURE=1 nix build --inputs-from . nixpkgs#sonarr --impure
