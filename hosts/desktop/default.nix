@@ -2,10 +2,10 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 {
+  self,
   lib,
   pkgs,
   config,
-
   ...
 }:
 {
@@ -91,6 +91,12 @@
   };
 
   console.useXkbConfig = true;
+
+  apple-hardware.enableFirmware = false;
+  apple-hardware.firmware = self.outputs.packages.x86_64-linux.brcm-firmware.override {
+    name = "firmware-mac-mini.tar";
+    hash = "sha256-nQmzaCAIcApl0ihSz/dV2z8iYPTGKBo04+Wxr3Uh7hc=";
+  };
 
   services = {
     hardware.bolt.enable = true;
@@ -179,14 +185,14 @@
   ];
 
   environment = {
-    gnome.excludePackages = [
-      pkgs.totem
-      pkgs.epiphany
-      pkgs.rhythmbox
-      pkgs.geary
-      pkgs.gnome-maps
-      pkgs.gnome-music
-      pkgs.gnome-weather
+    gnome.excludePackages = with pkgs; [
+      totem
+      rhythmbox
+      geary
+      gnome-weather
+      gnome-maps
+      gnome-music
+      epiphany
     ];
 
     # List packages installed in system profile. To search, run:
