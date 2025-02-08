@@ -6,14 +6,27 @@
   # lib,
   pkgs,
   config,
-  #_1password-shell-plugins,
-  #emacs-overlay,
+  sops,
   ...
 }:
 {
   imports = [
     ./hardware-configuration.nix
   ];
+
+  sops = {
+    age.generateKey = true;
+    defaultSopsFile = ../../secrets/server.yaml;
+    # This will automatically import SSH keys as age keys
+  #sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+  # This is using an age key that is expected to already be in the filesystem
+  #sops.age.keyFile = "/var/lib/sops-nix/key.txt";
+  # This will generate a new key if the key specified above does not exist
+
+  # This is the actual specification of the secrets.
+  #sops.secrets.example-key = {};
+  #sops.secrets."myservice/my_subdir/my_secret" = {};
+  };
 
   nix = {
     gc = {
@@ -37,7 +50,7 @@
     };
   };
 
-  users.users.root.password = "root";
+  users.users.root.initialPassword = "root";
 
   # Bootloader.
   boot = {
