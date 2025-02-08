@@ -2,7 +2,7 @@
   lib,
   stdenvNoCC,
   requireFile,
-  name ? "bcrm-firmware.tar.gz",
+  name ? "bcrm-firmware.tar",
   hash ? lib.fakeHash,
 }:
 
@@ -20,6 +20,6 @@ stdenvNoCC.mkDerivation (_: {
   };
   unpackPhase = ''
     mkdir -p $out/lib/firmware/brcm
-    tar xzf $src --dir "$out/lib/firmware/brcm"
+    tar xvf $src --dir "$out/lib/firmware/brcm"
   '';
 })
