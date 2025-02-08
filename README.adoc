@@ -1,7 +1,45 @@
 = dconf
 
-nix shell nixpkgs#dconf2nix
-dconf dump / | dconf2nix > dconf.nix
+
+[,console]
+----
+$ nix shell nixpkgs#dconf2nix
+# dconf dump / | dconf2nix > dconf.nix
+----
 
 https://github.com/nix-community/dconf2nix
 https://nix-community.github.io/home-manager/options.xhtml#opt-dconf.settings
+
+
+# Server
+
+.Create age keys for sops
+[,console]
+----
+$ mkdir -p ~/.config/sops/age
+$ age-keygen -o ~/.config/sops/age/keys.txt
+----
+
+.Modify sops secrets
+[,console]
+----
+$ nix-shell -p sops --run "sops secrets/example.yaml"
+----
+
+.After updating the keys:
+[,console]
+----
+$ nix-shell -p sops --run "sops updatekeys secrets/example.yaml"
+----
+
+.Run VM tests
+[,console]
+----
+nix run github:nix-community/nixos-anywhere -- --flake $(ROOT_DIR)#server --vm-test
+----
+
+.Deploy and generate hardware config
+[,console]
+----
+nix run github:nix-community/nixos-anywhere -- --generate-hardware-config nixos-facter ./hosts/server/facter.json  --flake .#server --target-host root@<ip address>
+----
