@@ -126,20 +126,77 @@
     # port: 9090
     prometheus = {
       enable = true;
+      globalConfig.scrape_interval = "10s"; # "1m"
+      scrapeConfigs = [
+        {
+          job_name = "node";
+          static_configs = [
+            {
+              targets = [
+                "localhost:${toString config.services.prometheus.exporters.node.port}"
+                "localhost:${toString config.services.prometheus.exporters.collectd.port}"
+                "localhost:${toString config.services.prometheus.exporters.process.port}"
+                "localhost:${toString config.services.prometheus.exporters.systemd.port}"
+
+                "localhost:${toString config.services.prometheus.exporters.exportarr-radarr.port}"
+                "localhost:${toString config.services.prometheus.exporters.exportarr-sonarr.port}"
+              ];
+            }
+          ];
+        }
+      ];
       exporters = {
         collectd.enable = true;
+        # TODO: For exportarr: api key file with sops
         #   exportarr-bazarr.enable = true;
         #   exportarr-lidarr.enable = true;
         #   exportarr-prowlarr.enable = true;
-        #   exportarr-radarr.enable = true;
+        #exportarr-radarr.enable = true;
         #   exportarr-readarr.enable = true;
-        #   exportarr-sonarr.enable = true;
+        #exportarr-sonarr.enable = true;
         node.enable = true;
         #   ping.enable = true;
         process.enable = true;
         systemd.enable = true;
         #   zfs.enable = true;
         #   wireguard.enable = true;
+      };
+    };
+
+    # Port: 3000
+    grafana = {
+      enable = true;
+      settings = {
+        analytics = {
+          reporting_enabled = false;
+          feedback_links_enabled = false;
+          check_for_updates = false;
+          check_for_plugin_updates = false;
+
+        };
+        server = {
+          enforce_domain = false;
+          enable_gzip = true;
+          serve_from_sub_path = true;
+          root_url = "%(protocol)s://%(domain)s:%(http_port)s/grafana/";
+        };
+      };
+
+      # TODO: Import
+      # https://grafana.com/grafana/dashboards/1860-node-exporter-full/
+      # https://grafana.com/grafana/dashboards/12530-sonarr-v3/
+      # https://grafana.com/grafana/dashboards/12896-radarr-v3/
+      provision = {
+        enable = true;
+        datasources = {
+          settings.datasources = [
+            {
+              name = "Prometheus";
+              type = "prometheus";
+              url = "http://${config.services.prometheus.listenAddress}:${toString config.services.prometheus.port}";
+            }
+          ];
+        };
       };
     };
 
@@ -155,7 +212,7 @@
       in
       {
         inherit package;
-        enable = true;
+        enable = false;
         python.enable = true;
         python.recommendedPythonPackages = true;
       };
@@ -163,6 +220,18 @@
     #shiori.enable = true;
     #outline.enable = true;
     #your_spotify.enable = true;
+
+    # Reverse proxy
+    nginx.enable = true;
+    nginx.virtualHosts.localhost = {
+      addSSL = false;
+      enableACME = false;
+      locations."/grafana/" = {
+        proxyPass = "http://${toString config.services.grafana.settings.server.http_addr}:${toString config.services.grafana.settings.server.http_port}";
+        proxyWebsockets = true;
+        recommendedProxySettings = true;
+      };
+    };
   };
 
   environment = {
