@@ -19,7 +19,6 @@
   # Disable the GNOME3/GDM auto-suspend feature that cannot be disabled in GUI!
   # If no user is logged in, the machine will power down after 20 minutes.
   systemd = {
-
     targets = {
       sleep.enable = false;
       suspend.enable = false;
@@ -39,9 +38,7 @@
       enable = true;
       theme = "breeze";
     };
-    #extraModprobeConfig = ''
-    #  options snd-hda-intel model=intel-mac-auto
-    #'';
+
     kernel.sysctl = {
       "vm.swappiness" = 1;
       # https://wiki.archlinux.org/title/Sysctl#Virtual_memory
@@ -319,6 +316,10 @@
         "de"
         "fr"
       ];
+    };
+
+    vim = {
+      enable = true;
     };
 
   };
