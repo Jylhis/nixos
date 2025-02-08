@@ -14,3 +14,6 @@ push-cache:
 
 clean:
 	nix store gc; nix-collect-garbage -d ; nix store optimise
+
+test:
+	nix run github:nix-community/nixos-anywhere -- --flake $(ROOT_DIR)#server --vm-test
