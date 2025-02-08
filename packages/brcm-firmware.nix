@@ -8,6 +8,10 @@
 
 stdenvNoCC.mkDerivation (_: {
   name = "brcm-firmware";
+
+  # Download the firmware script from: https://wiki.t2linux.org/tools/firmware.sh
+  # Run the script and select option 2. Create a tarball of the firmware and extract it to Linux.
+  # nix store add-file --name macbook-air-firmware.tar
   src = requireFile {
     inherit name hash;
 
