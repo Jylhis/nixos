@@ -8,6 +8,7 @@
     # Hardware configuration
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
+    nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs = {
@@ -15,7 +16,6 @@
       };
     };
 
-    _1password-shell-plugins.url = "github:1Password/shell-plugins";
     flake-utils.url = "github:numtide/flake-utils";
 
     home-manager = {
@@ -23,8 +23,16 @@
       url = "github:nix-community/home-manager/release-24.11";
     };
 
-    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
+    disko = {
+      url = "github:nix-community/disko/latest";
+      inputs.nixpkgs.follows = "nixpkgs";
+
+    };
   };
 
   nixConfig = {
@@ -50,6 +58,7 @@
       home-manager,
 
       sops-nix,
+      disko,
       ...
     }@attrs:
     flake-utils.lib.eachDefaultSystem (
