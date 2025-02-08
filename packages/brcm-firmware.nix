@@ -21,6 +21,6 @@ stdenvNoCC.mkDerivation (_: {
   dontUnpack = true;
   unpackPhase = ''
     mkdir -p $out/lib/firmware/brcm
-     tar -xf ${final.src} -C $out/lib/firmware/brcm
+     tar -xf $src -C $out/lib/firmware/brcm
   '';
 })
