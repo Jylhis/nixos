@@ -39,12 +39,8 @@
       nix-diff
 
       # Python
-      python3Packages.python-lsp-server
+      pyright
       ruff
-
-      # vala
-      vala
-      vala-lint
 
       # SQL
       sqls
@@ -62,6 +58,9 @@
       # HTML + CSS
       stylelint
 
+      nodePackages.vscode-json-languageserver
+      yaml-language-server
+
       # Config languages
       yamllint
 
@@ -71,6 +70,7 @@
 
       # Build tools
       cmake
+      cmake-language-server
       gnumake
 
       # Javascript & Typescript
@@ -79,11 +79,14 @@
       nodePackages.jsdoc
 
       # Docker
+      dockerfile-language-server-nodejs
       hadolint
 
       # Extra stuff
       emacs-all-the-icons-fonts
       source-code-pro
+
+      clang-tools
     ];
 
   };
