@@ -73,7 +73,7 @@
         packages = {
 
           emacs-markus = pkgs.callPackage ./packages/emacs-markus {
-            inherit (pkgs) emacsWithPackagesFromUsePackage emacs;
+            inherit (pkgs) emacsWithPackagesFromUsePackage emacs-nox;
           };
 
           brcm-firmware = pkgs.callPackage ./packages/brcm-firmware.nix { };
