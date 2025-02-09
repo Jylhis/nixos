@@ -8,7 +8,6 @@
     # Hardware configuration
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
-    nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs = {
@@ -59,7 +58,6 @@
 
       sops-nix,
       disko,
-      nixos-facter-modules,
       ...
     }@attrs:
     flake-utils.lib.eachDefaultSystem (
@@ -164,8 +162,6 @@
           system = "x86_64-linux";
           modules = [
             sops-nix.nixosModules.sops
-            nixos-facter-modules.nixosModules.facter
-            { config.facter.reportPath = ./hosts/server/facter.json; }
             disko.nixosModules.disko
             self.nixosModules.jyl-cachix
             ./hosts/server

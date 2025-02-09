@@ -44,7 +44,7 @@ nix run github:nix-community/nixos-anywhere -- --flake $(ROOT_DIR)#server --vm-t
 .Install nixos
 [,console]
 ----
-nix run github:nix-community/nixos-anywhere -- --disk-encryption-keys /tmp/disk.key ./local.key --generate-hardware-config nixos-facter ./hosts/server/facter.json  --flake .#server --target-host root@192.168.1.53
+nix run github:nix-community/nixos-anywhere -- --disk-encryption-keys /tmp/disk.key ./local.key --generate-hardware-config nixos-generate-config ./hosts/server/hardware-configuration.nix  --flake .#server --target-host root@192.168.1.53
 ----
 
 

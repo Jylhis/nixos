@@ -1,27 +1,21 @@
-# USAGE in your configuration.nix.
-# Update devices to match your hardware.
-# {
-#  imports = [ ./disko-config.nix ];
-#  disko.devices.disk.main.device = "/dev/sda";
-# }
-
 {
   disko.devices = {
     disk = {
       main = {
+        # Primary disk
         type = "disk";
+        #device = "/dev/sda"; # <--- Adjust if needed
         content = {
           type = "gpt";
           partitions = {
-            boot = {
+            bios_boot = {
               size = "1M";
-              type = "EF02"; # for grub MBR
-              priority = 1; # Needs to be first partition
+              type = "EF02"; # BIOS Boot for GRUB on GPT
             };
-            ESP = {
+            # UEFI Boot Partition
+            efi = {
               size = "500M";
               type = "EF00";
-
               content = {
                 type = "filesystem";
                 format = "vfat";
@@ -29,71 +23,115 @@
                 mountpoint = "/boot";
               };
             };
+            # ZFS Partition
             zfs = {
               size = "100%";
               content = {
                 type = "zfs";
                 pool = "zroot";
-
               };
             };
           };
         };
       };
+
       secondary = {
+        # Secondary disk
         type = "disk";
+        #device = "/dev/sdb"; # <--- Adjust if needed
         content = {
           type = "gpt";
           partitions = {
+            bios_boot = {
+              size = "1M";
+              type = "EF02";
+            };
 
+            efi = {
+              size = "500M";
+              type = "EF00";
+              content = {
+                type = "filesystem";
+                format = "vfat";
+                mountOptions = [ "umask=0077" ];
+                # Some users also mirror the EFI partition or mount only one.
+                # You could mount the second partition under /boot-efi2 if desired.
+              };
+            };
+            # Entire disk for ZFS pool
             zfs = {
               size = "100%";
               content = {
                 type = "zfs";
                 pool = "zroot";
-
               };
             };
           };
         };
       };
     };
+
+    # ZFS mirror configuration
     zpool = {
       zroot = {
         type = "zpool";
-        mode = "mirror"; # RAID1
-        # Workaround: cannot import 'zroot': I/O error in disko tests
-        #options.cachefile = "none";
-        rootFsOptions = {
-          # https://wiki.archlinux.org/title/Install_Arch_Linux_on_ZFS
-          # acltype = "posixacl";
-          # atime = "off";
-          compression = "zstd";
-          # mountpoint = "none";
-          # xattr = "sa";
+        mode = "mirror"; # RAID-1
+        # The partition numbers (sda2, sdb1, etc.) will match how Disko enumerates them
+        # after creating the GPT partitions above. Adjust if needed (e.g. "/dev/sda2", "/dev/sdb2").
+        #disks = [
+        #  "/dev/sda2"
+        #  "/dev/sdb1"
+        #];
+
+        # Common ZFS pool options
+        options = {
+          ashift = "12"; # Good default for modern disks (4K sectors)
         };
-        #options.ashift = "12";
-        mountpoint = "/";
 
+        # The "rootFsOptions" apply to the top-level dataset
+        rootFsOptions = {
+          canmount = "off"; # Don’t directly mount the top-level dataset
+          mountpoint = "none";
+          compression = "zstd";
+          acltype = "posixacl";
+          xattr = "sa";
+          atime = "off";
+        };
+
+        # Datasets inside "zroot"
         datasets = {
-
-          "local/nix" = {
+          # Root filesystem
+          root = {
             type = "zfs_fs";
-            mountpoint = "/nix";
-            options."com.sun:auto-snapshot" = "false";
+            mountpoint = "/";
+            options = {
+              canmount = "on"; # The actual dataset that gets mounted at /
+            };
           };
 
-          "data" = {
+          # Nix store
+          nix = {
+            type = "zfs_fs";
+            mountpoint = "/nix";
+            options."com.sun:auto-snapshot" = "false"; # Example: disable auto-snapshot on /nix
+          };
+
+          # Extra data
+          data = {
             type = "zfs_fs";
             mountpoint = "/data";
+
+            # Example encryption (prompt for passphrase at boot)
             options = {
               encryption = "aes-256-gcm";
               keyformat = "passphrase";
               keylocation = "file:///tmp/disk.key";
+
             };
-
+            postCreateHook = ''
+              zfs set keylocation="prompt" zroot/data
+            '';
           };
-
         };
       };
     };

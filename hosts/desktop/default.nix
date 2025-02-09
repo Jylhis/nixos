@@ -179,6 +179,7 @@
   users.users.markus.extraGroups = [
     config.users.groups.docker.name
     config.users.groups.vboxusers.name
+    config.users.groups.dialout.name # Serial console access. Used for virtualbox
   ];
 
   sops = {
@@ -215,6 +216,12 @@
       [
         sops
         age
+
+        # Hunspell for firefox
+        hunspell
+        #hunspellDicts.de-ch
+        #hunspellDicts.en-gb
+        #hunspellDicts.sv-fi
 
         # General
         unzip
@@ -301,6 +308,10 @@
 
   hardware = {
     graphics = {
+      extraPackages = with pkgs; [
+        intel-media-driver # For Broadwell (2014) or newer processors. LIBVA_DRIVER_NAME=iHD
+        #intel-vaapi-driver # For older processors. LIBVA_DRIVER_NAME=i965
+      ];
       enable = true;
       enable32Bit = true;
     };
@@ -333,6 +344,9 @@
         "de"
         "fr"
       ];
+      preferences = {
+        "media.ffmpeg.vaapi.enabled" = true;
+      };
     };
 
     vim = {

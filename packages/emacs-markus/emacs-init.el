@@ -503,12 +503,13 @@ point reaches the beginning or end of the buffer, stop there."
   orderless-component-separator
   #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
   orderless-style-dispatchers (list #'+orderless-consult-dispatch #'orderless-affix-dispatch))
+
+ :config
  ;; Define orderless style with initialism by default
  (orderless-define-completion-style
   +orderless-with-initialism
   (orderless-matching-styles
    '(orderless-initialism orderless-literal orderless-regexp)))
- :config
  (defun +orderless--consult-suffix ()
    "Regexp which matches the end of string with Consult tofu support."
    (if (and (boundp 'consult--tofu-char)
