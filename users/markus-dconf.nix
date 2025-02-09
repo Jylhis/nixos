@@ -22,6 +22,10 @@ with lib.hm.gvariant;
       ];
     };
 
+    "org/gnome/desktop/a11y/applications" = {
+      screen-keyboard-enabled = false;
+    };
+
     "org/gnome/desktop/app-folders" = {
       folder-children = [
         "Utilities"
@@ -67,6 +71,16 @@ with lib.hm.gvariant;
     };
 
     "org/gnome/desktop/input-sources" = {
+      sources = [
+        (mkTuple [
+          "xkb"
+          "us"
+        ])
+        (mkTuple [
+          "xkb"
+          "fi"
+        ])
+      ];
       xkb-options = [
         "terminate:ctrl_alt_bksp"
         "ctrl:swapcaps"
@@ -75,9 +89,11 @@ with lib.hm.gvariant;
 
     "org/gnome/desktop/interface" = {
       accent-color = "red";
+      color-scheme = "prefer-dark";
       enable-hot-corners = false;
       font-antialiasing = "grayscale";
       gtk-theme = "Adwaita";
+      toolkit-accessibility = false;
     };
 
     "org/gnome/desktop/notifications" = {
@@ -90,12 +106,36 @@ with lib.hm.gvariant;
       ];
     };
 
+    "org/gnome/desktop/notifications/application/1password" = {
+      application-id = "1password.desktop";
+    };
+
     "org/gnome/desktop/notifications/application/emacs" = {
       application-id = "emacs.desktop";
     };
 
+    "org/gnome/desktop/notifications/application/emacsclient" = {
+      application-id = "emacsclient.desktop";
+    };
+
+    "org/gnome/desktop/notifications/application/firefox" = {
+      application-id = "firefox.desktop";
+    };
+
+    "org/gnome/desktop/notifications/application/gimp" = {
+      application-id = "gimp.desktop";
+    };
+
     "org/gnome/desktop/notifications/application/gnome-power-panel" = {
       application-id = "gnome-power-panel.desktop";
+    };
+
+    "org/gnome/desktop/notifications/application/org-gnome-baobab" = {
+      application-id = "org.gnome.baobab.desktop";
+    };
+
+    "org/gnome/desktop/notifications/application/org-gnome-characters" = {
+      application-id = "org.gnome.Characters.desktop";
     };
 
     "org/gnome/desktop/notifications/application/org-gnome-console" = {
@@ -110,8 +150,28 @@ with lib.hm.gvariant;
       application-id = "org.gnome.Nautilus.desktop";
     };
 
+    "org/gnome/desktop/notifications/application/org-gnome-settings" = {
+      application-id = "org.gnome.Settings.desktop";
+    };
+
+    "org/gnome/desktop/notifications/application/signal-desktop" = {
+      application-id = "signal-desktop.desktop";
+    };
+
+    "org/gnome/desktop/notifications/application/spotify" = {
+      application-id = "spotify.desktop";
+    };
+
+    "org/gnome/desktop/notifications/application/vivaldi-stable" = {
+      application-id = "vivaldi-stable.desktop";
+    };
+
     "org/gnome/desktop/peripherals/keyboard" = {
       numlock-state = true;
+    };
+
+    "org/gnome/desktop/peripherals/touchpad" = {
+      two-finger-scrolling-enabled = true;
     };
 
     "org/gnome/desktop/wm/preferences" = {
@@ -168,6 +228,16 @@ with lib.hm.gvariant;
     "org/gnome/settings-daemon/plugins/color" = {
       night-light-enabled = true;
       night-light-schedule-automatic = false;
+      night-light-schedule-from = 18.0;
+      night-light-temperature = mkUint32 2581;
+    };
+
+    "org/gnome/settings-daemon/plugins/media-keys" = {
+      custom-keybindings = [
+        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
+      ];
+      home = [ "<Super>e" ];
+    };
     };
 
     "org/gnome/shell" = {

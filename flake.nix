@@ -74,7 +74,7 @@
 
           emacs-markus = pkgs.callPackage ./packages/emacs-markus {
             inherit (pkgs) emacsWithPackagesFromUsePackage;
-emacs = pkgs.emacs-pgtk;
+            emacs = pkgs.emacs-pgtk;
           };
 
           brcm-firmware = pkgs.callPackage ./packages/brcm-firmware.nix { };
