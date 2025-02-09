@@ -33,7 +33,6 @@
       gopls
 
       # Nix
-      nixd
       statix
       nixd
       nixfmt-rfc-style
