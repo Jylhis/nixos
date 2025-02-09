@@ -1,9 +1,9 @@
 {
   emacsWithPackagesFromUsePackage,
-  emacs-nox,
+  emacs,
 }:
 (emacsWithPackagesFromUsePackage {
-  package = emacs-nox;
+  package = emacs;
   config = ./emacs-init.el;
   defaultInitFile = true;
   alwaysEnsure = true;
