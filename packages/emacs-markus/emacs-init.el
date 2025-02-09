@@ -29,6 +29,9 @@
 :group 'mj)
 ;;; Code:
 
+;; TODO: remove custom stuff from below
+(use-package gcmh :ensure)
+(gcmh-mode 1)
 
 ;;;; Rest of the code:
 (when mj-setup-elpa
