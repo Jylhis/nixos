@@ -238,6 +238,11 @@ with lib.hm.gvariant;
       ];
       home = [ "<Super>e" ];
     };
+
+    "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
+      binding = "";
+      command = "emacsclient --create-frame";
+      name = "emacs";
     };
 
     "org/gnome/shell" = {

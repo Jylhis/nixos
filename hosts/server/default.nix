@@ -95,9 +95,9 @@ in
           # the keys are copied to initrd from the path specified; multiple keys can be set
           # you can generate any number of host keys using
           # `ssh-keygen -t ed25519 -N "" -f /path/to/ssh_host_ed25519_key`
-#          hostKeys = [ /path/to/ssh_host_rsa_key ];
+          #          hostKeys = [ /path/to/ssh_host_rsa_key ];
           # public ssh key used for login
- #         authorizedKeys = [ "ssh-rsa AAAA..." ];
+          #         authorizedKeys = [ "ssh-rsa AAAA..." ];
         };
       };
     };
