@@ -83,7 +83,7 @@
         #  "/dev/sdb1"
         #];
 
-        # Common ZFS pool options
+        # Common ZFS pool options: https://openzfs.github.io/openzfs-docs/Getting%20Started/NixOS/Root%20on%20ZFS.html
         options = {
           ashift = "12"; # Good default for modern disks (4K sectors)
         };
@@ -113,24 +113,28 @@
           nix = {
             type = "zfs_fs";
             mountpoint = "/nix";
-            options."com.sun:auto-snapshot" = "false"; # Example: disable auto-snapshot on /nix
+            options = {
+              "com.sun:auto-snapshot" = "false"; # Example: disable auto-snapshot on /nix
+            };
           };
 
-          # Extra data
+          # Unencrypt after boot
+          # zfs load-key zroot/data
+          # zfs mount zroot/data
           data = {
             type = "zfs_fs";
-            mountpoint = "/data";
 
-            # Example encryption (prompt for passphrase at boot)
-            # options = {
-            #   encryption = "aes-256-gcm";
-            #   keyformat = "passphrase";
-            #   keylocation = "file:///tmp/disk.key";
-	    #
-            # };
-            # postCreateHook = ''
-            #   zfs set keylocation="prompt" zroot/data
-            # '';
+            options = {
+              mountpoint = "/data";
+              encryption = "aes-256-gcm";
+              keyformat = "passphrase";
+              keylocation = "file:///tmp/disk.key";
+              canmount = "noauto";
+            };
+            postCreateHook = ''
+              zfs set keylocation="prompt" zroot/data
+            '';
+
           };
         };
       };
