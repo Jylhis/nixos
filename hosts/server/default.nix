@@ -304,9 +304,10 @@ in
       in
       {
         inherit package;
-        enable = false;
+        enable = true;
         python.enable = true;
         python.recommendedPythonPackages = true;
+        claimTokenFile = config.sops.secrets.netdata_claim_token.path;
       };
     # Experimental
     #shiori.enable = true;
