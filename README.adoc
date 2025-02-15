@@ -1,13 +1,60 @@
 = My NixOS
 
+
+
 == Initial setup
 
-* Install nixos
-* setup sops
-** Generate key from ssh
+[,console]
+----
+$ mkdir -p ~/.config/sops/age
+$ op read --out-file ./sops.key "op://<vault-id/name>/<item-id/name>/Private-key"
+$ ssh-to-age -private-key -i ./sops.key > ~/.config/sops/age/keys.txt && rm ./sops.key
+$ age-keygen -y ~/.config/sops/age/keys.txt
+----
+
+.Get server age key
+[,console]
+----
+ssh-keyscan <host/ip> | ssh-to-age
+----
+
+== Servers
+
+All of the tools needed for deployment are in the default devshell.
 
 
 
+.Run VM tests
+[,console]
+----
+nixos-anywhere -- --flake .#server --vm-test
+----
+
+.Install nixos with nixos-anywhere
+[,console]
+----
+nixos-anywhere -- --disk-encryption-keys /tmp/disk.key ./local.key --generate-hardware-config nixos-generate-config ./hosts/server/hardware-configuration.nix  --flake .#server --target-host root@192.168.1.53
+----
+
+
+.Deploy updates
+[,console]
+----
+# Using deploy-rs for magic rollback
+$ deploy --interactive .#server
+
+# Vanilla style
+$ nixos-rebuild switch --use-remote-sudo --flake "$(ROOT_DIR)#server" --target-host <hostname>
+----
+
+.Unlock encrypted volume
+[,console]
+----
+zfs load-key zroot/data
+zfs mount zroot/data
+----
+
+== Updates
 == dconf
 
 
@@ -19,47 +66,3 @@ $ nix shell nixpkgs#dconf2nix
 
 https://github.com/nix-community/dconf2nix
 https://nix-community.github.io/home-manager/options.xhtml#opt-dconf.settings
-
-
-# Server
-
-.Create age keys for sops
-[,console]
-----
-$ mkdir -p ~/.config/sops/age
-
-$ age-keygen -o ~/.config/sops/age/keys.txt
-# Or generate age key from ssh ed25519 key
-$ nix-shell -p ssh-to-age --run "ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt"
-----
-
-.Modify sops secrets
-[,console]
-----
-$ nix-shell -p sops --run "sops secrets/example.yaml"
-----
-
-.After updating the keys:
-[,console]
-----
-$ nix-shell -p sops --run "sops updatekeys secrets/example.yaml"
-----
-
-.Run VM tests
-[,console]
-----
-nix run github:nix-community/nixos-anywhere -- --flake $(ROOT_DIR)#server --vm-test
-----
-
-.Install nixos
-[,console]
-----
-nix run github:nix-community/nixos-anywhere -- --disk-encryption-keys /tmp/disk.key ./local.key --generate-hardware-config nixos-generate-config ./hosts/server/hardware-configuration.nix  --flake .#server --target-host root@192.168.1.53
-----
-
-
-.Deploy updates
-[,console]
-----
-nixos-rebuild switch --use-remote-sudo --flake "$(ROOT_DIR)#server" --target-host root@192.168.1.53
-----
