@@ -7,8 +7,12 @@
 
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # Hardware configuration
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+
+    srvos = {
+      url = "github:nix-community/srvos";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
@@ -46,6 +50,8 @@
       home-manager,
       sops-nix,
       disko,
+      srvos,
+      nixos-hardware,
       ...
     }@attrs:
 
@@ -75,7 +81,7 @@
               };
             }
             ./hosts/desktop
-
+            nixos-hardware.nixosModules.common-gpu-amd
             self.nixosModules.common
             self.nixosModules.user-markus
             self.nixosModules.user-sara
@@ -106,6 +112,8 @@
         server = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
+            srvos.nixosModules.server
+            srvos.nixosModules.hardware-hetzner-online-intel
             sops-nix.nixosModules.sops
             disko.nixosModules.disko
             self.nixosModules.jyl-cachix

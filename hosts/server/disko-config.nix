@@ -122,15 +122,15 @@
             mountpoint = "/data";
 
             # Example encryption (prompt for passphrase at boot)
-            options = {
-              encryption = "aes-256-gcm";
-              keyformat = "passphrase";
-              keylocation = "file:///tmp/disk.key";
-
-            };
-            postCreateHook = ''
-              zfs set keylocation="prompt" zroot/data
-            '';
+            # options = {
+            #   encryption = "aes-256-gcm";
+            #   keyformat = "passphrase";
+            #   keylocation = "file:///tmp/disk.key";
+	    #
+            # };
+            # postCreateHook = ''
+            #   zfs set keylocation="prompt" zroot/data
+            # '';
           };
         };
       };

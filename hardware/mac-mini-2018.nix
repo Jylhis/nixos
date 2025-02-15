@@ -31,7 +31,7 @@
         };
     boot = {
       kernelModules = [ "kvm-intel" ];
-
+      kernelParams = [ "nosgx" ];
       initrd = {
         availableKernelModules = [
           "xhci_pci"

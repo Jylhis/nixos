@@ -33,7 +33,7 @@
       efi.canTouchEfiVariables = true;
       systemd-boot = {
         enable = true;
-        configurationLimit = 5;
+        configurationLimit = 3;
       };
     };
     plymouth = {
@@ -56,8 +56,8 @@
     };
     consoleLogLevel = 0;
     kernelParams = [
+      "mitigations=off"
       "quiet"
-      "splash"
       "boot.shell_on_fail"
       "loglevel=3"
       "rd.systemd.show_status=false"
@@ -107,7 +107,10 @@
 
     xserver = {
       enable = true;
-
+      videoDrivers = [
+        "modesetting"
+        "fbdev"
+      ];
       displayManager.gdm.enable = true;
       desktopManager.gnome.enable = true;
       # Set layout in GNOME
@@ -137,9 +140,7 @@
       drivers = [ pkgs.gutenprint ];
     };
     avahi = {
-      enable = true;
-      nssmdns4 = true;
-      openFirewall = true;
+      enable = false;
     };
 
     pipewire = {
@@ -158,9 +159,12 @@
   };
 
   documentation = {
+    enable = true;
+    doc.enable = true;
     nixos.enable = true;
     man.enable = true;
     dev.enable = true;
+    info.enable = true;
   };
 
   virtualisation = {
@@ -290,11 +294,38 @@
       ]);
   };
 
+  # specialisation = {
+  #   egpu.configuration = {
+  #     system.nixos.tags = [ "egpu" ];
+  #     boot = {
+  #       blacklistedKernelModules = [ "i915" ];
+  #       initrd = {
+  #         kernelModules = [ "amdgpu" ];
+  #       };
+  #       kernelParams = [
+  #         "i915.modeset=0"
+  #         "module_blacklist=i915"
+  #         "amdgpu.pcie_gen_cap=0x40000" # Force AMD GPU to use full width (optional)
+  #
+  #       ];
+  #     };
+  #     services.xserver.videoDrivers = [ "amdgpu" ];
+  #     hardware.graphics = {
+  #       extraPackages = with pkgs; [
+  #         amdvlk
+  #       ];
+  #       extraPackages32 = with pkgs; [
+  #         driversi686Linux.amdvlk
+  #       ];
+  #     };
+  #   };
+  # };
+
   hardware = {
     graphics = {
 
       enable = true;
-      #enable32Bit = false;
+      enable32Bit = true;
     };
     logitech.wireless = {
       enable = true;

@@ -489,16 +489,9 @@ point reaches the beginning or end of the buffer, stop there."
 
 (use-package orderless
  :ensure
-
-
-
  :config
- ;; Define orderless style with initialism by default
- (orderless-define-completion-style
-  +orderless-with-initialism
-  (orderless-matching-styles
-   '(orderless-initialism orderless-literal orderless-regexp)))
- (defun +orderless--consult-suffix ()
+
+(defun +orderless--consult-suffix ()
    "Regexp which matches the end of string with Consult tofu support."
    (if (and (boundp 'consult--tofu-char)
             (boundp 'consult--tofu-range))
@@ -507,6 +500,8 @@ point reaches the beginning or end of the buffer, stop there."
         consult--tofu-char
         (+ consult--tofu-char consult--tofu-range -1))
      "$"))
+
+
 
  ;; Recognizes the following patterns:
  ;; * .ext (file extension)
@@ -528,9 +523,20 @@ point reaches the beginning or end of the buffer, stop there."
          "\\." (substring word 1) (+orderless--consult-suffix))))))
 
 
- (completion-styles '(substring orderless basic))
- (completion-category-defaults nil)
- ( completion-category-overrides
+ ;; Define orderless style with initialism by default
+ (orderless-define-completion-style
+  +orderless-with-initialism
+  (orderless-matching-styles
+   '(orderless-initialism orderless-literal orderless-regexp)))
+
+
+
+ (setq
+  completion-styles '(substring orderless basic)
+
+  completion-category-defaults nil
+
+  completion-category-overrides
   '((file (styles partial-completion)) ;; partial-completion is tried first
     ;; enable initialism by default for symbols
     (command (styles +orderless-with-initialism))
@@ -538,11 +544,19 @@ point reaches the beginning or end of the buffer, stop there."
     (symbol (styles +orderless-with-initialism))
     (eglot (styles orderless))
     (eglot-capf (styles orderless)))
-  orderless-component-separator
-  #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
-  orderless-style-dispatchers (list #'+orderless-consult-dispatch #'orderless-affix-dispatch))
- )
 
+  orderless-component-separator  #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
+  orderless-style-dispatchers (list #'+orderless-consult-dispatch #'orderless-affix-dispatch)
+ ))
+
+
+(defun consult--orderless-regexp-compiler (input type &rest _config)
+  (setq input (cdr (orderless-compile input)))
+  (cons
+   (mapcar (lambda (r) (consult--convert-regexp r type)) input)
+   (lambda (str) (orderless--highlight input t str))))
+
+(setq consult--regexp-compiler #'consult--orderless-regexp-compiler)
 
 ;; Adds intellisense-style code completion at point that works great
 ;; Add extra context to Emacs documentation to help make it easier to

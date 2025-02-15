@@ -5,26 +5,6 @@ with lib.hm.gvariant;
 
 {
   dconf.settings = {
-    "org/gnome/Console" = {
-      last-window-maximised = false;
-      last-window-size = mkTuple [
-        652
-        480
-      ];
-    };
-
-    "org/gnome/control-center" = {
-      last-panel = "bluetooth";
-      window-state = mkTuple [
-        980
-        640
-        false
-      ];
-    };
-
-    "org/gnome/desktop/a11y/applications" = {
-      screen-keyboard-enabled = false;
-    };
 
     "org/freedesktop/tracker/miner/files" = {
       index-recursive-directories = [
@@ -35,6 +15,47 @@ with lib.hm.gvariant;
         "&VIDEOS"
         "/home/markus/Developer"
       ];
+    };
+
+    "org/gnome/Console" = {
+      last-window-maximised = false;
+      last-window-size = mkTuple [
+        652
+        480
+      ];
+    };
+
+    "org/gnome/calculator" = {
+      accuracy = 9;
+      angle-units = "degrees";
+      base = 10;
+      button-mode = "basic";
+      number-format = "automatic";
+      show-thousands = false;
+      show-zeroes = false;
+      source-currency = "";
+      source-units = "degree";
+      target-currency = "";
+      target-units = "radian";
+      window-maximized = false;
+      window-size = mkTuple [
+        360
+        626
+      ];
+      word-size = 64;
+    };
+
+    "org/gnome/control-center" = {
+      last-panel = "background";
+      window-state = mkTuple [
+        980
+        640
+        false
+      ];
+    };
+
+    "org/gnome/desktop/a11y/applications" = {
+      screen-keyboard-enabled = false;
     };
 
     "org/gnome/desktop/app-folders" = {
@@ -258,6 +279,7 @@ with lib.hm.gvariant;
     };
 
     "org/gnome/shell" = {
+      disable-user-extensions = false;
       enabled-extensions = [
         "appindicatorsupport@rgcjonas.gmail.com"
         "solaar-extension@sidevesh"
