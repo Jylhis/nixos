@@ -225,7 +225,7 @@
         git
         gnumake
         clang-tools
-        gcc14
+        gcc
         gdb
         rr
         pkg-config
@@ -233,7 +233,7 @@
         cppcheck
         valgrind
         python3
-        nodejs_22
+        nodejs
         jdk
         git
 
