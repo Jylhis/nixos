@@ -314,17 +314,6 @@ in
     #outline.enable = true;
     #your_spotify.enable = true;
 
-    # Reverse proxy
-    nginx.enable = false;
-    nginx.virtualHosts.localhost = {
-      addSSL = false;
-      enableACME = false;
-      locations."/grafana/" = {
-        proxyPass = "http://${toString config.services.grafana.settings.server.http_addr}:${toString config.services.grafana.settings.server.http_port}";
-        proxyWebsockets = true;
-        recommendedProxySettings = true;
-      };
-    };
   };
 
   sops = {
