@@ -60,6 +60,11 @@ in
 
   # Bootloader.
   boot = {
+    kernelParams = [
+      "numa=off"
+      "mitigations=off"
+      "nosgx"
+    ];
     supportedFilesystems = [ "zfs" ];
     zfs.devNodes = "/dev";
     kernelPackages = latestKernelPackage;
@@ -71,6 +76,7 @@ in
         efiSupport = true;
         efiInstallAsRemovable = true;
         mirroredBoots = [
+          # FIXME
           {
             devices = [ "nodev" ];
             path = "/boot";
