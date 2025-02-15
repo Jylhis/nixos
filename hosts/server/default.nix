@@ -75,7 +75,14 @@ in
       "nosgx"
     ];
     supportedFilesystems = [ "zfs" ];
-    zfs.devNodes = "/dev";
+    zfs = {
+
+      devNodes = "/dev";
+      forceImportRoot = false;
+      forceImportAll = false;
+      passwordTimeout = 60;
+      requestEncryptionCredentials = false;
+    };
     kernelPackages = latestKernelPackage;
     loader = {
       #efi.canTouchEfiVariables = true;
