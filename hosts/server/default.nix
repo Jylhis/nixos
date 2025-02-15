@@ -178,8 +178,8 @@ in
     };
   };
 
-  #console.useXkbConfig = true;
-
+  # Disable default sync folder syncthing
+  systemd.services.syncthing.environment.STNODEFAULTFOLDER = "true"; # Don't create default ~/Sync folder
   services = {
     zfs.autoScrub.enable = true;
     openssh = {
@@ -205,7 +205,7 @@ in
     jellyfin.enable = false; # port: https: 8920 & http: 8096
 
     syncthing = {
-      enable = false;
+      enable = true;
       openDefaultPorts = true;
       settings.gui = {
         user = "myuser";
