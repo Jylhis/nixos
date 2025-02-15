@@ -13,7 +13,8 @@
       url = "github:nix-community/srvos";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
+    deploy-rs.url = "github:serokell/deploy-rs";
+    nixos-anywhere.url = "github:nix-community/nixos-anywhere";
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs = {
@@ -45,13 +46,15 @@
     {
       self,
       nixpkgs,
-      flake-utils,
-      emacs-overlay,
-      home-manager,
-      sops-nix,
+      deploy-rs,
       disko,
-      srvos,
+      nixos-anywhere,
+      emacs-overlay,
+      flake-utils,
+      home-manager,
       nixos-hardware,
+      sops-nix,
+      srvos,
       ...
     }@attrs:
 
@@ -122,6 +125,21 @@
         };
       };
 
+      deploy.nodes = {
+        server = {
+          hostname = "lab";
+          sshUser = "root";
+          autoRollback = true;
+          magicRollback = true;
+          profiles.system = {
+            user = "root";
+            path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.server;
+          };
+        };
+      };
+
+      checks = (builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib);
+
     })
     // flake-utils.lib.eachDefaultSystem (
       system:
@@ -149,19 +167,21 @@
 
         formatter = pkgs.nixfmt-rfc-style;
 
-        checks = {
-          deadnix = pkgs.runCommand "deadnix" { buildInputs = [ pkgs.deadnix ]; } ''
-            set -euo pipefail
-            deadnix --fail ${./.}
-            mkdir $out
-          '';
-          statix = pkgs.runCommand "statix" { buildInputs = [ pkgs.statix ]; } ''
-            set -euo pipefail
-            statix check ${./.}
-            mkdir $out
-          '';
+        devShells.default = pkgs.mkShellNoCC {
+          buildInputs = [
+            # Deployment tools
+            deploy-rs.packages.${system}.deploy-rs
+            nixos-anywhere.packages.${system}.nixos-anywhere
+            pkgs.age
+            pkgs.sops
+            pkgs.ssh-to-age
+
+            # Other tools
+            pkgs.dconf2nix
+          ];
 
         };
+
       }
     );
 }
