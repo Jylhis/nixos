@@ -190,8 +190,8 @@ in
     openssh = {
       enable = true;
       settings = {
-        PasswordAuthentication = lib.mkForce true;
-        PermitRootLogin = "yes";
+        PasswordAuthentication = false;
+        PermitRootLogin = "prohibit-password";
       };
 
     };
