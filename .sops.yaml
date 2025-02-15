@@ -1,12 +1,17 @@
+---
 keys:
-  - &markus age1yaq7q9cpuws7uay7z0x2frxwpmjlngk0vvqcg4mk9fzcxt09uusq95wfju
+  # sops updatekeys secrets/*
+  - &lab-server age1n70s2ssmssfd3x9wn4x39f7tuqvhnp7q6pluww54fq6swgq7au7s2d8gk6
   - &vm-server age1lql6xv47pqyyakfrpdnw772pjf9mzvp0uh5mctkfwr75lzdjs3xs9tc68n
+  - &markus age1yaq7q9cpuws7uay7z0x2frxwpmjlngk0vvqcg4mk9fzcxt09uusq95wfju
 creation_rules:
-  - path_regex: hosts/.*/secrets\.yaml$
+  - path_regex: secrets/.*\.yaml$
     key_groups:
       - age:
           - *markus
           - *vm-server
+          - *lab-server
+  # sops users/markus/secrets.yaml
   - path_regex: users/markus/secrets\.yaml$
     key_groups:
       - age:
