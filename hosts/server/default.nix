@@ -56,6 +56,12 @@ in
   users = {
 
     groups = {
+      prv-media = {
+        members = [
+          config.users.users.syncthing.name
+          config.users.users.jellyfin.name
+        ];
+      };
     };
 
     users = {
