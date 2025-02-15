@@ -140,7 +140,6 @@ in
   systemd.network.networks."10-uplink".networkConfig.Address = "2a01:4f8:201:71cd::1";
   networking = {
     hostId = "91312b0a";
-
     hostName = "server";
 
     interfaces."enp0s31f6".ipv4.addresses = [
@@ -208,7 +207,11 @@ in
     bazarr.enable = false; # port: 6767
     prowlarr.enable = false; # port: 9696
     readarr.enable = false; # port: 8787
-    jellyfin.enable = false; # port: https: 8920 & http: 8096
+    jellyfin = {
+
+      enable = true; # port: https: 8920 & http: 8096
+      openFirewall = true;
+    };
 
     syncthing = {
       enable = true;
