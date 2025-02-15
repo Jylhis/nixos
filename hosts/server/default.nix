@@ -175,9 +175,9 @@ in
 
     };
     tailscale = {
-      enable = false;
-      useRoutingFeatures = "server";
-      disableTaildrop = true;
+      enable = true;
+      openFirewall = true;
+      authKeyFile = config.sops.secrets.tailscale_auth_key.path;
     };
 
     sonarr.enable = false; # port: 8989
@@ -314,14 +314,15 @@ in
     age = {
       generateKey = true;
     };
-    defaultSopsFile = ./secrets.yaml;
-    #secrets = {
-    #  zfs_key = { };
-    #};
+    defaultSopsFile = ../../secrets/default.yaml;
+    secrets = {
+      tailscale_auth_key = { };
+    };
   };
 
   environment = {
     systemPackages = with pkgs; [
+      tailscale
       vim
       sops
       age
