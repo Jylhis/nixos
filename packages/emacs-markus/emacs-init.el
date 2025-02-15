@@ -98,7 +98,7 @@
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
  )
 
-(auto-insert-mode)
+;;(auto-insert-mode)
 
 ;; Ignore case in completions
 (setq
@@ -108,13 +108,13 @@
 
 ;; Resizing the Emacs frame can be costly when changing the font. Disable this
 ;; to improve startup times with fonts larger than the system default.
-(setq frame-resize-pixelwise t)
+;;(setq frame-resize-pixelwise t)
 
 ;; However, do not resize windows pixelwise, as this can cause crashes in some
 ;; cases when resizing too many windows at once or rapidly.
-(setq window-resize-pixelwise nil)
+;;(setq window-resize-pixelwise nil)
 
-(setq resize-mini-windows 'grow-only)
+;;(setq resize-mini-windows 'grow-only)
 
 ;; refresh a buffer if changed on disk
 (global-auto-revert-mode t)
@@ -271,7 +271,7 @@
 ;; Reduce cursor lag by :
 ;; 1. Prevent automatic adjustments to `window-vscroll' for long lines.
 ;; 2. Resolve the issue of random half-screen jumps during scrolling.
-(setq auto-window-vscroll nil)
+;;(setq auto-window-vscroll nil)
 
 (xterm-mouse-mode 1) ; Enable mouse in terminal
 
@@ -479,30 +479,18 @@ point reaches the beginning or end of the buffer, stop there."
 
 ;; ;; Use `consult-completion-in-region' if Vertico is enabled.
 ;; ;; Otherwise use the default `completion--in-region' function.
-;; (setq completion-in-region-function
-;;       (lambda (&rest args)
-;;         (apply
-;;          (if vertico-mode
-;;              #'consult-completion-in-region
-;;            #'completion--in-region)
-;;          args)))
+ (setq completion-in-region-function
+       (lambda (&rest args)
+         (apply
+          (if vertico-mode
+              #'consult-completion-in-region
+            #'completion--in-region)
+          args)))
 
 (use-package orderless
  :ensure
- :custom
- (completion-styles '(substring orderless basic))
- (completion-category-defaults nil)
- ( completion-category-overrides
-  '((file (styles partial-completion)) ;; partial-completion is tried first
-    ;; enable initialism by default for symbols
-    (command (styles +orderless-with-initialism))
-    (variable (styles +orderless-with-initialism))
-    (symbol (styles +orderless-with-initialism))
-    (eglot (styles orderless))
-    (eglot-capf (styles orderless)))
-  orderless-component-separator
-  #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
-  orderless-style-dispatchers (list #'+orderless-consult-dispatch #'orderless-affix-dispatch))
+
+
 
  :config
  ;; Define orderless style with initialism by default
@@ -540,7 +528,19 @@ point reaches the beginning or end of the buffer, stop there."
          "\\." (substring word 1) (+orderless--consult-suffix))))))
 
 
-
+ (completion-styles '(substring orderless basic))
+ (completion-category-defaults nil)
+ ( completion-category-overrides
+  '((file (styles partial-completion)) ;; partial-completion is tried first
+    ;; enable initialism by default for symbols
+    (command (styles +orderless-with-initialism))
+    (variable (styles +orderless-with-initialism))
+    (symbol (styles +orderless-with-initialism))
+    (eglot (styles orderless))
+    (eglot-capf (styles orderless)))
+  orderless-component-separator
+  #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
+  orderless-style-dispatchers (list #'+orderless-consult-dispatch #'orderless-affix-dispatch))
  )
 
 
@@ -613,7 +613,7 @@ active region is added to the search string."
 
 ;; Extended completion utilities
 ;; https://github.com/minad/consult?tab=readme-ov-file#use-package-example
-(use-package  consult
+(use-package consult
  :ensure
  ;; Enable automatic preview at point in the *Completions* buffer. This is
  ;; relevant when you use the default completion UI.
@@ -766,7 +766,7 @@ active region is added to the search string."
     (window-parameters (mode-line-format . none)))))
 
 ;; Consult users will also want the embark-consult package.
-(use-package  embark-consult
+(use-package embark-consult
  :ensure ; only need to install it, embark loads it after consult if found
  :hook
  (embark-collect-mode . consult-preview-at-point-mode)
@@ -791,8 +791,7 @@ active region is added to the search string."
 
 ;; Icons
 (use-package all-the-icons :ensure)
-(use-package
- all-the-icons-dired
+(use-package all-the-icons-dired
  :ensure
  :after dired
  :hook (dired-mode . all-the-icons-dired-mode)
@@ -812,8 +811,7 @@ active region is added to the search string."
 (use-package dtrt-indent :ensure)
 
 ;;; Indication of local VCS changes
-(use-package
- diff-hl
+(use-package diff-hl
  :ensure
  :config (add-hook 'prog-mode-hook #'diff-hl-mode))
 (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
@@ -824,8 +822,7 @@ active region is added to the search string."
 
 (use-package cmake-font-lock :ensure)
 
-(use-package
- cmake-mode
+(use-package cmake-mode
  :ensure
  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
 
@@ -839,8 +836,7 @@ active region is added to the search string."
 (use-package google-c-style :ensure)
 
 ;; An extremely feature-rich git client. Activate it with "C-c g".
-(use-package
- magit
+(use-package magit
  :ensure
  :init (require 'bind-key)
  :bind (("C-c g" . magit-status))
@@ -853,8 +849,7 @@ active region is added to the search string."
 
 (use-package magit-lfs :ensure :after magit)
 
-(use-package
- magit-todos
+(use-package magit-todos
  :ensure
  :after magit
  :config (magit-todos-mode 1))
@@ -942,16 +937,15 @@ active region is added to the search string."
 (setq eglot-report-progress nil)  ; Prevent Eglot minibuffer spam
 (setq eglot-extend-to-xref t) ; Activate Eglot in cross-referenced non-project files
 
-(use-package
- copilot
- :ensure
- :bind
- (:map
-  copilot-completion-map
-  ("<tab>" . 'copilot-accept-completion)
-  ("TAB" . 'copilot-accept-completion)
-  ("C-TAB" . 'copilot-accept-completion-by-word)
-  ("C-<tab>" . 'copilot-accept-completion-by-word)))
+;; (use-package copilot
+;;  :ensure
+;;  :bind
+;;  (:map
+;;   copilot-completion-map
+;;   ("<tab>" . 'copilot-accept-completion)
+;;   ("TAB" . 'copilot-accept-completion)
+;;   ("C-TAB" . 'copilot-accept-completion-by-word)
+;;   ("C-<tab>" . 'copilot-accept-completion-by-word)))
 
 (use-package eldoc
   :init

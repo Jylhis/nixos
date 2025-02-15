@@ -26,6 +26,17 @@ with lib.hm.gvariant;
       screen-keyboard-enabled = false;
     };
 
+    "org/freedesktop/tracker/miner/files" = {
+      index-recursive-directories = [
+        "&DESKTOP"
+        "&DOCUMENTS"
+        "&MUSIC"
+        "&PICTURES"
+        "&VIDEOS"
+        "/home/markus/Developer"
+      ];
+    };
+
     "org/gnome/desktop/app-folders" = {
       folder-children = [
         "Utilities"
@@ -89,9 +100,10 @@ with lib.hm.gvariant;
 
     "org/gnome/desktop/interface" = {
       accent-color = "red";
-      color-scheme = "prefer-dark";
+      color-scheme = "default";
       enable-hot-corners = false;
-      font-antialiasing = "grayscale";
+      font-antialiasing = "rgba";
+      font-hinting = "full";
       gtk-theme = "Adwaita";
       toolkit-accessibility = false;
     };
@@ -294,6 +306,10 @@ with lib.hm.gvariant;
         1231
         902
       ];
+    };
+
+    "system/locale" = {
+      region = "de_CH.UTF-8";
     };
 
   };

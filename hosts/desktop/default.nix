@@ -10,10 +10,10 @@
 }:
 {
   imports = [
+    self.nixosModules.mac-mini-2018
 
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-
   ];
 
   # Disable the GNOME3/GDM auto-suspend feature that cannot be disabled in GUI!
@@ -30,9 +30,11 @@
   # Bootloader.
   boot = {
     loader = {
-      systemd-boot.enable = true;
-      systemd-boot.configurationLimit = 5;
       efi.canTouchEfiVariables = true;
+      systemd-boot = {
+        enable = true;
+        configurationLimit = 5;
+      };
     };
     plymouth = {
       enable = true;
@@ -40,15 +42,18 @@
     };
 
     kernel.sysctl = {
+      "kernel.sysrq" = 1;
       "vm.swappiness" = 1;
       # https://wiki.archlinux.org/title/Sysctl#Virtual_memory
       "vm.dirty_background_bytes" = 4194304;
       "vm.dirty_bytes" = 4194304;
     };
-    initrd.systemd.enable = true;
+    initrd = {
+      systemd.enable = true;
 
-    # Enable "Silent Boot"
-    initrd.verbose = false;
+      # Enable "Silent Boot"
+      verbose = false;
+    };
     consoleLogLevel = 0;
     kernelParams = [
       "quiet"
@@ -88,12 +93,6 @@
   };
 
   console.useXkbConfig = true;
-
-  apple-hardware.enableFirmware = false;
-  apple-hardware.firmware = self.outputs.packages.x86_64-linux.brcm-firmware.override {
-    name = "firmware-mac-mini.tar";
-    hash = "sha256-nQmzaCAIcApl0ihSz/dV2z8iYPTGKBo04+Wxr3Uh7hc=";
-  };
 
   services = {
     hardware.bolt.enable = true;
@@ -138,15 +137,15 @@
       drivers = [ pkgs.gutenprint ];
     };
     avahi = {
-      enable = false;
-      nssmdns4 = false;
+      enable = true;
+      nssmdns4 = true;
       openFirewall = true;
     };
 
     pipewire = {
       enable = true;
       alsa.enable = true;
-      alsa.support32Bit = true;
+      #alsa.support32Bit = false;
       pulse.enable = true;
       # If you want to use JACK applications, uncomment this
       #jack.enable = true;
@@ -182,30 +181,15 @@
     config.users.groups.dialout.name # Serial console access. Used for virtualbox
   ];
 
-  sops = {
-    age = {
-      keyFile = "${config.users.users.markus.home}/.config/sops/age/keys.txt";
-      generateKey = true;
-      # sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-    };
-    defaultSopsFile = ../../secrets/default.yaml;
-    secrets = {
-      hello = {
-        owner = config.users.users.markus.name;
-      };
-    };
-
-  };
-
   environment = {
-    gnome.excludePackages = with pkgs; [
-      totem
-      rhythmbox
-      geary
-      gnome-weather
-      gnome-maps
-      gnome-music
-      epiphany
+    gnome.excludePackages = [
+      pkgs.epiphany
+      pkgs.geary
+      pkgs.gnome-maps
+      pkgs.gnome-music
+      pkgs.gnome-weather
+      pkgs.rhythmbox
+      pkgs.totem
     ];
 
     # List packages installed in system profile. To search, run:
@@ -216,6 +200,7 @@
       [
         sops
         age
+        ssh-to-age
 
         # Hunspell for firefox
         hunspell
@@ -228,7 +213,6 @@
         bash-completion
 
         # Development
-        cloud-utils
         curlie
         delta
         devenv
@@ -308,12 +292,9 @@
 
   hardware = {
     graphics = {
-      extraPackages = with pkgs; [
-        intel-media-driver # For Broadwell (2014) or newer processors. LIBVA_DRIVER_NAME=iHD
-        #intel-vaapi-driver # For older processors. LIBVA_DRIVER_NAME=i965
-      ];
+
       enable = true;
-      enable32Bit = true;
+      #enable32Bit = false;
     };
     logitech.wireless = {
       enable = true;
@@ -344,9 +325,7 @@
         "de"
         "fr"
       ];
-      preferences = {
-        "media.ffmpeg.vaapi.enabled" = true;
-      };
+
     };
 
     vim = {

@@ -28,6 +28,10 @@
       settings = {
         auto-optimise-store = true;
         accept-flake-config = true;
+        download-attempts = 2;
+        connect-timeout = 5;
+        fallback = true;
+        tarball-ttl = 604800;
         keep-outputs = true;
         experimental-features = [
           "nix-command"

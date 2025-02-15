@@ -2,8 +2,12 @@ keys:
   - &markus age1yaq7q9cpuws7uay7z0x2frxwpmjlngk0vvqcg4mk9fzcxt09uusq95wfju
   - &vm-server age1lql6xv47pqyyakfrpdnw772pjf9mzvp0uh5mctkfwr75lzdjs3xs9tc68n
 creation_rules:
-  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+  - path_regex: hosts/.*/secrets\.yaml$
     key_groups:
-    - age:
-      - *markus
-      - *vm-server
+      - age:
+          - *markus
+          - *vm-server
+  - path_regex: users/markus/secrets\.yaml$
+    key_groups:
+      - age:
+          - *markus

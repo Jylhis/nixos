@@ -3,14 +3,15 @@
   pkgs,
   config,
   home-manager,
-
+  sops-nix,
   ...
 }:
 {
   imports = [
     # Paths to other modules.
     # Compose this module out of smaller ones.
-    ../modules/markus-dev.nix
+
+    ../../modules/markus-dev.nix
   ];
 
   options = {
@@ -39,11 +40,23 @@
     home-manager.users.markus =
       {
         lib,
+        sops,
         ...
       }:
       {
+        sops = {
+          age = {
+            keyFile = "${config.users.users.markus.home}/.config/sops/age/keys.txt";
+          };
+          defaultSopsFile = ./secrets.yaml;
+          secrets = {
+            #hello = {};
+          };
+
+        };
         imports = [
-          ./markus-dconf.nix
+          ./dconf.nix
+          sops-nix.homeManagerModules.sops
         ];
 
         services = {
@@ -65,6 +78,22 @@
           bash = {
             enable = true;
             enableCompletion = true;
+            enableVteIntegration = true;
+            bashrcExtra = ''
+              	      vterm_printf() {
+                              if [ -n "$TMUX" ] \
+                                && { [ "''${TERM%%-*}" = "tmux" ] \
+                                    || [ "''${TERM%%-*}" = "screen" ]; }; then
+                                # Tell tmux to pass the escape sequences through
+                                printf "\ePtmux;\e\e]%s\007\e\\" "$1"
+                              elif [ "''${TERM%%-*}" = "screen" ]; then
+                                # GNU screen (screen, screen-256color, screen-256color-bce)
+                                printf "\eP\e]%s\007\e\\" "$1"
+                              else
+                                printf "\e]%s\e\\" "$1"
+                              fi
+                           }
+              	    '';
             historyControl = [
               "ignoreboth"
               "erasedups"

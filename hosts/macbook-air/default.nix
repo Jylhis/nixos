@@ -10,7 +10,7 @@
 
 {
   imports = [
-
+    self.nixosModules.macbook-air
     ./hardware-configuration.nix
   ];
   boot = {
@@ -25,13 +25,6 @@
       theme = "breeze";
     };
 
-  };
-  powerManagement.enable = true;
-
-  apple-hardware.enableFirmware = true;
-  apple-hardware.firmware = self.outputs.packages.x86_64-linux.brcm-firmware.override {
-    name = "macbook-air-firmware.tar.gz";
-    hash = "sha256-kbBB0HgbUBwDMqTJwLo3ykDs1mmx8dj1JUXbXGLVQss=";
   };
 
   networking = {
@@ -59,12 +52,11 @@
 
   # NetworkManager-wait-online.service fails to start
   # https://github.com/NixOS/nixpkgs/issues/180175
-  systemd.services.NetworkManager-wait-online.enable = false;
-  systemd.network.wait-online.enable = false;
-  boot.initrd.systemd.network.wait-online.enable = false;
+  # systemd.services.NetworkManager-wait-online.enable = false;
+  # systemd.network.wait-online.enable = false;
+  # boot.initrd.systemd.network.wait-online.enable = false;
 
   services = {
-    thermald.enable = true;
 
     tailscale.enable = true;
     hardware.bolt.enable = true;
@@ -102,12 +94,9 @@
       enable = true;
       drivers = [ pkgs.gutenprint ];
     };
-    gnome = {
-      #gnome-online-accounts.enable = true;
-      #gnome-browser-connector.enable = true;
-    };
+
   };
-  #systemd.services.NetworkManager-wait-online.enable = false;
+
   environment = {
     gnome.excludePackages = with pkgs; [
       totem

@@ -1,4 +1,14 @@
-= dconf
+= My NixOS
+
+== Initial setup
+
+* Install nixos
+* setup sops
+** Generate key from ssh
+
+
+
+== dconf
 
 
 [,console]
