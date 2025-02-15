@@ -20,7 +20,6 @@
     nix.settings = {
 
       extra-substituters = [
-
         "https://nix-community.cachix.org"
         "https://jylhis-nixos.cachix.org"
       ];
