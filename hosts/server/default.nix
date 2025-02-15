@@ -186,6 +186,9 @@ in
   # Disable default sync folder syncthing
   systemd.services.syncthing.environment.STNODEFAULTFOLDER = "true"; # Don't create default ~/Sync folder
   services = {
+    fail2ban = {
+      enable = true;
+    };
     zfs.autoScrub.enable = true;
     openssh = {
       enable = true;
@@ -333,7 +336,7 @@ in
     secrets = {
       tailscale_auth_key = { };
       netdata_claim_token = {
-	owner = config.services.netdata.user;
+        owner = config.services.netdata.user;
       };
     };
   };
