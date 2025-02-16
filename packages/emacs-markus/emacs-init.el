@@ -946,7 +946,8 @@ active region is added to the search string."
 ;;; LSP Support
 (use-package eglot
   :ensure
-  :hook (prog-mode . eglot-ensure)
+  :hook
+  (prog-mode . eglot-ensure)
   )
 (setq eglot-report-progress nil)  ; Prevent Eglot minibuffer spam
 (setq eglot-extend-to-xref t) ; Activate Eglot in cross-referenced non-project files
@@ -1069,7 +1070,7 @@ active region is added to the search string."
  :ensure
  :mode "\\.nix\\'"
  :config
- (add-to-list 'eglot-server-programs '((nix-ts-mode nix-mode) . ("nixd")))
+ (add-to-list 'eglot-server-programs '((nix-ts-mode nix-mode) . ("nil")))
  )
 
 
