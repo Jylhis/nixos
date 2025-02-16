@@ -264,7 +264,7 @@ in
 
     # Port: 3000
     grafana = {
-      enable = false;
+      enable = true;
       settings = {
         analytics = {
           reporting_enabled = false;
