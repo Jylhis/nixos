@@ -237,7 +237,7 @@ in
                 "localhost:${toString config.services.prometheus.exporters.collectd.port}"
                 "localhost:${toString config.services.prometheus.exporters.process.port}"
                 "localhost:${toString config.services.prometheus.exporters.systemd.port}"
-
+		"localhost:${toString config.services.prometheus.exporters.zfs.port}"
                 #"localhost:${toString config.services.prometheus.exporters.exportarr-radarr.port}"
                 #"localhost:${toString config.services.prometheus.exporters.exportarr-sonarr.port}"
 		"100.100.100.100" # tailscale
@@ -255,12 +255,12 @@ in
         #exportarr-radarr.enable = true;
         #   exportarr-readarr.enable = true;
         #exportarr-sonarr.enable = true;
+	zfs.enable = true;
         node.enable = true;
         #   ping.enable = true;
         process.enable = true;
         systemd.enable = true;
-        #   zfs.enable = true;
-        #   wireguard.enable = true;
+
       };
     };
 
