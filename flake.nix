@@ -40,8 +40,17 @@
       inputs.nixpkgs.follows = "nixpkgs";
 
     };
-  };
+    systems.url = "github:nix-systems/default";
+    devenv = {
+      url = "github:cachix/devenv";
+      inputs.nixpkgs.follows = "nixpkgs";
 
+    };
+  };
+  nixConfig = {
+    extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
+    extra-substituters = "https://devenv.cachix.org";
+  };
   outputs =
     {
       self,
@@ -53,6 +62,7 @@
       flake-utils,
       home-manager,
       nixos-hardware,
+      devenv,
       sops-nix,
       srvos,
       ...
@@ -138,7 +148,7 @@
         };
       };
 
-      checks = (builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib);
+      checks = builtins.mapAttrs (_system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
 
     })
     // flake-utils.lib.eachDefaultSystem (
@@ -167,20 +177,70 @@
 
         formatter = pkgs.nixfmt-rfc-style;
 
-        devShells.default = pkgs.mkShellNoCC {
-          buildInputs = [
-            # Deployment tools
-            deploy-rs.packages.${system}.deploy-rs
-            nixos-anywhere.packages.${system}.nixos-anywhere
-            pkgs.age
-            pkgs.sops
-            pkgs.ssh-to-age
-            pkgs.git-agecrypt
+        devShells = {
+          deploy = pkgs.mkShellNoCC {
+            buildInputs = [
+              # Deployment tools
+              deploy-rs.packages.${system}.deploy-rs
+              nixos-anywhere.packages.${system}.nixos-anywhere
+              pkgs.age
+              pkgs.sops
+              pkgs.ssh-to-age
+              pkgs.git-agecrypt
 
-            # Other tools
-            pkgs.dconf2nix
-          ];
+              # Other tools
+              pkgs.dconf2nix
+            ];
+          };
+          default = devenv.lib.mkShell {
+            inherit pkgs;
+            inputs = attrs;
+            modules = [
+              {
+                cachix.enable = true;
+                cachix.pull = [
+                  "pre-commit-hooks"
+                  "jylhis-nixos"
+                ];
+                languages.nix.enable = true;
+                packages = [
+                  # Deployment tools
+                  deploy-rs.packages.${system}.deploy-rs
+                  nixos-anywhere.packages.${system}.nixos-anywhere
+                  pkgs.age
+                  pkgs.sops
+                  pkgs.ssh-to-age
+                  pkgs.git-agecrypt
 
+                  # Other tools
+                  pkgs.dconf2nix
+                ];
+                git-hooks.excludes = [
+                  "secrets/.*\.yaml$"
+                  "users/.*/secrets\.yaml$"
+                ];
+                git-hooks.hooks = {
+                  shellcheck.enable = true;
+                  check-added-large-files.enable = true;
+                  check-case-conflicts.enable = true;
+                  check-executables-have-shebangs.enable = true;
+                  check-merge-conflicts.enable = true;
+                  check-shebang-scripts-are-executable.enable = true;
+                  check-symlinks.enable = true;
+                  deadnix.enable = true;
+                  detect-private-keys.enable = true;
+                  #editorconfig-checker.enable = true;
+                  fix-byte-order-marker.enable = true;
+                  forbid-new-submodules.enable = true;
+                  nil.enable = true;
+                  nixfmt-rfc-style.enable = true;
+                  ripsecrets.enable = true;
+                  statix.enable = true;
+                  typos.enable = true;
+                };
+              }
+            ];
+          };
         };
 
       }

@@ -166,7 +166,7 @@
  ;custom-safe-themes t ; Mark all custom themes safe TODO: Needed?
 
 
- confirm-kill-processes nil ; when quiting emacs, just kill processes
+ confirm-kill-processes nil ; when quitting emacs, just kill processes
  enable-local-variables t ; ask if local variables are safe once.
  use-short-answers t ; life is too short to type yes or no
  tab-width 4
@@ -342,7 +342,7 @@
 
 ;; TODO: are both needed?
 (add-hook 'before-save-hook 'delete-trailing-whitespace) ; Delete trailing spaces
-(autoload 'nuke-trailing-whitespace "whitespace" nil t) ; Remove tailing whitepsace
+(autoload 'nuke-trailing-whitespace "whitespace" nil t) ; Remove tailing whitespace
 
 (use-package adoc-mode :ensure) ; AsciiDoc
 

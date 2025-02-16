@@ -138,7 +138,6 @@ in
 
   };
 
-
   networking = {
     hostId = "91312b0a";
     hostName = "server";
@@ -205,9 +204,9 @@ in
           user = "myuser";
           password = "mypassword";
         };
-        devices = import ./syncthing-devices.nix ;
+        devices = import ./syncthing-devices.nix;
 
-        folders = import ./syncthing-folders.nix {inherit config;};
+        folders = import ./syncthing-folders.nix { inherit config; };
       };
     };
 

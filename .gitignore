@@ -5,3 +5,4 @@ result-man
 /firmware/
 .devenv
 .direnv
+.pre-commit-config.yaml
