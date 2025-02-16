@@ -3,7 +3,7 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 build:
 	nixos-rebuild --flake $(ROOT_DIR) build
 
-switch-now:
+switch-mow:
 	nixos-rebuild --flake $(ROOT_DIR) --use-remote-sudo switch |& nom
 
 switch:
