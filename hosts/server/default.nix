@@ -152,6 +152,7 @@ in
   networking = {
     hostId = "91312b0a";
     hostName = "server";
+    firewall.allowedTCPPorts = [ config.services.grafana.settings.server.http_port ];
   };
 
   time.timeZone = "Europe/Zurich";
@@ -237,8 +238,9 @@ in
                 "localhost:${toString config.services.prometheus.exporters.process.port}"
                 "localhost:${toString config.services.prometheus.exporters.systemd.port}"
 
-                "localhost:${toString config.services.prometheus.exporters.exportarr-radarr.port}"
-                "localhost:${toString config.services.prometheus.exporters.exportarr-sonarr.port}"
+                #"localhost:${toString config.services.prometheus.exporters.exportarr-radarr.port}"
+                #"localhost:${toString config.services.prometheus.exporters.exportarr-sonarr.port}"
+		"100.100.100.100" # tailscale
               ];
             }
           ];
@@ -276,8 +278,12 @@ in
         server = {
           enforce_domain = false;
           enable_gzip = true;
-          serve_from_sub_path = true;
-          root_url = "%(protocol)s://%(domain)s:%(http_port)s/grafana/";
+          http_addr = "0.0.0.0";
+        };
+        security = {
+          disable_gravatar = true;
+          admin_user = "admin";
+          admin_password = "$__file{${config.sops.secrets.grafana_admin_password.path}}";
         };
       };
 
@@ -313,7 +319,9 @@ in
     defaultSopsFile = ../../secrets/default.yaml;
     secrets = {
       tailscale_auth_key = { };
-
+      grafana_admin_password = {
+        owner = config.systemd.services.grafana.serviceConfig.User;
+      };
     };
   };
 
