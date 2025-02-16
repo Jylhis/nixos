@@ -1088,7 +1088,7 @@ active region is added to the search string."
  :ensure
  :mode "\\.nix\\'"
  :config
- (add-to-list 'eglot-server-programs '((nix-ts-mode nix-mode) . (eglot-alternatives '("nil" "nixd") )))
+ (add-to-list 'eglot-server-programs '((nix-ts-mode nix-mode) "nil"  ))
  )
 
 
