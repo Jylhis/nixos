@@ -422,16 +422,23 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package treesit
   ;; Builtin tree-sitter
  :ensure nil
- :custom (treesit-font-lock-level 4)
+ :custom
+ (treesit-font-lock-level 4)
  (major-mode-remap-alist
-  '((c-mode . c-ts-mode)
+  '(
+    (c-mode . c-ts-mode)
     (c++-mode . c++-ts-mode)
+    (cmake-mode . cmake-ts-mode)
     (go-mode . go-ts-mode)
+    (sh-mode . bash-ts-mode)
     (html-mode . html-ts-mde)
     (bash-mode . bash-ts-mode)
     (python-mode . python-ts-mode)
     (typescript-mode . typescript-ts-mode)
-    (nix-mode . nix-ts-mode))))
+    (nix-mode . nix-ts-mode)
+    ))
+
+ )
 
 
 (use-package hl-todo
@@ -449,7 +456,7 @@ point reaches the beginning or end of the buffer, stop there."
     ("DEPRECATED" font-lock-doc-face bold))))
 
 ;; TODO(v30): This has been integrated with emacs, possibly released with emacs 30
-(use-package which-key :ensure :config (which-key-mode))
+;;(use-package which-key :ensure :config (which-key-mode))
 
 
 ;; Move between windows with numbers C-x w <num>
@@ -796,12 +803,12 @@ active region is added to the search string."
 
 
 ;; Miscellaneous options
-(setq-default major-mode
-              (lambda () ; guess major mode from file name
-                (unless
-                 buffer-file-name
-                 (let ((buffer-file-name (buffer-name)))
-                   (set-auto-mode)))))
+;; (setq-default major-mode
+;;               (lambda () ; guess major mode from file name
+;;                 (unless
+;;                  buffer-file-name
+;;                  (let ((buffer-file-name (buffer-name)))
+;;                    (set-auto-mode)))))
 
 ;; Icons
 (use-package all-the-icons :ensure)
@@ -1042,6 +1049,12 @@ active region is added to the search string."
 (use-package editorconfig-custom-majormode :ensure)
 
 (use-package gitlab-ci-mode :ensure)
+
+(use-package ansible
+	     :ensure)
+
+(use-package ssh-config-mode
+  :ensure)
 
 (use-package avy ; Jump around easily
  :ensure
