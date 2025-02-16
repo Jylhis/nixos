@@ -180,7 +180,7 @@
         formatter = pkgs.nixfmt-rfc-style;
 
         devShells = {
-          deploy = pkgs.mkShellNoCC {
+          default = pkgs.mkShellNoCC {
             buildInputs = [
               # Deployment tools
               deploy-rs.packages.${system}.deploy-rs
@@ -196,7 +196,7 @@
           };
 
           # TODO: define devenv.root
-          # default = devenv.lib.mkShell {
+          # dev = devenv.lib.mkShell {
           #   inherit pkgs;
           #   inputs = attrs;
           #
