@@ -1,8 +1,16 @@
-{ pkgs, ... }:
+{
+  self,
+  pkgs,
+  config,
+  home-manager,
+  sops-nix,
+  ...
+}:
 {
   imports = [
     # Paths to other modules.
     # Compose this module out of smaller ones.
+    ./.
   ];
 
   options = {
@@ -22,9 +30,15 @@
       bat
       direnv
       nix-direnv
-      git
       ripgrep
       moreutils
+      devenv
+      btop
+      htop
+      fd
+      # Version control stuff
+      git
+      delta
 
       # Golang
       go
@@ -34,11 +48,14 @@
 
       # Nix
       statix
-      nixd
+      nil
       nixfmt-rfc-style
       nix-diff
+      nix-ld
+      nix-output-monitor
 
       # Python
+      python3
       pyright
       ruff
 
@@ -72,6 +89,8 @@
       cmake
       cmake-language-server
       gnumake
+      gcc
+      gdb
 
       # Javascript & Typescript
       eslint
@@ -88,6 +107,5 @@
 
       clang-tools
     ];
-
   };
 }

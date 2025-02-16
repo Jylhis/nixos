@@ -206,88 +206,19 @@
         age
         ssh-to-age
         git-agecrypt
-
-        # Hunspell for firefox
-        hunspell
-        #hunspellDicts.de-ch
-        #hunspellDicts.en-gb
-        #hunspellDicts.sv-fi
-
-        # General
+        ffmpeg-full
         unzip
         bash-completion
-
-        # Development
-        curlie
-        delta
-        devenv
-        direnv
-        duf
-        dust
-        eza
-        fd
-        git-lfs
-        git
-        gnumake
-        clang-tools
-        gcc
-        gdb
-        rr
-        pkg-config
-        rtags
-        cppcheck
-        valgrind
-        python3
-        nodejs
-        jdk
-        git
-
-        # Monitoring
-        sniffnet
-        btop
-        glances
-        htop
-        iotop
-
-        # Applications
-        gimp
         gnome-tweaks
-        pandoc
         planify
         vlc
-
-        # Kubernetes
-        k9s
-        kubectl
-
-        # Nix
-        nix-direnv
-        nix-ld
-        nix-output-monitor
-
-        # Other
         file
-        man
-        man-pages
-        linux-manual
-        man-pages-posix
-        clang-manpages
-        stdmanpages
         jq
         lsof
         openssl
-
         pciutils
-
-        sd
-
-        solaar
-        sshpass
-        starship
         tailscale
         vim
-        yq
-        zoxide
       ]
       ++ (with pkgs.gnomeExtensions; [
         solaar-extension
@@ -366,6 +297,18 @@
 
   };
 
+  nixpkgs.config = {
+    allowUnfree = true;
+
+    # TODO
+    packageOverrides = pkgs: {
+      ffmpeg-full = pkgs.ffmpeg-full.override {
+        withUnfree = true;
+        withOpengl = true;
+      };
+
+    };
+  };
   # This value determines the NixOS release from which the default
   # settings for stateful data,like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave

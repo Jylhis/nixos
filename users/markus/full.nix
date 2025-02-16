@@ -11,7 +11,7 @@
     # Paths to other modules.
     # Compose this module out of smaller ones.
     ./.
-    ../../modules/markus-dev.nix
+    ./dev.nix
   ];
 
   options = {
@@ -23,7 +23,12 @@
   config = {
 
     environment.systemPackages = with pkgs; [
-      dconf2nix
+      starship
+      sops
+      age
+      ssh-to-age
+      git-agecrypt
+
       # Emacs spelling
       (aspellWithDicts (
         dicts: with dicts; [
