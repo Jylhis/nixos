@@ -224,7 +224,7 @@ in
 
     # port: 9090
     prometheus = {
-      enable = false;
+      enable = true;
       globalConfig.scrape_interval = "10s"; # "1m"
       scrapeConfigs = [
         {
