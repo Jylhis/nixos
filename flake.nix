@@ -71,6 +71,7 @@
     flake-utils.lib.eachDefaultSystemPassThrough (system: {
 
       nixosModules = {
+        cloud-backup = import ./modules/cloud-backup;
         common = import ./modules/common.nix;
         user-markus = import ./users/markus;
         user-markus-full = import ./users/markus/full.nix;

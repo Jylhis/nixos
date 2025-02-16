@@ -72,7 +72,7 @@ in
         members = [
           config.users.users.syncthing.name
           config.users.users.jellyfin.name
-	  config.users.users.sonarr.name
+          config.users.users.sonarr.name
         ];
       };
     };
