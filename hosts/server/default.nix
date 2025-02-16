@@ -313,9 +313,7 @@ in
     defaultSopsFile = ../../secrets/default.yaml;
     secrets = {
       tailscale_auth_key = { };
-      netdata_claim_token = {
-        owner = config.services.netdata.user;
-      };
+
     };
   };
 

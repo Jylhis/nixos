@@ -73,6 +73,7 @@
       nixosModules = {
         common = import ./modules/common.nix;
         user-markus = import ./users/markus;
+        user-markus-full = import ./users/markus/full.nix;
         user-sara = import ./users/sara;
         apple-hardware = import ./modules/apple-hardware.nix;
         mac-mini-2018 = import ./hardware/mac-mini-2018.nix;
@@ -96,7 +97,7 @@
             ./hosts/desktop
             nixos-hardware.nixosModules.common-gpu-amd
             self.nixosModules.common
-            self.nixosModules.user-markus
+            self.nixosModules.user-markus-full
             self.nixosModules.user-sara
             self.nixosModules.jyl-nix-config
             self.nixosModules.jyl-cachix
@@ -115,7 +116,7 @@
             }
             ./hosts/macbook-air
             self.nixosModules.common
-            self.nixosModules.user-markus
+            self.nixosModules.user-markus-full
             self.nixosModules.user-sara
             self.nixosModules.jyl-nix-config
             self.nixosModules.jyl-cachix
@@ -130,6 +131,7 @@
             sops-nix.nixosModules.sops
             disko.nixosModules.disko
             self.nixosModules.jyl-cachix
+            self.nixosModules.user-markus
             ./hosts/server
           ];
         };
