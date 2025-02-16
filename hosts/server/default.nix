@@ -31,6 +31,18 @@ in
   disko.devices.disk.main.device = "/dev/sda";
   disko.devices.disk.secondary.device = "/dev/sdb";
 
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver
+      intel-vaapi-driver
+      vaapiVdpau
+      intel-compute-runtime # OpenCL filter support (hardware tonemapping and subtitle burn-in)
+      vpl-gpu-rt # QSV on 11th gen or newer
+      intel-media-sdk # QSV up to 11th gen
+    ];
+  };
+
   nix = {
     gc = {
       automatic = true;
@@ -188,7 +200,6 @@ in
     prowlarr.enable = false; # port: 9696
     readarr.enable = false; # port: 8787
     jellyfin = {
-
       enable = true; # port: https: 8920 & http: 8096
       openFirewall = true;
     };
@@ -288,23 +299,6 @@ in
       };
     };
 
-    # port: 19999
-    netdata =
-      let
-        package = pkgs.netdata.override {
-          withCloud = true;
-          withCloudUi = true;
-          withConnPrometheus = true;
-          withConnPubSub = true;
-        };
-      in
-      {
-        inherit package;
-        enable = true;
-        python.enable = true;
-        python.recommendedPythonPackages = true;
-        claimTokenFile = config.sops.secrets.netdata_claim_token.path;
-      };
     # Experimental
     #shiori.enable = true;
     #outline.enable = true;
@@ -350,6 +344,9 @@ in
       "dotnet-sdk-6.0.428"
       "aspnetcore-runtime-6.0.36"
     ];
+    packageOverrides = pkgs: {
+      vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
+    };
   };
 
   system.stateVersion = "24.11";

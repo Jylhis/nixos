@@ -193,11 +193,11 @@
             ];
           };
 
-	  # TODO: define devenv.root
+          # TODO: define devenv.root
           # default = devenv.lib.mkShell {
           #   inherit pkgs;
           #   inputs = attrs;
-	  #
+          #
           #   modules = [
           #     {
           #       cachix.enable = true;
@@ -214,7 +214,7 @@
           #         pkgs.sops
           #         pkgs.ssh-to-age
           #         pkgs.git-agecrypt
-	  #
+          #
           #         # Other tools
           #         pkgs.dconf2nix
           #       ];
