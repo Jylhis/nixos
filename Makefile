@@ -4,6 +4,9 @@ build:
 	nixos-rebuild --flake $(ROOT_DIR) build
 
 switch:
+	nixos-rebuild --flake $(ROOT_DIR) --use-remote-sudo switch |& nom
+
+switch-plain:
 	nixos-rebuild --flake $(ROOT_DIR) --use-remote-sudo switch
 
 server-vm:

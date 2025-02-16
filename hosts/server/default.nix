@@ -198,7 +198,7 @@ in
     radarr.enable = false; # port: 7878
     lidarr.enable = false; # port: 8686
     bazarr.enable = false; # port: 6767
-    prowlarr.enable = false; # port: 9696
+    prowlarr.enable = true; # port: 9696
     readarr.enable = false; # port: 8787
     jellyfin = {
       enable = true; # port: https: 8920 & http: 8096
