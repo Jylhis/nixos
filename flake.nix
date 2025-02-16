@@ -175,6 +175,7 @@
             pkgs.age
             pkgs.sops
             pkgs.ssh-to-age
+            pkgs.git-agecrypt
 
             # Other tools
             pkgs.dconf2nix

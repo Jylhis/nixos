@@ -219,9 +219,16 @@ in
     syncthing = {
       enable = true;
       openDefaultPorts = true;
-      settings.gui = {
-        user = "myuser";
-        password = "mypassword";
+
+      guiAddress = "0.0.0.0:8384";
+      settings = {
+        gui = {
+          user = "myuser";
+          password = "mypassword";
+        };
+        devices = import ./syncthing-devices.nix ;
+
+        folders = import ./syncthing-folders.nix {inherit config;};
       };
     };
 

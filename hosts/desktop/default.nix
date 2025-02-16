@@ -205,6 +205,7 @@
         sops
         age
         ssh-to-age
+        git-agecrypt
 
         # Hunspell for firefox
         hunspell
