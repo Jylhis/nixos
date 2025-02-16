@@ -1,3 +1,4 @@
 secrets/* diff=sops-decrypt
 hosts/server/syncthing-devices.nix filter=git-agecrypt diff=git-agecrypt
 hosts/server/syncthing-folders.nix filter=git-agecrypt diff=git-agecrypt
+hosts/server/networking-details.nix filter=git-agecrypt diff=git-agecrypt

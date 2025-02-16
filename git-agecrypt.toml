@@ -1,3 +1,4 @@
 [config]
 "hosts/server/syncthing-devices.nix" = ["age1yaq7q9cpuws7uay7z0x2frxwpmjlngk0vvqcg4mk9fzcxt09uusq95wfju"]
 "hosts/server/syncthing-folders.nix" = ["age1yaq7q9cpuws7uay7z0x2frxwpmjlngk0vvqcg4mk9fzcxt09uusq95wfju"]
+"hosts/server/networking-details.nix" = ["age1yaq7q9cpuws7uay7z0x2frxwpmjlngk0vvqcg4mk9fzcxt09uusq95wfju"]

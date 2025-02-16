@@ -24,6 +24,7 @@ in
   imports = [
     ./disko-config.nix
     ./hardware-configuration.nix
+    ./networking-details.nix
   ];
 
   # TODO: Hetzner serial access
@@ -137,32 +138,10 @@ in
 
   };
 
-  systemd.network.networks."10-uplink".networkConfig.Address = "2a01:4f8:201:71cd::1";
+
   networking = {
     hostId = "91312b0a";
     hostName = "server";
-
-    interfaces."enp0s31f6".ipv4.addresses = [
-      {
-        address = "148.251.13.17";
-        prefixLength = 24;
-      }
-    ];
-    interfaces."enp0s31f6".ipv6.addresses = [
-      {
-        address = "2a01:4f8:201:71cd::1";
-        prefixLength = 64;
-      }
-    ];
-    defaultGateway = {
-      address = "148.251.13.1";
-      interface = "enp0s31f6";
-    };
-    defaultGateway6 = {
-      address = "fe80::1";
-      interface = "enp0s31f6";
-    };
-
   };
 
   time.timeZone = "Europe/Zurich";
