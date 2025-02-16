@@ -948,6 +948,11 @@ active region is added to the search string."
   :ensure
   :hook
   (prog-mode . eglot-ensure)
+  :config
+  (setq-default eglot-workspace-configuration '(
+						(:nil . (:nix (:flake (:autoArchive t))))
+
+						))
   )
 (setq eglot-report-progress nil)  ; Prevent Eglot minibuffer spam
 (setq eglot-extend-to-xref t) ; Activate Eglot in cross-referenced non-project files
@@ -1070,7 +1075,7 @@ active region is added to the search string."
  :ensure
  :mode "\\.nix\\'"
  :config
- (add-to-list 'eglot-server-programs '((nix-ts-mode nix-mode) . ("nil")))
+ (add-to-list 'eglot-server-programs '((nix-ts-mode nix-mode) . (eglot-alternatives '("nil" "nixd") )))
  )
 
 
