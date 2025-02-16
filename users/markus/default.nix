@@ -172,13 +172,17 @@
               color = {
                 ui = true;
               };
-	      pull.rebase = true;
+              pull.rebase = true;
               diff = {
                 "sops-decrypt".textconv = "sops decrypt";
               };
-	      git-agecrypt = if builtins.hasAttr "git-agecrypt" pkgs then {
-		"config".identity = config.home-manager.users.markus.sops.age.keyFile;
-	      } else null;
+              git-agecrypt =
+                if builtins.hasAttr "git-agecrypt" pkgs then
+                  {
+                    "config".identity = config.home-manager.users.markus.sops.age.keyFile;
+                  }
+                else
+                  null;
 
             };
           };
