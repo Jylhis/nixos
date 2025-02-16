@@ -334,6 +334,9 @@ in
     ];
   };
 
+  users.groups.wheel.members = [
+    users.users.markus.name
+  ];
   security = {
     sudo.wheelNeedsPassword = false;
     tpm2 = {
