@@ -72,6 +72,7 @@ in
         members = [
           config.users.users.syncthing.name
           config.users.users.jellyfin.name
+	  config.users.users.sonarr.name
         ];
       };
     };
@@ -194,7 +195,7 @@ in
       authKeyFile = config.sops.secrets.tailscale_auth_key.path;
     };
 
-    sonarr.enable = false; # port: 8989
+    sonarr.enable = true; # port: 8989
     radarr.enable = false; # port: 7878
     lidarr.enable = false; # port: 8686
     bazarr.enable = false; # port: 6767
@@ -240,7 +241,7 @@ in
                 "localhost:${toString config.services.prometheus.exporters.zfs.port}"
                 #"localhost:${toString config.services.prometheus.exporters.exportarr-radarr.port}"
                 #"localhost:${toString config.services.prometheus.exporters.exportarr-sonarr.port}"
-                "100.100.100.100" # tailscale
+                "100.100.100.100:80" # tailscale
               ];
             }
           ];
@@ -335,7 +336,7 @@ in
   };
 
   users.groups.wheel.members = [
-    users.users.markus.name
+    config.users.users.markus.name
   ];
   security = {
     sudo.wheelNeedsPassword = false;
