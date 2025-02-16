@@ -23,7 +23,14 @@
   };
 
   config = {
-    hardware.graphics.extraPackages = lib.optional config.hardware.graphics.enable pkgs.intel-media-driver;
+    hardware.graphics.extraPackages = lib.optionals config.hardware.graphics.enable [
+      pkgs.intel-media-driver
+      pkgs.intel-vaapi-driver
+      pkgs.vaapiVdpau
+      pkgs.intel-compute-runtime # OpenCL filter support (hardware tonemapping and subtitle burn-in)
+      pkgs.vpl-gpu-rt # QSV on 11th gen or newer
+      pkgs.intel-media-sdk # QSV up to 11th gen
+    ];
     programs.firefox.preferences =
       lib.mkIf (config.hardware.graphics.enable && config.programs.firefox.enable)
         {
