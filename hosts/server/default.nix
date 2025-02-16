@@ -28,7 +28,6 @@ in
   ];
 
   # TODO: Hetzner serial access
-  # TODO: ZFS remote unlock
   disko.devices.disk.main.device = "/dev/sda";
   disko.devices.disk.secondary.device = "/dev/sdb";
 
