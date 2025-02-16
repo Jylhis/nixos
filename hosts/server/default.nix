@@ -35,10 +35,10 @@ in
     enable = true;
     extraPackages = with pkgs; [
       intel-media-driver
-      intel-vaapi-driver
+      #intel-vaapi-driver
       vaapiVdpau
       intel-compute-runtime # OpenCL filter support (hardware tonemapping and subtitle burn-in)
-      vpl-gpu-rt # QSV on 11th gen or newer
+      #vpl-gpu-rt # QSV on 11th gen or newer
       intel-media-sdk # QSV up to 11th gen
     ];
   };
@@ -342,9 +342,10 @@ in
       "dotnet-sdk-6.0.428"
       "aspnetcore-runtime-6.0.36"
     ];
-    packageOverrides = pkgs: {
-      vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
-    };
+    # TODO
+    # packageOverrides = pkgs: {
+    #   vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
+    # };
   };
 
   system.stateVersion = "24.11";
