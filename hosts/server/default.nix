@@ -73,8 +73,10 @@ in
           config.users.users.syncthing.name
           config.users.users.jellyfin.name
           config.users.users.sonarr.name
-	  config.users.users.radarr.name
-	  config.users.users.bazarr.name
+          config.users.users.radarr.name
+          config.users.users.bazarr.name
+          config.users.users.lidarr.name
+          config.users.users.readarr.name
         ];
       };
     };
@@ -180,13 +182,27 @@ in
   services = {
     fail2ban = {
       enable = true;
+      maxretry = 5;
+      bantime = "15m";
+      bantime-increment = {
+        enable = true;
+        formula = "ban.Time * math.exp(float(ban.Count+1)*banFactor)/math.exp(1*banFactor)";
+        factor = "4";
+        maxtime = "168h"; # Do not ban for more than 1 week
+      };
+      ignoreIP = [
+        "100.64.0.0/10"
+        "127.0.0.1/8"
+      ];
     };
     zfs.autoScrub.enable = true;
     openssh = {
       enable = true;
+      allowSFTP = false;
       settings = {
         PasswordAuthentication = false;
         PermitRootLogin = "prohibit-password";
+        X11Forwarding = false;
       };
 
     };
@@ -198,10 +214,10 @@ in
 
     sonarr.enable = true; # port: 8989
     radarr.enable = true; # port: 7878
-    lidarr.enable = false; # port: 8686
+    lidarr.enable = true; # port: 8686
     bazarr.enable = true; # port: 6767
     prowlarr.enable = true; # port: 9696
-    readarr.enable = false; # port: 8787
+    readarr.enable = true; # port: 8787
     jellyfin = {
       enable = true; # port: https: 8920 & http: 8096
     };
@@ -227,10 +243,9 @@ in
     # port: 9090
     prometheus = {
       enable = true;
-      globalConfig.scrape_interval = "10s"; # "1m"
       scrapeConfigs = [
         {
-          job_name = "node";
+          job_name = "main";
           static_configs = [
             {
               targets = [
@@ -239,29 +254,77 @@ in
                 "localhost:${toString config.services.prometheus.exporters.process.port}"
                 "localhost:${toString config.services.prometheus.exporters.systemd.port}"
                 "localhost:${toString config.services.prometheus.exporters.zfs.port}"
-                #"localhost:${toString config.services.prometheus.exporters.exportarr-radarr.port}"
-                #"localhost:${toString config.services.prometheus.exporters.exportarr-sonarr.port}"
-                "100.100.100.100:80" # tailscale
+
               ];
             }
           ];
         }
+        {
+          job_name = "exportarr";
+          static_configs = [
+            {
+              targets = [
+                "localhost:${toString config.services.prometheus.exporters.exportarr-radarr.port}"
+                "localhost:${toString config.services.prometheus.exporters.exportarr-sonarr.port}"
+                "localhost:${toString config.services.prometheus.exporters.exportarr-bazarr.port}"
+                "localhost:${toString config.services.prometheus.exporters.exportarr-lidarr.port}"
+                "localhost:${toString config.services.prometheus.exporters.exportarr-readarr.port}"
+                "localhost:${toString config.services.prometheus.exporters.exportarr-prowlarr.port}"
+              ];
+            }
+          ];
+        }
+
       ];
       exporters = {
         collectd.enable = true;
         # TODO: For exportarr: api key file with sops
-        #   exportarr-bazarr.enable = true;
-        #   exportarr-lidarr.enable = true;
-        #   exportarr-prowlarr.enable = true;
-        #exportarr-radarr.enable = true;
-        #   exportarr-readarr.enable = true;
-        #exportarr-sonarr.enable = true;
+        exportarr-bazarr = {
+          port = 9708;
+          url = "http://localhost:6767";
+          enable = true;
+          apiKeyFile = config.sops.secrets.bazarr_api_key.path;
+        };
+
+        exportarr-lidarr = {
+          port = 9709;
+          url = "http://localhost:8686";
+          enable = true;
+          apiKeyFile = config.sops.secrets.lidarr_api_key.path;
+        };
+
+        exportarr-prowlarr = {
+          port = 9710;
+          url = "http://localhost:9696";
+          enable = true;
+          apiKeyFile = config.sops.secrets.prowlarr_api_key.path;
+        };
+
+        exportarr-radarr = {
+          port = 9711;
+          url = "http://localhost:7878";
+          enable = true;
+          apiKeyFile = config.sops.secrets.radarr_api_key.path;
+        };
+
+        exportarr-readarr = {
+          port = 9712;
+          url = "http://localhost:8787";
+          enable = true;
+          apiKeyFile = config.sops.secrets.readarr_api_key.path;
+        };
+
+        exportarr-sonarr = {
+          port = 9713;
+          url = "http://localhost:8989";
+          enable = true;
+          apiKeyFile = config.sops.secrets.sonarr_api_key.path;
+        };
+
         zfs.enable = true;
         node.enable = true;
-        #   ping.enable = true;
         process.enable = true;
         systemd.enable = true;
-
       };
     };
 
@@ -323,6 +386,31 @@ in
       grafana_admin_password = {
         owner = config.systemd.services.grafana.serviceConfig.User;
       };
+
+      sonarr_api_key = {
+        mode = "0444";
+      };
+
+      bazarr_api_key = {
+        mode = "0444";
+      };
+
+      lidarr_api_key = {
+        mode = "0444";
+      };
+
+      radarr_api_key = {
+        mode = "0444";
+      };
+
+      readarr_api_key = {
+        mode = "0444";
+      };
+
+      prowlarr_api_key = {
+        mode = "0444";
+      };
+
     };
   };
 
