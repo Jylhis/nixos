@@ -4,6 +4,7 @@
 {
   self,
   lib,
+  unstable,
   pkgs,
   config,
   ...
@@ -298,15 +299,14 @@
   };
 
   nixpkgs.config = {
-    allowUnfree = true;
-
     # TODO
     packageOverrides = pkgs: {
       ffmpeg-full = pkgs.ffmpeg-full.override {
         withUnfree = true;
         withOpengl = true;
       };
-
+      _1password = unstable._1password;
+      _1password-cli = unstable._1password-cli;
     };
   };
   # This value determines the NixOS release from which the default

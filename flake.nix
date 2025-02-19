@@ -55,6 +55,7 @@
     {
       self,
       nixpkgs,
+      nixpkgs-unstable,
       deploy-rs,
       disko,
       nixos-anywhere,
@@ -86,7 +87,12 @@
       nixosConfigurations = {
         mac-mini = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          specialArgs = attrs;
+          specialArgs = attrs // {
+            unstable = import nixpkgs-unstable {
+              inherit system;
+              config.allowUnfree = true;
+            };
+          };
           modules = [
             home-manager.nixosModules.home-manager
             {
@@ -160,7 +166,7 @@
 
         pkgs = import nixpkgs {
           inherit system;
-          allowUnfree = true;
+          config.allowUnfree = true;
           overlays = [
             emacs-overlay.overlay
           ];
