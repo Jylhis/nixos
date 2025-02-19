@@ -3,6 +3,7 @@
   imports = [ ];
 
   config = {
+    nixpkgs.config.allowUnfree = true;
 
     # Long-lived public host keys
     programs.ssh.knownHostsFiles = [

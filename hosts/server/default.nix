@@ -73,13 +73,14 @@ in
           config.users.users.syncthing.name
           config.users.users.jellyfin.name
           config.users.users.sonarr.name
+	  config.users.users.radarr.name
+	  config.users.users.bazarr.name
         ];
       };
     };
 
     users = {
-
-      root.password = "root"; # FIXME
+      root.initialPassword = "root"; # FIXME
       root.openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK4zXcaYT+RTxvAjUjE3B33kwwxCOo4ApI4diLnajbUT"
       ];
@@ -196,14 +197,13 @@ in
     };
 
     sonarr.enable = true; # port: 8989
-    radarr.enable = false; # port: 7878
+    radarr.enable = true; # port: 7878
     lidarr.enable = false; # port: 8686
-    bazarr.enable = false; # port: 6767
+    bazarr.enable = true; # port: 6767
     prowlarr.enable = true; # port: 9696
     readarr.enable = false; # port: 8787
     jellyfin = {
       enable = true; # port: https: 8920 & http: 8096
-      openFirewall = true;
     };
 
     syncthing = {
@@ -349,7 +349,6 @@ in
 
   # Allow unfree packages
   nixpkgs.config = {
-    allowUnfree = true;
     permittedInsecurePackages = [
       "dotnet-sdk-6.0.428"
       "aspnetcore-runtime-6.0.36"
