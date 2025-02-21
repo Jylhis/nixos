@@ -26,6 +26,16 @@
       optimise.automatic = true;
 
       settings = {
+        extra-substituters = [
+          "ssh://nix-ssh@lab"
+        ];
+        extra-trusted-public-keys = [
+          "jylhis.com:2tR5lVPX2yBu38X3n2rkKYcXJdjbCcuiCgh4byzA21I="
+        ];
+        extra-trusted-substituters = [
+          "ssh://nix-ssh@lab"
+        ];
+
         auto-optimise-store = true;
         accept-flake-config = true;
         download-attempts = 2;

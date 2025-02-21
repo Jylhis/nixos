@@ -44,6 +44,11 @@ in
   };
 
   nix = {
+
+    sshServe = {
+      enable = true;
+      keys = config.users.users.markus.openssh.authorizedKeys.keys;
+    };
     gc = {
       automatic = true;
       options = "--delete-older-than 14d";
