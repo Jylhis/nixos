@@ -291,13 +291,14 @@ in
 
       ];
       exporters = {
-        collectd.enable = true;
-        # TODO: For exportarr: api key file with sops
         exportarr-bazarr = {
           port = 9708;
           url = "http://localhost:6767";
           enable = true;
           apiKeyFile = config.sops.secrets.bazarr_api_key.path;
+          environment = {
+            ENABLE_ADDITIONAL_METRICS = "true";
+          };
         };
 
         exportarr-lidarr = {
@@ -305,6 +306,9 @@ in
           url = "http://localhost:8686";
           enable = true;
           apiKeyFile = config.sops.secrets.lidarr_api_key.path;
+          environment = {
+            ENABLE_ADDITIONAL_METRICS = "true";
+          };
         };
 
         exportarr-prowlarr = {
@@ -312,6 +316,9 @@ in
           url = "http://localhost:9696";
           enable = true;
           apiKeyFile = config.sops.secrets.prowlarr_api_key.path;
+          environment = {
+            ENABLE_ADDITIONAL_METRICS = "true";
+          };
         };
 
         exportarr-radarr = {
@@ -319,6 +326,9 @@ in
           url = "http://localhost:7878";
           enable = true;
           apiKeyFile = config.sops.secrets.radarr_api_key.path;
+          environment = {
+            ENABLE_ADDITIONAL_METRICS = "true";
+          };
         };
 
         exportarr-readarr = {
@@ -326,6 +336,9 @@ in
           url = "http://localhost:8787";
           enable = true;
           apiKeyFile = config.sops.secrets.readarr_api_key.path;
+          environment = {
+            ENABLE_ADDITIONAL_METRICS = "true";
+          };
         };
 
         exportarr-sonarr = {
@@ -333,11 +346,44 @@ in
           url = "http://localhost:8989";
           enable = true;
           apiKeyFile = config.sops.secrets.sonarr_api_key.path;
+          environment = {
+            ENABLE_ADDITIONAL_METRICS = "true";
+          };
         };
 
         zfs.enable = true;
-        node.enable = true;
-        process.enable = true;
+
+        node = {
+
+          enable = true;
+          enabledCollectors = [
+            "logind"
+            "network_route"
+            "perf"
+            #	    "processes"
+            #	    "systemd"
+          ];
+          disabledCollectors = [
+            "btrfs"
+            "infiniband"
+            "nfs"
+            "nfsd"
+            "selinux"
+          ];
+        };
+        process = {
+          enable = true;
+          settings.process_names = [
+            # Remove nix store path from process name
+            {
+              name = "{{.Matches.Wrapped}} {{ .Matches.Args }}";
+              cmdline = [ "^/nix/store[^ ]*/(?P<Wrapped>[^ /]*) (?P<Args>.*)" ];
+            }
+          ];
+
+        };
+
+        # https://github.com/prometheus-community/systemd_exporter?tab=readme-ov-file#configuration
         systemd.enable = true;
       };
     };
