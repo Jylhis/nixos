@@ -217,6 +217,15 @@ in
       authKeyFile = config.sops.secrets.tailscale_auth_key.path;
     };
 
+    open-webui = {
+      enable = true;
+    };
+
+    ollama = {
+      enable = true;
+      host = "0.0.0.0";
+    };
+
     sonarr.enable = true; # port: 8989
     radarr.enable = true; # port: 7878
     lidarr.enable = true; # port: 8686
