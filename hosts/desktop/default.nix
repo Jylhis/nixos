@@ -270,9 +270,14 @@
   security.rtkit.enable = true;
 
   programs = {
-    _1password.enable = true;
+    _1password = {
+      enable = true;
+      package = unstable._1password-cli;
+
+    };
     _1password-gui = {
       enable = true;
+      package = unstable._1password-gui;
       polkitPolicyOwners = [
         config.users.users.markus.name
         config.users.users.sara.name
@@ -305,8 +310,7 @@
         withUnfree = true;
         withOpengl = true;
       };
-      _1password = unstable._1password;
-      _1password-cli = unstable._1password-cli;
+
     };
   };
   # This value determines the NixOS release from which the default
