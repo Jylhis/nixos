@@ -219,11 +219,23 @@ in
 
     open-webui = {
       enable = true;
+      host = "0.0.0.0";
+      environment = {
+        ENABLE_SIGNUP = "false";
+        ENABLE_LOGIN_FORM = "false";
+        WEBUI_AUTH = "WEBUI_AUTH";
+        ENABLE_EVALUATION_ARENA_MODELS = "false";
+      };
     };
 
     ollama = {
       enable = true;
-      host = "0.0.0.0";
+      loadModels = [
+        "deepseek-r1:1.5b"
+        "deepseek-r1:8b"
+        "llama3.2:3b"
+        "mistral:7b"
+      ];
     };
 
     sonarr.enable = true; # port: 8989
