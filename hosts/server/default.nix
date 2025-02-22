@@ -264,6 +264,10 @@ in
 
       guiAddress = "0.0.0.0:8384";
       settings = {
+        options = {
+          urAccepted = -1;
+
+        };
         gui = {
           user = "myuser";
           password = "mypassword";
