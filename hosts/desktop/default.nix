@@ -25,6 +25,7 @@
       "getty@tty1".enable = false;
       "autovt@tty1".enable = false;
     };
+    coredump.enable = false; # Disable coredumps
     targets = {
       sleep.enable = false;
       suspend.enable = false;
@@ -39,7 +40,7 @@
       efi.canTouchEfiVariables = true;
       systemd-boot = {
         enable = true;
-        configurationLimit = 3;
+        configurationLimit = 5;
       };
     };
     plymouth = {
@@ -49,6 +50,7 @@
 
     kernel.sysctl = {
       "kernel.sysrq" = 1;
+      "kernel.core_pattern" = "|/bin/false"; # Disable core dumps
       "vm.swappiness" = 1;
       # https://wiki.archlinux.org/title/Sysctl#Virtual_memory
       "vm.dirty_background_bytes" = 4194304;
@@ -104,9 +106,12 @@
     hardware.bolt.enable = true;
     tailscale.enable = true;
     fstrim.enable = true;
+
+    # Automatically connect any thunderbolt device
     udev.extraRules = ''
       ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
     '';
+
     udev.packages = [
       pkgs.gnome-settings-daemon
     ];
