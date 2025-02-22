@@ -132,6 +132,8 @@
 
         server = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
+	  specialArgs = attrs;
+
           modules = [
             srvos.nixosModules.server
             srvos.nixosModules.hardware-hetzner-online-intel
@@ -181,6 +183,9 @@
           };
 
           brcm-firmware = pkgs.callPackage ./packages/brcm-firmware.nix { };
+          grafana-treemap-panel = pkgs.callPackage ./packages/grafana-treemap-panel.nix {
+            inherit (pkgs.grafanaPlugins) grafanaPlugin;
+          };
 
         };
 

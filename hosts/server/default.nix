@@ -3,6 +3,7 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 {
   lib,
+  self,
   pkgs,
   config,
   ...
@@ -417,6 +418,9 @@ in
     # Port: 3000
     grafana = {
       enable = true;
+      declarativePlugins = [
+        self.packages.x86_64-linux.grafana-treemap-panel
+      ];
       settings = {
         analytics = {
           reporting_enabled = false;
