@@ -300,7 +300,8 @@
 
         jetbrains.datagrip
 
-        planify
+        #planify
+        todoist-electron
         starship
 
       ];
