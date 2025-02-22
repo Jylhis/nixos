@@ -18,6 +18,16 @@ $ age-keygen -y ~/.config/sops/age/keys.txt
 ssh-keyscan <host/ip> | ssh-to-age
 ----
 
+
+.Generate manpages manually
+[,console]
+----
+sudo mkdir -p /var/cache/man/nixos
+sudo mandb
+----
+https://wiki.nixos.org/wiki/Apropos
+https://wiki.nixos.org/wiki/Man_pages
+
 == Servers
 
 All of the tools needed for deployment are in the default devshell.
