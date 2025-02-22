@@ -426,16 +426,21 @@ point reaches the beginning or end of the buffer, stop there."
  (treesit-font-lock-level 4)
  (major-mode-remap-alist
   '(
-    (c-mode . c-ts-mode)
-    (c++-mode . c++-ts-mode)
-    (cmake-mode . cmake-ts-mode)
-    (go-mode . go-ts-mode)
-    (sh-mode . bash-ts-mode)
-    (html-mode . html-ts-mde)
+    ((js-mode javascript-mode) . js-ts-mode)
     (bash-mode . bash-ts-mode)
-    (python-mode . python-ts-mode)
-    (typescript-mode . typescript-ts-mode)
+    (c++-mode . c++-ts-mode)
+    (c-mode . c-ts-mode)
+    (cmake-mode . cmake-ts-mode)
+    (css-mode . css-ts-mode)
+    (dockerfile-mode . dockerfile-ts-mode)
+    (go-mode . go-ts-mode)
+    (html-mode . html-ts-mde)
+    (json-mode . json-ts-mode)
     (nix-mode . nix-ts-mode)
+    (python-mode . python-ts-mode)
+    (sh-mode . bash-ts-mode)
+    (typescript-mode . typescript-ts-mode)
+    (yaml-mode . yaml-ts-mode)
     ))
 
  )
@@ -775,7 +780,7 @@ active region is added to the search string."
  ;; jarring since the message shown in the minibuffer can be more
  ;; than one line, causing the modeline to move up and down:
 
- (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
+ ;;(add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
 
 
  :config
@@ -954,13 +959,29 @@ active region is added to the search string."
 (use-package eglot
   :ensure
   :hook
-  (prog-mode . eglot-ensure)
+  ((
+    asm-mode
+    bash-ts-mode
+    c-ts-mode
+    c++-ts-mode
+    cmake-ts-mode
+    dockerfile-ts-mode
+    go-ts-mode
+    html-ts-mode
+    json-ts-mode
+    python-ts-mode
+    typescript-ts-mode
+    web-mode
+    yaml-ts-mode
+    nix-ts-mode
+    ) . eglot-ensure)
   :config
   (setq-default eglot-workspace-configuration '(
 						(:nil . (:nix (:flake (:autoArchive t))))
 
 						))
   )
+
 (setq eglot-report-progress nil)  ; Prevent Eglot minibuffer spam
 (setq eglot-extend-to-xref t) ; Activate Eglot in cross-referenced non-project files
 
@@ -974,6 +995,8 @@ active region is added to the search string."
 ;;   ("C-TAB" . 'copilot-accept-completion-by-word)
 ;;   ("C-<tab>" . 'copilot-accept-completion-by-word)))
 
+
+;; eldoc-box?
 (use-package eldoc
   :init
   (global-eldoc-mode)
@@ -984,8 +1007,12 @@ active region is added to the search string."
 ;; Collects and displays all available documentation immediately, even if
 ;; multiple sources provide it. It concatenates the results.
 (setq eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
+;;(setq eldoc-documentation-strategy 'eldoc-documentation-compose)
 (setq eldoc-echo-area-use-multiline-p t) ; TODO: Move to use-package
 
+
+;;(add-hook 'eldoc-documentation-functions #'eglot-hover-eldoc-function)
+;;(add-hook 'eldoc-documentation-functions #'eglot-signature-eldoc-function)
 
 (setq help-at-pt-display-when-idle t) ; Display messages when idle, without prompting
 
