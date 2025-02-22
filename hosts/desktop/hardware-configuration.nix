@@ -29,6 +29,14 @@
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/177c6bcd-05a4-456a-83f0-c7f98186fef9";
     fsType = "ext4";
+    # TODO: Possible optimisations?
+    # options = [
+    #   "defaults"
+    #   "noatime"
+    #   "commit=60"
+    #   "data=journal"
+    #   "journal_async_commit"
+    # ];
   };
 
   fileSystems."/boot" = {

@@ -36,6 +36,8 @@
 
   # Bootloader.
   boot = {
+
+    #  options amdgpu pcie_gen_cap=0x40000 # TODO(amdgpu)
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot = {
@@ -55,9 +57,12 @@
       # https://wiki.archlinux.org/title/Sysctl#Virtual_memory
       "vm.dirty_background_bytes" = 4194304;
       "vm.dirty_bytes" = 4194304;
+      #"vm.vfs_cache_pressure" = 50;
     };
     initrd = {
       systemd.enable = true;
+      # TODO(amd)
+      # availableKernelModules = [ "amdgpu" ];
 
       # Enable "Silent Boot"
       verbose = false;
@@ -121,6 +126,7 @@
       videoDrivers = [
         "modesetting"
         "fbdev"
+        # "amdgpu" # TODO(amdgpu)
       ];
       displayManager.gdm.enable = true;
       desktopManager.gnome.enable = true;
@@ -237,38 +243,18 @@
       ]);
   };
 
-  # specialisation = {
-  #   egpu.configuration = {
-  #     system.nixos.tags = [ "egpu" ];
-  #     boot = {
-  #       blacklistedKernelModules = [ "i915" ];
-  #       initrd = {
-  #         kernelModules = [ "amdgpu" ];
-  #       };
-  #       kernelParams = [
-  #         "i915.modeset=0"
-  #         "module_blacklist=i915"
-  #         "amdgpu.pcie_gen_cap=0x40000" # Force AMD GPU to use full width (optional)
-  #
-  #       ];
-  #     };
-  #     services.xserver.videoDrivers = [ "amdgpu" ];
-  #     hardware.graphics = {
-  #       extraPackages = with pkgs; [
-  #         amdvlk
-  #       ];
-  #       extraPackages32 = with pkgs; [
-  #         driversi686Linux.amdvlk
-  #       ];
-  #     };
-  #   };
-  # };
-
   hardware = {
     graphics = {
-
       enable = true;
       enable32Bit = true;
+      # TODO(amdgpu)
+      # extraPackages = with pkgs; [
+      #   amdvlk
+      #   rocmPackages.clr.icd
+      # ];
+      # extraPackages32 = with pkgs; [
+      #   driversi686Linux.amdvlk
+      # ];
     };
     logitech.wireless = {
       enable = true;
@@ -314,7 +300,6 @@
   };
 
   nixpkgs.config = {
-    # TODO
     packageOverrides = pkgs: {
       ffmpeg-full = pkgs.ffmpeg-full.override {
         withUnfree = true;
