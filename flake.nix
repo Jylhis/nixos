@@ -179,7 +179,7 @@
         packages = {
 
           emacs-markus = pkgs.callPackage ./packages/emacs-markus {
-            emacs = pkgs.emacs-pgtk;
+            emacs = pkgs.emacs;
           };
 
           brcm-firmware = pkgs.callPackage ./packages/brcm-firmware.nix { };
