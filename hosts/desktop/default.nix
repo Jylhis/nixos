@@ -20,6 +20,11 @@
   # Disable the GNOME3/GDM auto-suspend feature that cannot be disabled in GUI!
   # If no user is logged in, the machine will power down after 20 minutes.
   systemd = {
+    services = {
+      # FIXME: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
+      "getty@tty1".enable = false;
+      "autovt@tty1".enable = false;
+    };
     targets = {
       sleep.enable = false;
       suspend.enable = false;
