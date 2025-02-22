@@ -132,7 +132,7 @@
 
         server = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-	  specialArgs = attrs;
+          specialArgs = attrs;
 
           modules = [
             srvos.nixosModules.server

@@ -325,6 +325,7 @@ in
           apiKeyFile = config.sops.secrets.bazarr_api_key.path;
           environment = {
             ENABLE_ADDITIONAL_METRICS = "true";
+            LOG_LEVEL = "error";
           };
         };
 
@@ -335,6 +336,7 @@ in
           apiKeyFile = config.sops.secrets.lidarr_api_key.path;
           environment = {
             ENABLE_ADDITIONAL_METRICS = "true";
+            LOG_LEVEL = "error";
           };
         };
 
@@ -345,6 +347,7 @@ in
           apiKeyFile = config.sops.secrets.prowlarr_api_key.path;
           environment = {
             ENABLE_ADDITIONAL_METRICS = "true";
+            LOG_LEVEL = "error";
           };
         };
 
@@ -355,6 +358,7 @@ in
           apiKeyFile = config.sops.secrets.radarr_api_key.path;
           environment = {
             ENABLE_ADDITIONAL_METRICS = "true";
+            LOG_LEVEL = "error";
           };
         };
 
@@ -365,6 +369,7 @@ in
           apiKeyFile = config.sops.secrets.readarr_api_key.path;
           environment = {
             ENABLE_ADDITIONAL_METRICS = "true";
+            LOG_LEVEL = "error";
           };
         };
 
@@ -375,6 +380,7 @@ in
           apiKeyFile = config.sops.secrets.sonarr_api_key.path;
           environment = {
             ENABLE_ADDITIONAL_METRICS = "true";
+            LOG_LEVEL = "error";
           };
         };
 
