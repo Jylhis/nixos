@@ -190,7 +190,36 @@
         };
 
         formatter = pkgs.nixfmt-rfc-style;
+        apps = {
+          dconf-dump = {
+            type = "app";
+            program = pkgs.lib.getExe (
+              pkgs.writeShellApplication {
+                name = "dconf-dump";
+                runtimeInputs = [
+                  pkgs.dconf2nix
+                  pkgs.gnused
+		  pkgs.nixfmt-rfc-style
+                ];
+                bashOptions = [
+                  "errexit"
+                  "pipefail"
+                ];
+                text = ''
+                  if [ -z "$1" ]; then
+                      echo "Usage: nix run .#dconf-dump path/to/output-file.nix"
+                      exit 1
+                  fi
 
+                  dconf dump / \
+                  | sed "/mru-sources/d" \
+                  | dconf2nix \
+		  | nixfmt > "$1"
+                '';
+              }
+            );
+          };
+        };
         devShells = {
           default = pkgs.mkShellNoCC {
             buildInputs = [
