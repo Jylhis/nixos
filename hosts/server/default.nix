@@ -5,6 +5,7 @@
   lib,
   self,
   pkgs,
+  unstable,
   config,
   ...
 }:
@@ -529,6 +530,24 @@ in
 
   # Allow unfree packages
   nixpkgs.config = {
+    allowUnfree = true;
+    packageOverrides = pkgs: {
+      ffmpeg-full = pkgs.ffmpeg-full.override {
+        withUnfree = true;
+        withOpengl = true;
+      };
+
+      bazarr = unstable.bazarr.override {
+        ffmpeg = pkgs.ffmpeg-full;
+      };
+
+      sonarr = unstable.sonarr.override {
+        ffmpeg = pkgs.ffmpeg-full;
+        withFFmpeg = true;
+      };
+
+    };
+
     permittedInsecurePackages = [
       "dotnet-sdk-6.0.428"
       "aspnetcore-runtime-6.0.36"
