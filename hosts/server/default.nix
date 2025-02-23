@@ -75,18 +75,9 @@ in
   users = {
 
     groups = {
-      media-srv = { };
-      prv-media = {
-        members = [
-          config.users.users.media-srv.name
-          config.users.users.syncthing.name
-          config.users.users.jellyfin.name
-          config.users.users.sonarr.name
-          config.users.users.radarr.name
-          config.users.users.bazarr.name
-          config.users.users.lidarr.name
-          config.users.users.readarr.name
-        ];
+      media-srv = {
+        members = [ "markus" ];
+
       };
     };
 
@@ -226,7 +217,7 @@ in
     zfs.autoScrub.enable = true;
     openssh = {
       enable = true;
-      allowSFTP = false;
+      allowSFTP = true;
       settings = {
         PasswordAuthentication = false;
         PermitRootLogin = "prohibit-password";
@@ -272,20 +263,48 @@ in
       # ];
     };
 
-    sonarr.enable = true; # port: 8989
-    radarr.enable = true; # port: 7878
-    lidarr.enable = true; # port: 8686
-    bazarr.enable = true; # port: 6767
-    prowlarr.enable = true; # port: 9696
-    readarr.enable = true; # port: 8787
+    sonarr = {
+      enable = true; # port: 8989
+      user = "media-srv";
+      group = "media-srv";
+
+    };
+    radarr = {
+      enable = true; # port: 7878
+      user = "media-srv";
+      group = "media-srv";
+    };
+    lidarr = {
+      user = "media-srv";
+      group = "media-srv";
+      enable = true; # port: 8686
+    };
+    bazarr = {
+      user = "media-srv";
+      group = "media-srv";
+      enable = true; # port: 6767
+    };
+    prowlarr = {
+
+      enable = true; # port: 9696
+    };
+    readarr = {
+      user = "media-srv";
+      group = "media-srv";
+      enable = true; # port: 8787
+
+    };
     jellyfin = {
       enable = true; # port: https: 8920 & http: 8096
+      user = "media-srv";
+      group = "media-srv";
     };
 
     syncthing = {
       enable = true;
       openDefaultPorts = true;
-
+      user = "media-srv";
+      group = "media-srv";
       guiAddress = "0.0.0.0:8384";
       settings = {
         options = {

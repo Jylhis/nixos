@@ -9,6 +9,9 @@ switch-mow:
 switch:
 	nixos-rebuild --flake $(ROOT_DIR) --use-remote-sudo switch
 
+boot:
+	nixos-rebuild --flake $(ROOT_DIR) --use-remote-sudo boot
+
 server-vm:
 	nixos-rebuild switch --use-remote-sudo --flake "$(ROOT_DIR)#server" --target-host root@192.168.1.53
 
