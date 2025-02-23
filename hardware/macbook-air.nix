@@ -37,8 +37,8 @@
 
     apple-hardware.enableFirmware = true;
     apple-hardware.firmware = self.outputs.packages.x86_64-linux.brcm-firmware.override {
-      name = "macbook-air-firmware.tar.gz";
-      hash = "sha256-kbBB0HgbUBwDMqTJwLo3ykDs1mmx8dj1JUXbXGLVQss=";
+      name = "macbook-air-firmware.tar";
+      hash = "sha256-YEDh9tljjDSReQaoNwiuzODAiYRAAt1ls77XBXRaJUs=";
     };
 
     services.thermald.enable = true;
