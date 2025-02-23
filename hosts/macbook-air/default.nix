@@ -3,6 +3,8 @@
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 {
   self,
+  lib,
+  unstable,
   pkgs,
   config,
   ...
@@ -24,6 +26,14 @@
       enable = true;
       theme = "breeze";
     };
+
+    kernel.sysctl = {
+      "kernel.sysrq" = 1;
+    };
+
+    kernelParams = [
+      "mitigations=off"
+    ];
 
   };
 
@@ -114,6 +124,10 @@
     systemPackages =
       with pkgs;
       [
+        sops
+        age
+        ssh-to-age
+        git-agecrypt
 
         unzip
         bash-completion
@@ -166,9 +180,14 @@
   };
 
   programs = {
-    _1password.enable = true;
+    _1password = {
+      enable = true;
+      package = unstable._1password-cli;
+
+    };
     _1password-gui = {
       enable = true;
+      package = unstable._1password-gui;
       polkitPolicyOwners = [
         config.users.users.markus.name
         config.users.users.sara.name
@@ -191,6 +210,16 @@
       enable = true;
     };
 
+  };
+
+  nixpkgs.config = {
+    packageOverrides = pkgs: {
+      ffmpeg-full = pkgs.ffmpeg-full.override {
+        withUnfree = true;
+        withOpengl = true;
+      };
+
+    };
   };
 
   system.stateVersion = "24.11"; # Did you read the comment?
