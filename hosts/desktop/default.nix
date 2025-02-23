@@ -38,6 +38,9 @@
   boot = {
 
     #  options amdgpu pcie_gen_cap=0x40000 # TODO(amdgpu)
+    extraModprobeConfig = ''
+      options i915 mitigations=off
+    '';
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot = {

@@ -447,10 +447,6 @@ in
         };
       };
 
-      # TODO: Import
-      # https://grafana.com/grafana/dashboards/1860-node-exporter-full/
-      # https://grafana.com/grafana/dashboards/12530-sonarr-v3/
-      # https://grafana.com/grafana/dashboards/12896-radarr-v3/
       provision = {
         enable = true;
         datasources = {
