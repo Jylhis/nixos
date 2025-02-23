@@ -130,9 +130,11 @@
               keyformat = "passphrase";
               keylocation = "file:///tmp/disk.key";
               canmount = "noauto";
+              aclinherit = "passthrough";
             };
             postCreateHook = ''
-              zfs set keylocation="prompt" zroot/data
+                zfs set keylocation="prompt" zroot/data
+              	zfs set aclinherit=passthrough zroot/data
             '';
 
           };

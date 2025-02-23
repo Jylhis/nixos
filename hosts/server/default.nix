@@ -75,8 +75,10 @@ in
   users = {
 
     groups = {
+      media-srv = { };
       prv-media = {
         members = [
+          config.users.users.media-srv.name
           config.users.users.syncthing.name
           config.users.users.jellyfin.name
           config.users.users.sonarr.name
@@ -89,6 +91,13 @@ in
     };
 
     users = {
+      media-srv = {
+        group = "media-srv";
+        isSystemUser = true;
+        home = "/var/lib/media-srv";
+        createHome = true;
+        description = "Shared user for media server stuff";
+      };
       root.initialPassword = "root"; # FIXME
       root.openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK4zXcaYT+RTxvAjUjE3B33kwwxCOo4ApI4diLnajbUT"
