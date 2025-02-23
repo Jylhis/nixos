@@ -292,6 +292,7 @@ with lib.hm.gvariant;
         "org.gnome.Console.desktop"
         "firefox.desktop"
         "spotify.desktop"
+        "todoist.desktop"
       ];
       last-selected-power-profile = "performance";
       welcome-dialog-last-shown-version = "47.1";
