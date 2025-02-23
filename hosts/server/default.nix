@@ -232,22 +232,23 @@ in
 
     ollama = {
       enable = true;
-      loadModels = [
-        # Coding
-        "qwen2.5-coder:7b" # Coding
-
-        # General
-        "qwen2.5:7b"
-        "deepseek-r1:8b" # general?
-        "llama3.2:3b"
-        "phi3:3.8b"
-
-        # Testings
-        "mistral:7b"
-        "deepseek-coder-v2:6.7b"
-        "deepseek-r1:1.5b"
-        "dolphin-llama3:8b"
-      ];
+      # Starts unreliably
+      # loadModels = [
+      #   # Coding
+      #   "qwen2.5-coder:7b" # Coding
+      #
+      #   # General
+      #   "qwen2.5:7b"
+      #   "deepseek-r1:8b" # general?
+      #   "llama3.2:3b"
+      #   "phi3:3.8b"
+      #
+      #   # Testings
+      #   "mistral:7b"
+      #   "deepseek-coder-v2:6.7b"
+      #   "deepseek-r1:1.5b"
+      #   "dolphin-llama3:8b"
+      # ];
     };
 
     sonarr.enable = true; # port: 8989
