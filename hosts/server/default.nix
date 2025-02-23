@@ -187,6 +187,18 @@ in
   # Disable default sync folder syncthing
   systemd.services.syncthing.environment.STNODEFAULTFOLDER = "true"; # Don't create default ~/Sync folder
   services = {
+
+    rclone-sync = {
+      enable = false;
+      source = "OneDrive:/";
+      destination = "/data/personal/OneDrive/";
+      extraArgs = [
+        "--dry-run"
+        "--no-update-modtime"
+        "--backup-dir=/data/personal/rclone-backup"
+      ];
+    };
+
     fail2ban = {
       enable = true;
       maxretry = 5;

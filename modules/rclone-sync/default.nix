@@ -25,6 +25,16 @@ in
 
     package = mkPackageOption pkgs "rclone" { };
 
+    source = mkOption {
+      type = types.str;
+      default = "";
+    };
+
+    destination = mkOption {
+      type = types.str;
+      default = "";
+    };
+
     extraArgs = mkOption {
       type = with lib.types; listOf str;
       default = [ ];
@@ -87,6 +97,7 @@ in
         # --delete-excluded
         # --exclude
         # --include
+        # --track-renames
       };
 
       serviceConfig = {
@@ -107,10 +118,13 @@ in
         PrivateTmp = true;
         EnvironmentFile = lib.mkIf (cfg.environment.file != null) cfg.environment.file;
 
-        ExecStart = ''
-                      ${cfg.package}/bin/rclone \
-          	    sync source:path dest:path [flags]
-        '';
+        # ExecStart = let
+        #   extraArgsEscaped = lib.escapeShellArgs cfg.extraArgs;
+        # in
+        #   ''
+        #               ${cfg.package}/bin/rclone \
+        #   	    sync source:path dest:path ${extraArgsEscaped}
+        # '';
 
       };
     };

@@ -151,6 +151,7 @@
               disko.nixosModules.disko
               self.nixosModules.jyl-cachix
               self.nixosModules.user-markus
+              self.nixosModules.rclone-sync
               ./hosts/server
             ];
           };
