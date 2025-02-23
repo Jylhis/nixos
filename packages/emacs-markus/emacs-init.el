@@ -1016,6 +1016,13 @@ active region is added to the search string."
 
 (setq help-at-pt-display-when-idle t) ; Display messages when idle, without prompting
 
+
+(use-package devdocs
+  :ensure
+  :hook
+  (python-mode . (lambda () (setq-local devdocs-current-docs '("python~3.12"))))
+  )
+
 ;; Enabled inline static analysis
 (use-package flymake
   :ensure

@@ -26,6 +26,8 @@
     # using the "option" above.
     # Options for modules imported in "imports" can be set here.
     environment.systemPackages = with pkgs; [
+      devdocs-desktop
+
       # CLI utils
       bat
       direnv
