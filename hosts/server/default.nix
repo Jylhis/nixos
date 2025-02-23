@@ -559,6 +559,11 @@ in
         withFFmpeg = true;
       };
 
+      radarr = unstable.radarr;
+      readarr = unstable.readarr;
+      lidarr = unstable.lidarr;
+      prowlarr = unstable.prowlarr;
+
     };
 
     permittedInsecurePackages = [
