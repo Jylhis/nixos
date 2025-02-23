@@ -121,7 +121,7 @@ with lib.hm.gvariant;
 
     "org/gnome/desktop/interface" = {
       accent-color = "red";
-      color-scheme = "default";
+      color-scheme = "prefer-dark";
       enable-hot-corners = false;
       font-antialiasing = "rgba";
       font-hinting = "full";

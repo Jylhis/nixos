@@ -205,6 +205,7 @@
                   "errexit"
                   "pipefail"
                 ];
+		# sed command is due to this: https://github.com/nix-community/dconf2nix/issues/112
                 text = ''
                   if [ -z "$1" ]; then
                       echo "Usage: nix run .#dconf-dump path/to/output-file.nix"
