@@ -69,99 +69,110 @@
       ...
     }@attrs:
 
-    flake-utils.lib.eachDefaultSystemPassThrough (system: {
+    flake-utils.lib.eachDefaultSystemPassThrough (
+      system:
+      let
 
-      nixosModules = {
-        cloud-backup = import ./modules/cloud-backup;
-        common = import ./modules/common.nix;
-        user-markus = import ./users/markus;
-        user-markus-full = import ./users/markus/full.nix;
-        user-sara = import ./users/sara;
-        apple-hardware = import ./modules/apple-hardware.nix;
-        mac-mini-2018 = import ./hardware/mac-mini-2018.nix;
-        macbook-air = import ./hardware/macbook-air.nix;
-        jyl-nix-config = import ./modules/nix-config.nix;
-        jyl-cachix = import ./modules/cachix.nix;
-      };
+        unstable = import nixpkgs-unstable {
+          inherit system;
+          config.allowUnfree = true;
+        };
+      in
+      {
 
-      nixosConfigurations = {
-        mac-mini = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = attrs // {
-            unstable = import nixpkgs-unstable {
-              inherit system;
-              config.allowUnfree = true;
+        nixosModules = {
+          rclone-sync = import ./modules/rclone-sync;
+          common = import ./modules/common.nix;
+          user-markus = import ./users/markus;
+          user-markus-full = import ./users/markus/full.nix;
+          user-sara = import ./users/sara;
+          apple-hardware = import ./modules/apple-hardware.nix;
+          mac-mini-2018 = import ./hardware/mac-mini-2018.nix;
+          macbook-air = import ./hardware/macbook-air.nix;
+          jyl-nix-config = import ./modules/nix-config.nix;
+          jyl-cachix = import ./modules/cachix.nix;
+        };
+
+        nixosConfigurations = {
+          mac-mini = nixpkgs.lib.nixosSystem {
+            system = "x86_64-linux";
+            specialArgs = attrs // {
+              inherit unstable;
+            };
+            modules = [
+              home-manager.nixosModules.home-manager
+              {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                };
+              }
+              ./hosts/desktop
+              nixos-hardware.nixosModules.common-gpu-amd
+              self.nixosModules.common
+              self.nixosModules.user-markus-full
+              self.nixosModules.user-sara
+              self.nixosModules.jyl-nix-config
+              self.nixosModules.jyl-cachix
+            ];
+          };
+          macbook-air = nixpkgs.lib.nixosSystem {
+            system = "x86_64-linux";
+            specialArgs = attrs // {
+              inherit unstable;
+            };
+            modules = [
+              home-manager.nixosModules.home-manager
+              {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                };
+              }
+              ./hosts/macbook-air
+              self.nixosModules.common
+              self.nixosModules.user-markus-full
+              self.nixosModules.user-sara
+              self.nixosModules.jyl-nix-config
+              self.nixosModules.jyl-cachix
+            ];
+          };
+
+          server = nixpkgs.lib.nixosSystem {
+            system = "x86_64-linux";
+            specialArgs = attrs // {
+              inherit unstable;
+            };
+
+            modules = [
+              srvos.nixosModules.server
+              srvos.nixosModules.hardware-hetzner-online-intel
+              sops-nix.nixosModules.sops
+              disko.nixosModules.disko
+              self.nixosModules.jyl-cachix
+              self.nixosModules.user-markus
+              ./hosts/server
+            ];
+          };
+        };
+
+        deploy.nodes = {
+          server = {
+            hostname = "lab";
+            sshUser = "root";
+            autoRollback = true;
+            magicRollback = true;
+            profiles.system = {
+              user = "root";
+              path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.server;
             };
           };
-          modules = [
-            home-manager.nixosModules.home-manager
-            {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-              };
-            }
-            ./hosts/desktop
-            nixos-hardware.nixosModules.common-gpu-amd
-            self.nixosModules.common
-            self.nixosModules.user-markus-full
-            self.nixosModules.user-sara
-            self.nixosModules.jyl-nix-config
-            self.nixosModules.jyl-cachix
-          ];
-        };
-        macbook-air = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = attrs;
-          modules = [
-            home-manager.nixosModules.home-manager
-            {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-              };
-            }
-            ./hosts/macbook-air
-            self.nixosModules.common
-            self.nixosModules.user-markus-full
-            self.nixosModules.user-sara
-            self.nixosModules.jyl-nix-config
-            self.nixosModules.jyl-cachix
-          ];
         };
 
-        server = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = attrs;
+        checks = builtins.mapAttrs (_system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
 
-          modules = [
-            srvos.nixosModules.server
-            srvos.nixosModules.hardware-hetzner-online-intel
-            sops-nix.nixosModules.sops
-            disko.nixosModules.disko
-            self.nixosModules.jyl-cachix
-            self.nixosModules.user-markus
-            ./hosts/server
-          ];
-        };
-      };
-
-      deploy.nodes = {
-        server = {
-          hostname = "lab";
-          sshUser = "root";
-          autoRollback = true;
-          magicRollback = true;
-          profiles.system = {
-            user = "root";
-            path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.server;
-          };
-        };
-      };
-
-      checks = builtins.mapAttrs (_system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
-
-    })
+      }
+    )
     // flake-utils.lib.eachDefaultSystem (
       system:
       let
