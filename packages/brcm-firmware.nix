@@ -14,11 +14,14 @@ stdenvNoCC.mkDerivation (_: {
   # nix store prefetch-file --name firmware.tar --hash-type sha256 file:///home/$USER/path/to/firmware-mac-mini.tar
   src = requireFile {
     inherit name hash;
-
-    message = "Check brcm-firmware for docs";
+    url = "https://wiki.t2linux.org/tools/firmware.sh";
 
   };
-  dontUnpack = true;
+  dontBuild = true;
+  dontConfigure = true;
+  dontInstall = true;
+  dontPatch = true;
+
   unpackPhase = ''
     mkdir -p $out/lib/firmware/brcm
      tar -xf $src -C $out/lib/firmware/brcm
