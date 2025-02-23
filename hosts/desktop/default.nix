@@ -64,8 +64,8 @@
     };
     initrd = {
       systemd.enable = true;
-      # TODO(amd)
-      # availableKernelModules = [ "amdgpu" ];
+      #kernelModules = [ "i915" ];
+      #availableKernelModules = [ "amdgpu" ];
 
       # Enable "Silent Boot"
       verbose = false;
