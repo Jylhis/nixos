@@ -463,6 +463,15 @@ in
       };
     };
 
+    loki = {
+      enable =true;
+      configFile = ./loki-config.yaml;
+    };
+
+    alloy ={
+      enable = true;
+      extraFlags =["--disable-reporting"];
+    };
     # Port: 3000
     grafana = {
       enable = true;
@@ -498,6 +507,11 @@ in
               type = "prometheus";
               url = "http://${config.services.prometheus.listenAddress}:${toString config.services.prometheus.port}";
             }
+	    {
+	      name = "Loki";
+	      type = "loki";
+	      url = "http://localhost:${toString config.services.loki.port}";
+	    }
           ];
         };
       };
@@ -549,6 +563,9 @@ in
   };
 
   environment = {
+    etc = {
+      "alloy/config.alloy".source = ./config.alloy;
+    };
     systemPackages = with pkgs; [
       tailscale
       vim
