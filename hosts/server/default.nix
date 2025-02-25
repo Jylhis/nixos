@@ -510,7 +510,7 @@ in
             {
               name = "Loki";
               type = "loki";
-              url = "http://localhost:${toString config.services.loki.port}";
+              url = "http://localhost:3100";
             }
           ];
         };
