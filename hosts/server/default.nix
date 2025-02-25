@@ -464,13 +464,13 @@ in
     };
 
     loki = {
-      enable =true;
+      enable = true;
       configFile = ./loki-config.yaml;
     };
 
-    alloy ={
+    alloy = {
       enable = true;
-      extraFlags =["--disable-reporting"];
+      extraFlags = [ "--disable-reporting" ];
     };
     # Port: 3000
     grafana = {
@@ -507,11 +507,11 @@ in
               type = "prometheus";
               url = "http://${config.services.prometheus.listenAddress}:${toString config.services.prometheus.port}";
             }
-	    {
-	      name = "Loki";
-	      type = "loki";
-	      url = "http://localhost:${toString config.services.loki.port}";
-	    }
+            {
+              name = "Loki";
+              type = "loki";
+              url = "http://localhost:${toString config.services.loki.port}";
+            }
           ];
         };
       };
