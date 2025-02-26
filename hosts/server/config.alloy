@@ -15,6 +15,7 @@ loki.source.file "log_scrape" {
 
 loki.source.journal "journal" {
   forward_to    = [loki.write.grafana_loki.receiver]
+  format_as_json = true
 }
 
 loki.process "filter_logs" {

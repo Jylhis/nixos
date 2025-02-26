@@ -1,9 +1,7 @@
 {
   self,
   pkgs,
-  config,
-  home-manager,
-  sops-nix,
+  nixpkgs,
   ...
 }:
 {
@@ -20,11 +18,10 @@
   };
 
   config = {
-    # Option definitions.
-    # Define what other settings, services and resources should be active.
-    # Usually these depend on whether a user of this module chose to "enable" it
-    # using the "option" above.
-    # Options for modules imported in "imports" can be set here.
+
+    # For Nixd
+    nix.nixPath = [ "nixpkgs=${nixpkgs}" ];
+
     environment.systemPackages = with pkgs; [
       devdocs-desktop
 
@@ -50,7 +47,9 @@
 
       # Nix
       statix
-      nil
+
+      nixd
+      nvd
       nixfmt-rfc-style
       nix-diff
       nix-ld

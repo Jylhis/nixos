@@ -978,11 +978,16 @@ active region is added to the search string."
   :config
   (setq-default eglot-workspace-configuration
                 '(:nil
-				  (:formatting (:command ["nixfmt"])
-							   :nix (:flake
-									 (:autoArchive t :autoEvalInputs t))
-							   )
-		       :gopls (:usePlaceholders t :gofumpt t)))
+		  (:formatting (:command ["nixfmt"])
+			       :nix (:flake
+				     (:autoArchive t :autoEvalInputs t))
+			       )
+		  :gopls (:usePlaceholders t :gofumpt t)
+		  :nixd
+		  (:formatting (:command ["nixfmt"])
+
+			       )
+		  ))
   )
 
 (setq eglot-report-progress nil)  ; Prevent Eglot minibuffer spam
@@ -1125,7 +1130,7 @@ active region is added to the search string."
  :ensure
  :mode "\\.nix\\'"
  :config
- (add-to-list 'eglot-server-programs '((nix-ts-mode nix-mode) "nil"  ))
+ (add-to-list 'eglot-server-programs '((nix-ts-mode nix-mode) "nixd"  ))
  )
 
 
