@@ -76,6 +76,7 @@
       # HTML + CSS
       stylelint
 
+      nodePackages.jsonlint
       nodePackages.vscode-json-languageserver
       yaml-language-server
 

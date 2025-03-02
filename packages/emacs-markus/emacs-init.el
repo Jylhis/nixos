@@ -1,20 +1,6 @@
 ;;; init.el --- General emacs config -*- lexical-binding: t -*-
 ;;; Commentary:
-;;
-;; LSP -> eglot
-;; treesit
-;; flymake
-;; eldoc
-;; xref
-;; imenu
-
-
-;;; TODO
-;; - This by default with 'enter': https://www.gnu.org/software/emacs/manual/html_node/emacs/Multi_002dLine-Comments.html
-;; - highlight parenthesis when either side of the parenthessis. currently highlight only when outside https://www.gnu.org/software/emacs/manual/html_node/emacs/Matching.html
-;; - font-lock config?
-;; - eglot-x
-
+;; see README.adoc for docs
 
 ;;; Code:
 
@@ -124,7 +110,7 @@
  split-height-threshold nil)
 
 (setq
- default-directory "~/" ; TODO: Is this needed?
+ default-directory "~/"
  vc-follow-symlinks t ; always follow symlinks when opening files
  find-file-visit-truename t ; Resolve symlinks
 
@@ -133,7 +119,7 @@
  initial-scratch-message nil ; Disable initial scratch message
  inhibit-startup-screen t ; Disable initial startup screen
 
- ;custom-safe-themes t ; Mark all custom themes safe TODO: Needed?
+ custom-safe-themes t ; Mark all custom themes safe
  confirm-kill-processes nil ; when quitting emacs, just kill processes
  enable-local-variables t ; ask if local variables are safe once.
  use-short-answers t ; life is too short to type yes or no
@@ -172,7 +158,7 @@
  :config (load-theme 'leuven t t) (load-theme 'leuven-dark t))
 
 (use-package
- centered-cursor-mode ;; TODO: Move to dev branch
+ centered-cursor-mode ;; TODO: Move to dev branch?
  :ensure
  :config (global-centered-cursor-mode))
 
@@ -292,10 +278,8 @@
 
 
 ;;;; Text editing
-
-;; TODO: are both needed?
 (add-hook 'before-save-hook 'delete-trailing-whitespace) ; Delete trailing spaces
-;;(autoload 'nuke-trailing-whitespace "whitespace" nil t) ; Remove tailing whitespace
+
 
 (use-package adoc-mode :ensure) ; AsciiDoc
 
@@ -381,7 +365,9 @@ point reaches the beginning or end of the buffer, stop there."
  :ensure nil
  :custom (treesit-font-lock-level 4)
  (major-mode-remap-alist
-  '(((js-mode javascript-mode) . js-ts-mode)
+  '(
+    ;; tag::tree-sit-mapping[]
+    ((js-mode javascript-mode) . js-ts-mode)
     (bash-mode . bash-ts-mode)
     (c++-mode . c++-ts-mode)
     (c-mode . c-ts-mode)
@@ -395,7 +381,9 @@ point reaches the beginning or end of the buffer, stop there."
     (python-mode . python-ts-mode)
     (sh-mode . bash-ts-mode)
     (typescript-mode . typescript-ts-mode)
-    (yaml-mode . yaml-ts-mode))))
+    (yaml-mode . yaml-ts-mode)
+    ;; end::tree-sit-mapping[]
+    )))
 
 
 (use-package
@@ -628,17 +616,14 @@ active region is added to the search string."
   ("M-s g" . consult-grep)
   ("M-s G" . consult-git-grep)
   ("M-s r" . consult-ripgrep)
-  ;;("M-s l" . consult-line)
-  ("M-s L" . consult-line-multi)
   ("M-s k" . consult-keep-lines)
   ("M-s u" . consult-focus-lines)
   ;; Isearch integration
   ("M-s e" . consult-isearch-history)
   :map
   isearch-mode-map
-  ("M-e" . consult-isearch-history) ;; orig. isearch-edit-string
   ("M-s e" . consult-isearch-history) ;; orig. isearch-edit-string
-  ("M-s l" . consult-line) ;; needed by consult-line to detect isearch
+  ("M-s l" . consult-line) ;; needed by consult-line to detect isearch # FIXME: not defined
   ("M-s L" . consult-line-multi) ;; needed by consult-line to detect isearch
   ;; Minibuffer history
   :map
@@ -740,22 +725,11 @@ active region is added to the search string."
  :ensure ; only need to install it, embark loads it after consult if found
  :hook (embark-collect-mode . consult-preview-at-point-mode))
 
-
 (use-package consult-eglot :ensure)
-
 (use-package consult-eglot-embark :ensure)
 (use-package consult-yasnippet :ensure)
 
 (use-package typescript-mode :ensure)
-
-
-;; Miscellaneous options
-;; (setq-default major-mode
-;;               (lambda () ; guess major mode from file name
-;;                 (unless
-;;                  buffer-file-name
-;;                  (let ((buffer-file-name (buffer-name)))
-;;                    (set-auto-mode)))))
 
 ;; Icons
 (use-package all-the-icons :ensure)
@@ -765,13 +739,6 @@ active region is added to the search string."
  :after dired
  :hook (dired-mode . all-the-icons-dired-mode)
  :config (setq all-the-icons-dired-monochrome nil))
-
-
-(use-package
- ace-link
- ;; TODO: What is this?
- :ensure
- :config (ace-link-setup-default))
 
 
 ;; Make script file executable by default
@@ -797,10 +764,6 @@ active region is added to the search string."
  cmake-mode
  :ensure
  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
-
-;; TODO: Useful?
-;;(use-package rtags :ensure)
-
 
 ;; TODO: https://github.com/redguardtoo/cpputils-cmake
 (use-package modern-cpp-font-lock :ensure :hook c++-mode-hook)
@@ -902,6 +865,7 @@ active region is added to the search string."
 (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
 ;;; LSP Support
+;; tag::eglot-config[]
 (use-package
  eglot
  :ensure
@@ -932,6 +896,8 @@ active region is added to the search string."
 
 (setq eglot-report-progress nil) ; Prevent Eglot minibuffer spam
 (setq eglot-extend-to-xref t) ; Activate Eglot in cross-referenced non-project files
+;; end::eglot-config[]
+
 
 ;; (use-package copilot
 ;;  :ensure
@@ -1040,9 +1006,7 @@ active region is added to the search string."
 
 (use-package
  go-mode
- :ensure
- :bind (:map go-mode-map ("C-c C-f" . 'gofmt))
- ;;:hook (before-save . gofmt-before-save)
+ :ensure)
 
  ;; TODO: Use :hook
  :config (add-hook 'go-mode-hook #'yas-minor-mode))
@@ -1079,15 +1043,6 @@ active region is added to the search string."
  (yas-global-mode 1))
 
 (use-package yasnippet-snippets :ensure :after (yasnippet))
-
-;; (use-package paredit
-;;   :ensure t
-;;   :hook ((emacs-lisp-mode . enable-paredit-mode)
-;;          (lisp-mode . enable-paredit-mode)
-;;          (ielm-mode . enable-paredit-mode)
-;;          (lisp-interaction-mode . enable-paredit-mode)
-;;          (scheme-mode . enable-paredit-mode)))
-
 
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)
