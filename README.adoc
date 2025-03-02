@@ -70,8 +70,7 @@ zfs mount zroot/data
 
 [,console]
 ----
-$ nix shell nixpkgs#dconf2nix
-# dconf dump / | dconf2nix > dconf.nix
+$ nix run .#dconf-dump ./dconf.nix
 ----
 
 https://github.com/nix-community/dconf2nix

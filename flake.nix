@@ -201,8 +201,6 @@
             emacs = unstable.emacs30;
           };
 
-          atsumeru = pkgs.callPackage ./packages/atsumeru { };
-
           brcm-firmware = pkgs.callPackage ./packages/brcm-firmware.nix { };
           grafana-treemap-panel = pkgs.callPackage ./packages/grafana-treemap-panel.nix {
             inherit (pkgs.grafanaPlugins) grafanaPlugin;

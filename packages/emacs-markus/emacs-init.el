@@ -1004,11 +1004,9 @@ active region is added to the search string."
  (global-set-key (kbd "C-c z") #'avy-goto-word-1)
  (setq avy-all-windows 'all-frames))
 
-(use-package
- go-mode
- :ensure)
-
- ;; TODO: Use :hook
+(use-package go-mode
+ :ensure
+ ;; TODO: Use :hook ?
  :config (add-hook 'go-mode-hook #'yas-minor-mode))
 
 (use-package

@@ -60,16 +60,12 @@
       nix-output-monitor
 
       # Python
-      (python3).withPackages
-      (
-        pkgs:
-        (with pkgs; [
-          python-lsp-server
-          python-lsp-ruff
-          pylsp-rope
-          pylsp-mypy
-        ])
-      )
+      python3
+      python3Packages.python-lsp-server
+      python3Packages.python-lsp-ruff
+      python3Packages.pylsp-rope
+      python3Packages.pylsp-mypy
+
       ruff
 
       # SQL
