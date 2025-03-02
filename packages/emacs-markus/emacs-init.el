@@ -155,7 +155,30 @@
 (use-package
  leuven-theme
  :ensure
- :config (load-theme 'leuven t t) (load-theme 'leuven-dark t))
+ :config (load-theme 'leuven t t) (load-theme 'leuven-dark t t)
+ )
+
+
+(use-package auto-dark
+  :ensure
+  :custom
+  (auto-dark-themes '((leuven-dark) (leuven)))
+  :init (auto-dark-mode))
+
+;; Ugly hack for emacs server FIXME: implement this
+(defun id/server-auto-dark (frame)
+  (use-package auto-dark
+    :ensure
+    :config (auto-dark-mode t)
+    :diminish auto-dark-mode
+    :custom
+    (auto-dark-dark-theme 'leuven-dark)
+    (auto-dark-light-theme 'leuven)
+    )
+    (remove-hook 'after-make-frame-functions #'id/server-auto-dark)
+  )
+(add-hook 'after-make-frame-functions #'id/server-auto-dark)
+
 
 (use-package
  centered-cursor-mode ;; TODO: Move to dev branch?

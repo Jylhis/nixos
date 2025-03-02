@@ -27,7 +27,7 @@
 
       settings = {
         extra-substituters = [
-          "ssh://nix-ssh@lab"
+          "ssh://nix-ssh@lab?trusted=true"
         ];
         extra-trusted-public-keys = [
           "jylhis.com:2tR5lVPX2yBu38X3n2rkKYcXJdjbCcuiCgh4byzA21I="
