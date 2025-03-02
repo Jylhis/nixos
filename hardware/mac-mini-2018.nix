@@ -1,3 +1,4 @@
+# This is specifically for Apple Mac Mini 2018 with i7-8700B
 {
   self,
   pkgs,
@@ -23,13 +24,13 @@
   };
 
   config = {
+    nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+    hardware.intelgpu.vaapiDriver = "intel-media-driver";
     hardware.graphics.extraPackages = lib.optionals config.hardware.graphics.enable [
       pkgs.intel-media-driver
-      #pkgs.intel-vaapi-driver
       pkgs.vaapiVdpau
       pkgs.intel-compute-runtime # OpenCL filter support (hardware tonemapping and subtitle burn-in)
-      pkgs.vpl-gpu-rt # QSV on 11th gen or newer
-      #pkgs.intel-media-sdk # QSV up to 11th gen
+      pkgs.intel-media-sdk # QSV up to 11th gen
     ];
     programs.firefox.preferences =
       lib.mkIf (config.hardware.graphics.enable && config.programs.firefox.enable)
@@ -38,7 +39,10 @@
         };
     boot = {
       kernelModules = [ "kvm-intel" ];
-      kernelParams = [ "nosgx" ];
+      kernelParams = [
+        "nosgx"
+        "i915.enable_guc=2"
+      ];
       initrd = {
         availableKernelModules = [
           "xhci_pci"
