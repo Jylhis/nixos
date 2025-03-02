@@ -79,14 +79,14 @@
           };
         };
         programs = {
-	  ripgrep = {
-	    enable = true;
-	    arguments = [
-	      "--hidden"
-	      "--smart-case"
-	      # --type-add 'foo:*.foo'
-	    ];
-	  };
+          ripgrep = {
+            enable = true;
+            arguments = [
+              "--hidden"
+              "--smart-case"
+              # --type-add 'foo:*.foo'
+            ];
+          };
           bash = {
             enable = true;
             enableCompletion = true;

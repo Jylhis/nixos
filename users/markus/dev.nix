@@ -35,9 +35,14 @@
       btop
       htop
       fd
+
       # Version control stuff
       git
       delta
+
+      # shell
+      bash-language-server
+      shellcheck
 
       # Golang
       go
@@ -47,7 +52,6 @@
 
       # Nix
       statix
-
       nixd
       nvd
       nixfmt-rfc-style
@@ -56,8 +60,16 @@
       nix-output-monitor
 
       # Python
-      python3
-      pyright
+      (python3).withPackages
+      (
+        pkgs:
+        (with pkgs; [
+          python-lsp-server
+          python-lsp-ruff
+          pylsp-rope
+          pylsp-mypy
+        ])
+      )
       ruff
 
       # SQL
@@ -97,12 +109,14 @@
       # Javascript & Typescript
       eslint
       typescript
+      typescript-language-server
       nodePackages.jsdoc
 
       # Docker
       dockerfile-language-server-nodejs
       hadolint
 
+      marksman
       # Extra stuff
       emacs-all-the-icons-fonts
       source-code-pro
