@@ -88,6 +88,7 @@ in
     users = {
       nixremote = {
         isSystemUser = true;
+        useDefaultShell = true;
         group = "nixremote";
         openssh.authorizedKeys.keys = [
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG1FlfEoerMLkY/a1/cIx57dlg6gbeqpsxbzHB8V9X6K root@macbook-air"
