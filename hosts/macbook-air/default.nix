@@ -107,6 +107,29 @@
 
   };
 
+  nix.buildMachines = [
+    {
+      hostName = "lab";
+      system = "x86_64-linux";
+      sshUser = "nixremote";
+      protocol = "ssh-ng";
+      publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUcxRmxmRW9lck1Ma1kvYTEvY0l4NTdkbGc2Z2JlcXBzeGJ6SEI4VjlYNksgcm9vdEBtYWNib29rLWFpcgo=";
+      sshKey = "/etc/ssh/ssh_host_ed25519_key";
+      maxJobs = 3;
+      speedFactor = 4;
+      supportedFeatures = [
+        "nixos-test"
+        "benchmark"
+        "big-parallel"
+        "kvm"
+      ];
+      mandatoryFeatures = [ ];
+    }
+  ];
+  nix.distributedBuilds = true;
+  nix.settings = {
+    builders-use-substitutes = true;
+  };
   environment = {
     gnome.excludePackages = with pkgs; [
       totem
@@ -180,6 +203,11 @@
   };
 
   programs = {
+    ssh.extraConfig = ''
+      	    Match Host lab User nix-ssh
+                IdentitiesOnly yes
+                IdentityFile /etc/ssh/ssh_host_ed25519_key
+    '';
     _1password = {
       enable = true;
       package = unstable._1password-cli;

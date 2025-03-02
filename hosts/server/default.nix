@@ -49,7 +49,9 @@ in
 
     sshServe = {
       enable = true;
-      keys = config.users.users.markus.openssh.authorizedKeys.keys;
+      keys =
+        config.users.users.nixremote.openssh.authorizedKeys.keys
+        ++ config.users.users.markus.openssh.authorizedKeys.keys;
     };
     gc = {
       automatic = true;
@@ -68,6 +70,7 @@ in
       ];
       trusted-users = [
         config.users.users.root.name
+        config.users.users.nixremote.name
       ];
     };
   };
@@ -79,9 +82,17 @@ in
         members = [ "markus" ];
 
       };
+      nixremote = { };
     };
 
     users = {
+      nixremote = {
+        isSystemUser = true;
+        group = "nixremote";
+        openssh.authorizedKeys.keys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG1FlfEoerMLkY/a1/cIx57dlg6gbeqpsxbzHB8V9X6K root@macbook-air"
+        ];
+      };
       media-srv = {
         group = "media-srv";
         isSystemUser = true;

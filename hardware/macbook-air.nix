@@ -1,5 +1,6 @@
 {
   self,
+  lib,
   nixos-hardware,
   ...
 }:
