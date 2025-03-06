@@ -553,7 +553,10 @@ point reaches the beginning or end of the buffer, stop there."
  direnv
  ;; TODO: ? envrc https://github.com/purcell/envrc
  :ensure
- :config (direnv-mode))
+ :config 
+ (direnv-mode)
+ (add-to-list 'warning-suppress-types '(direnv))
+ )
 
 (use-package
  git-modes
