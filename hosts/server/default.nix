@@ -244,7 +244,7 @@ in
     };
 
     open-webui = {
-      enable = true;
+      enable = false;
       host = "0.0.0.0";
       environment = {
         ENABLE_SIGNUP = "false";
@@ -255,7 +255,7 @@ in
     };
 
     ollama = {
-      enable = true;
+      enable = false;
       # Starts unreliably
       # loadModels = [
       #   # Coding
