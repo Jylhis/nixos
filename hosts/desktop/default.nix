@@ -4,6 +4,8 @@
 {
   self,
   lib,
+  nix-software-center,
+  nixos-conf-editor,
   unstable,
   pkgs,
   config,
@@ -246,6 +248,8 @@
     systemPackages =
       with pkgs;
       [
+        nix-software-center.packages.${system}.nix-software-center
+        nixos-conf-editor.packages.${system}.nixos-conf-editor
         sops
         age
         ssh-to-age

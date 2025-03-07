@@ -11,6 +11,19 @@
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
+    nix-software-center = {
+      url = "github:snowfallorg/nix-software-center";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        utils.follows = "flake-utils";
+      };
+    };
+
+    nixos-conf-editor = {
+      url = "github:snowfallorg/nixos-conf-editor";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     srvos = {
       url = "github:nix-community/srvos";
       inputs.nixpkgs.follows = "nixpkgs";
