@@ -1,6 +1,8 @@
 {
   description = "Jylhis personal flake";
 
+  # TODO: deadnix
+  # TODO: statix
   inputs = {
 
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
@@ -138,11 +140,9 @@
             ];
           };
 
-          server = nixpkgs.lib.nixosSystem {
+          server = nixpkgs-unstable.lib.nixosSystem {
             system = "x86_64-linux";
-            specialArgs = attrs // {
-              inherit unstable;
-            };
+            specialArgs = attrs;
 
             modules = [
               srvos.nixosModules.server

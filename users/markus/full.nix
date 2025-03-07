@@ -79,6 +79,10 @@
           };
         };
         programs = {
+          nh = {
+            enable = true;
+            flake = lib.mkDefault "/etc/nixos";
+          };
           ripgrep = {
             enable = true;
             arguments = [

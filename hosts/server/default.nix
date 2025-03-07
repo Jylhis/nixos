@@ -5,7 +5,6 @@
   lib,
   self,
   pkgs,
-  unstable,
   config,
   ...
 }:
@@ -92,6 +91,7 @@ in
         group = "nixremote";
         openssh.authorizedKeys.keys = [
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG1FlfEoerMLkY/a1/cIx57dlg6gbeqpsxbzHB8V9X6K root@macbook-air"
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAzxssZrZsAZ2oeIXNW7dMxwGQt7ZFOuqT0Oyc1o/l4V root@mac-mini"
         ];
       };
       media-srv = {
@@ -607,20 +607,14 @@ in
         withOpengl = true;
       };
 
-      bazarr = unstable.bazarr.override {
+      bazarr = pkgs.bazarr.override {
         ffmpeg = pkgs.ffmpeg-full;
       };
 
-      sonarr = unstable.sonarr.override {
+      sonarr = pkgs.sonarr.override {
         ffmpeg = pkgs.ffmpeg-full;
         withFFmpeg = true;
       };
-
-      radarr = unstable.radarr;
-      readarr = unstable.readarr;
-      lidarr = unstable.lidarr;
-      prowlarr = unstable.prowlarr;
-
     };
 
     permittedInsecurePackages = [
