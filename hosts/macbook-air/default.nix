@@ -24,7 +24,7 @@
     };
     plymouth = {
       enable = true;
-      theme = "breeze";
+      theme = lib.mkDefault "breeze";
     };
 
     kernel.sysctl = {

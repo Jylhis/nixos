@@ -52,7 +52,7 @@
     };
     plymouth = {
       enable = true;
-      theme = "breeze";
+      theme = lib.mkDefault "breeze";
     };
 
     kernel.sysctl = {
@@ -240,6 +240,7 @@
       pkgs.gnome-weather
       pkgs.rhythmbox
       pkgs.totem
+      pkgs.gnome-tour
     ];
 
     # List packages installed in system profile. To search, run:

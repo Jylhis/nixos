@@ -38,6 +38,21 @@
       };
     };
 
+    stylix = {
+      url = "github:danth/stylix/release-24.11";
+      inputs = {
+        flake-utils.follows = "flake-utils";
+        home-manager.follows = "home-manager";
+        nixpkgs.follows = "nixpkgs";
+        systems.follows = "systems";
+      };
+    };
+
+    tinted-schemes = {
+      url = "github:tinted-theming/schemes";
+      flake = false;
+    };
+
     flake-utils.url = "github:numtide/flake-utils";
 
     home-manager = {
@@ -70,6 +85,7 @@
     {
       self,
       nixpkgs,
+      stylix,
       nixpkgs-unstable,
       deploy-rs,
       disko,
@@ -122,6 +138,7 @@
                   useUserPackages = true;
                 };
               }
+              stylix.nixosModules.stylix
               ./hosts/desktop
               nixos-hardware.nixosModules.common-gpu-amd
               self.nixosModules.common
@@ -144,6 +161,7 @@
                   useUserPackages = true;
                 };
               }
+              stylix.nixosModules.stylix
               ./hosts/macbook-air
               self.nixosModules.common
               self.nixosModules.user-markus-full

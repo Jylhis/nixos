@@ -1,8 +1,11 @@
 {
   self,
   pkgs,
+  lib,
   unstable,
   config,
+  stylix,
+  tinted-schemes,
   home-manager,
   sops-nix,
   ...
@@ -43,6 +46,30 @@
         ]
       ))
     ];
+
+    stylix = {
+      enable = true;
+      image = config.lib.stylix.pixel "base01";
+      base16Scheme = "${tinted-schemes}/base16/catppuccin-latte.yaml";
+      polarity = "light";
+      fonts = {
+        sizes = {
+          terminal = 10;
+        };
+      };
+      cursor = {
+        package = pkgs.adwaita-icon-theme;
+        name = "Adwaita";
+      };
+    };
+
+    specialisation.night.configuration = {
+      stylix = {
+        polarity = lib.mkForce "dark";
+        base16Scheme = lib.mkForce "${tinted-schemes}/base16/catppuccin-macchiato.yaml";
+      };
+    };
+
     home-manager.users.markus =
       {
         lib,
@@ -50,6 +77,11 @@
         ...
       }:
       {
+        stylix = {
+          targets = {
+            emacs.enable = false;
+          };
+        };
         sops = {
           age = {
             keyFile = "${config.users.users.markus.home}/.config/sops/age/keys.txt";
@@ -310,7 +342,7 @@
         # General applications
         spotify
         signal-desktop
-	unstable.protonmail-desktop
+        unstable.protonmail-desktop
 
         jetbrains.datagrip
 
