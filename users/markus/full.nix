@@ -1,6 +1,7 @@
 {
   self,
   pkgs,
+  unstable,
   config,
   home-manager,
   sops-nix,
@@ -309,6 +310,7 @@
         # General applications
         spotify
         signal-desktop
+	unstable.protonmail-desktop
 
         jetbrains.datagrip
 

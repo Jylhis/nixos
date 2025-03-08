@@ -23,14 +23,16 @@ with lib.hm.gvariant;
         652
         480
       ];
+      theme = "auto";
     };
 
     "org/gnome/calculator" = {
-      accuracy = 9;
+      accuracy = 3;
       angle-units = "degrees";
       base = 10;
-      button-mode = "basic";
+      button-mode = "keyboard";
       number-format = "automatic";
+      refresh-interval = 604800;
       show-thousands = false;
       show-zeroes = false;
       source-currency = "";
@@ -39,8 +41,8 @@ with lib.hm.gvariant;
       target-units = "radian";
       window-maximized = false;
       window-size = mkTuple [
-        360
-        626
+        680
+        788
       ];
       word-size = 64;
     };
@@ -121,7 +123,7 @@ with lib.hm.gvariant;
 
     "org/gnome/desktop/interface" = {
       accent-color = "red";
-      color-scheme = "prefer-dark";
+      color-scheme = "default";
       enable-hot-corners = false;
       font-antialiasing = "rgba";
       font-hinting = "full";
