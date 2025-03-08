@@ -75,3 +75,39 @@ $ nix run .#dconf-dump ./dconf.nix
 
 https://github.com/nix-community/dconf2nix
 https://nix-community.github.io/home-manager/options.xhtml#opt-dconf.settings
+
+
+== Packaging notes
+
+.Usefull tools
+* https://github.com/msteen/nix-prefetch[nix-prefetch]
+* https://github.com/Mic92/nix-update
+* https://github.com/nix-community/nurl
+
+
+== Docs and search
+
+.Docs
+* https://nixos.org/guides/nix-pills/[nix-pills]
+* https://nix.dev/[nix.dev]
+* https://wiki.nixos.org/wiki/NixOS_Wiki
+
+.Official manuals
+** https://nix.dev/manual/nix/stable/[Nix]
+** https://nixos.org/manual/nixpkgs/stable/[Nixpkgs reference]
+** https://nixos.org/manual/nixos/stable/[NixOS]
+
+.Online posts and misc
+* https://github.com/justinwoo/nix-shorts/
+
+.Search
+* https://search.nixos.org/packages
+* https://noogle.dev/
+* https://lazamar.co.uk/nix-versions/
+* https://home-manager-options.extranix.com/
+* https://searchix.alanpearce.eu/
+
+
+.Learn
+* https://zaynetro.com/explainix
+* https://nixos-and-flakes.thiscute.world/
