@@ -27,6 +27,7 @@
   config = {
 
     environment.systemPackages = with pkgs; [
+      digikam
       starship
       sops
       age

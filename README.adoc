@@ -83,6 +83,7 @@ https://nix-community.github.io/home-manager/options.xhtml#opt-dconf.settings
 * https://github.com/msteen/nix-prefetch[nix-prefetch]
 * https://github.com/Mic92/nix-update
 * https://github.com/nix-community/nurl
+* https://github.com/nix-community/nix-init
 
 
 == Docs and search
