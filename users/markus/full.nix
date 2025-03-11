@@ -69,6 +69,9 @@
         polarity = lib.mkForce "dark";
         base16Scheme = lib.mkForce "${tinted-schemes}/base16/catppuccin-macchiato.yaml";
       };
+      home-manager.users.markus.dconf.settings."org/gnome/desktop/interface".color-scheme =
+        lib.mkForce "prefer-dark";
+
     };
 
     home-manager.users.markus =

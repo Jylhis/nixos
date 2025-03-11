@@ -121,7 +121,6 @@ with lib.hm.gvariant;
     };
 
     "org/gnome/desktop/interface" = {
-      accent-color = "red";
       color-scheme = "default";
       cursor-size = 32;
       cursor-theme = "Adwaita";
