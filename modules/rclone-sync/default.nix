@@ -8,10 +8,6 @@ with lib;
 let
 
   cfg = config.services.rclone-sync;
-  opt = options.services.rclone-sync;
-
-  defaultUser = "rclone-sync";
-  defaultGroup = defaultUser;
 in
 {
   imports = [
@@ -68,7 +64,7 @@ in
     systemd.packages = [ pkgs.rclone ];
     users.users = {
       ${cfg.user} = {
-        group = cfg.group;
+        inherit (cfg) group;
         home = cfg.dataDir;
         createHome = true;
         description = "RClone sync daemon user";

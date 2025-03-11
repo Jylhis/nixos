@@ -1,4 +1,3 @@
----
 keys:
   # sops updatekeys secrets/*
   - &lab-server age1n70s2ssmssfd3x9wn4x39f7tuqvhnp7q6pluww54fq6swgq7au7s2d8gk6
