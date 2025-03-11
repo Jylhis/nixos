@@ -860,7 +860,8 @@
         "srvos": "srvos",
         "stylix": "stylix",
         "systems": "systems_4",
-        "tinted-schemes": "tinted-schemes"
+        "tinted-schemes": "tinted-schemes",
+        "treefmt-nix": "treefmt-nix_2"
       }
     },
     "snowfall-lib": {
@@ -1106,6 +1107,26 @@
         "owner": "numtide",
         "repo": "treefmt-nix",
         "rev": "0ce9d149d99bc383d1f2d85f31f6ebd146e46085",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "treefmt-nix_2": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1739829690,
+        "narHash": "sha256-mL1szCeIsjh6Khn3nH2cYtwO5YXG6gBiTw1A30iGeDU=",
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "rev": "3d0579f5cc93436052d94b73925b48973a104204",
         "type": "github"
       },
       "original": {
