@@ -11,6 +11,11 @@
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nix-software-center = {
       url = "github:snowfallorg/nix-software-center";
       inputs = {
@@ -91,10 +96,10 @@
       disko,
       nixos-anywhere,
       emacs-overlay,
+      treefmt-nix,
       flake-utils,
       home-manager,
       nixos-hardware,
-      devenv,
       sops-nix,
       srvos,
       ...
@@ -103,10 +108,12 @@
     flake-utils.lib.eachDefaultSystemPassThrough (
       system:
       let
-
         unstable = import nixpkgs-unstable {
           inherit system;
           config.allowUnfree = true;
+          overlays = [
+            emacs-overlay.overlay
+          ];
         };
       in
       {
@@ -201,8 +208,6 @@
           };
         };
 
-        checks = builtins.mapAttrs (_system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
-
       }
     )
     // flake-utils.lib.eachDefaultSystem (
@@ -218,10 +223,14 @@
         pkgs = import nixpkgs {
           inherit system;
           config.allowUnfree = true;
-
         };
+
+        treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
       in
       {
+        checks = {
+          formatting = treefmtEval.config.build.check self;
+        } // deploy-rs.lib.${system}.deployChecks self.deploy;
 
         packages = {
 
@@ -239,7 +248,7 @@
 
         };
 
-        formatter = pkgs.nixfmt-rfc-style;
+        formatter = treefmtEval.config.build.wrapper;
         apps = {
           dconf-dump = {
             type = "app";
@@ -287,60 +296,7 @@
             ];
           };
 
-          # TODO: define devenv.root
-          # dev = devenv.lib.mkShell {
-          #   inherit pkgs;
-          #   inputs = attrs;
-          #
-          #   modules = [
-          #     {
-          #       cachix.enable = true;
-          #       cachix.pull = [
-          #         "pre-commit-hooks"
-          #         "jylhis-nixos"
-          #       ];
-          #       languages.nix.enable = true;
-          #       packages = [
-          #         # Deployment tools
-          #         deploy-rs.packages.${system}.deploy-rs
-          #         nixos-anywhere.packages.${system}.nixos-anywhere
-          #         pkgs.age
-          #         pkgs.sops
-          #         pkgs.ssh-to-age
-          #         pkgs.git-agecrypt
-          #
-          #         # Other tools
-          #         pkgs.dconf2nix
-          #       ];
-          #       git-hooks.excludes = [
-          #         "secrets/.*\.yaml$"
-          #         "users/.*/secrets\.yaml$"
-          #       ];
-          #       git-hooks.hooks = {
-          #         shellcheck.enable = true;
-          #         check-added-large-files.enable = true;
-          #         check-case-conflicts.enable = true;
-          #         check-executables-have-shebangs.enable = true;
-          #         check-merge-conflicts.enable = true;
-          #         check-shebang-scripts-are-executable.enable = true;
-          #         check-symlinks.enable = true;
-          #         deadnix.enable = true;
-          #         detect-private-keys.enable = true;
-          #         #editorconfig-checker.enable = true;
-          #         fix-byte-order-marker.enable = true;
-          #         forbid-new-submodules.enable = true;
-          #         nil.enable = true;
-          #         nixfmt-rfc-style.enable = true;
-          #         ripsecrets.enable = true;
-          #         statix.enable = true;
-          #         typos.enable = true;
-          #       };
-          #     }
-          #   ];
-          # };
-
         };
-
       }
     );
 }
