@@ -158,7 +158,6 @@
 
         curlie
         delta
-        devenv
         direnv
 
         # duf

@@ -8,6 +8,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
 
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-small.url = "github:nixos/nixpkgs/nixos-unstable-small";
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
@@ -26,15 +27,40 @@
 
     nixos-conf-editor = {
       url = "github:snowfallorg/nixos-conf-editor";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+
+        nixpkgs.follows = "nixpkgs";
+        flake-compat.follows = "flake-compat";
+      };
     };
+    flake-compat.url = "https://flakehub.com/f/edolstra/flake-compat/1.tar.gz";
 
     srvos = {
       url = "github:nix-community/srvos";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    deploy-rs.url = "github:serokell/deploy-rs";
-    nixos-anywhere.url = "github:nix-community/nixos-anywhere";
+    deploy-rs = {
+      url = "github:serokell/deploy-rs";
+      inputs = {
+
+        nixpkgs.follows = "nixpkgs";
+        utils.follows = "flake-utils";
+
+      };
+
+    };
+    flake-parts.url = "github:hercules-ci/flake-parts";
+
+    nixos-anywhere = {
+      url = "github:nix-community/nixos-anywhere";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs-small";
+        disko.follows = "disko";
+        nixos-stable.follows = "nixpkgs";
+        treefmt-nix.follows = "treefmt-nix";
+      };
+    };
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs = {
@@ -47,6 +73,7 @@
       url = "github:danth/stylix/release-24.11";
       inputs = {
         flake-utils.follows = "flake-utils";
+        flake-compat.follows = "flake-compat";
         home-manager.follows = "home-manager";
         nixpkgs.follows = "nixpkgs";
         systems.follows = "systems";
@@ -58,7 +85,10 @@
       flake = false;
     };
 
-    flake-utils.url = "github:numtide/flake-utils";
+    flake-utils = {
+      url = "github:numtide/flake-utils";
+      inputs.systems.follows = "systems";
+    };
 
     home-manager = {
       inputs.nixpkgs.follows = "nixpkgs";
@@ -76,11 +106,7 @@
 
     };
     systems.url = "github:nix-systems/default";
-    devenv = {
-      url = "github:cachix/devenv";
-      inputs.nixpkgs.follows = "nixpkgs";
 
-    };
   };
   nixConfig = {
     extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";

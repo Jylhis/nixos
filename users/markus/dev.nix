@@ -30,7 +30,6 @@
       nix-direnv
       ripgrep
       moreutils
-      devenv
       btop
       htop
       fd
