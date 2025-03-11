@@ -26,13 +26,13 @@
       optimise.automatic = true;
 
       settings = {
-        extra-substituters = [
+        substituters = [
           "ssh://nix-ssh@lab?trusted=true"
         ];
-        extra-trusted-public-keys = [
+        trusted-public-keys = [
           "jylhis.com:2tR5lVPX2yBu38X3n2rkKYcXJdjbCcuiCgh4byzA21I="
         ];
-        extra-trusted-substituters = [
+        trusted-substituters = [
           "ssh://nix-ssh@lab"
         ];
 

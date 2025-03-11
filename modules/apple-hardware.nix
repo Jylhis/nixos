@@ -38,15 +38,15 @@ in
     # using the "option" above.
     # Options for modules imported in "imports" can be set here.
     nix.settings = {
-      extra-substituters = [
+      substituters = [
         #"https://hydra.soopy.moe"
         "https://cache.soopy.moe"
       ];
-      extra-trusted-public-keys = [
+      trusted-public-keys = [
         "hydra.soopy.moe:IZ/bZ1XO3IfGtq66g+C85fxU/61tgXLaJ2MlcGGXU8Q="
         "cache.soopy.moe-1:0RZVsQeR+GOh0VQI9rvnHz55nVXkFardDqfm4+afjPo="
       ];
-      extra-trusted-substituters = [
+      trusted-substituters = [
         "https://cache.soopy.moe"
         #"https://hydra.soopy.moe"
       ];
