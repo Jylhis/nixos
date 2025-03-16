@@ -1,6 +1,5 @@
 {
   self,
-  lib,
   nix-software-center,
   nixos-conf-editor,
   unstable,
@@ -34,12 +33,10 @@
       efi.canTouchEfiVariables = true;
       systemd-boot = {
         enable = true;
-        configurationLimit = 3;
       };
     };
     plymouth = {
       enable = true;
-      theme = lib.mkDefault "breeze";
     };
 
     kernel.sysctl = {
@@ -68,22 +65,6 @@
   networking = {
     hostName = "macbook-air"; # Define your hostname.
     networkmanager.enable = true;
-  };
-
-  time.timeZone = "Europe/Zurich";
-  i18n = {
-    defaultLocale = "en_US.UTF-8";
-    extraLocaleSettings = {
-      LC_ADDRESS = "de_CH.UTF-8";
-      LC_IDENTIFICATION = "de_CH.UTF-8";
-      LC_MEASUREMENT = "de_CH.UTF-8";
-      LC_MONETARY = "de_CH.UTF-8";
-      LC_NAME = "de_CH.UTF-8";
-      LC_NUMERIC = "de_CH.UTF-8";
-      LC_PAPER = "de_CH.UTF-8";
-      LC_TELEPHONE = "de_CH.UTF-8";
-      LC_TIME = "de_CH.UTF-8";
-    };
   };
 
   console.useXkbConfig = true;
@@ -163,48 +144,9 @@
 
   documentation = {
     enable = true;
-    doc.enable = true;
-    nixos.enable = true;
-    man.enable = true;
-    dev.enable = true;
-    info.enable = true;
-  };
-
-  nix.buildMachines = [
-    {
-      hostName = "lab";
-      system = "x86_64-linux";
-      sshUser = "nixremote";
-      protocol = "ssh-ng";
-      publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUcxRmxmRW9lck1Ma1kvYTEvY0l4NTdkbGc2Z2JlcXBzeGJ6SEI4VjlYNksgcm9vdEBtYWNib29rLWFpcgo=";
-      sshKey = "/etc/ssh/ssh_host_ed25519_key";
-      maxJobs = 3;
-      speedFactor = 4;
-      supportedFeatures = [
-        "nixos-test"
-        "benchmark"
-        "big-parallel"
-        "kvm"
-      ];
-      mandatoryFeatures = [ ];
-    }
-  ];
-  nix.distributedBuilds = true;
-  nix.settings = {
-    builders-use-substitutes = true;
   };
 
   environment = {
-    gnome.excludePackages = [
-      pkgs.epiphany
-      pkgs.geary
-      pkgs.gnome-maps
-      pkgs.gnome-music
-      pkgs.gnome-weather
-      pkgs.rhythmbox
-      pkgs.totem
-      pkgs.gnome-tour
-    ];
 
     # List packages installed in system profile. To search, run:
     # $ nix search wget
@@ -252,11 +194,6 @@
   security.rtkit.enable = true;
 
   programs = {
-    ssh.extraConfig = ''
-      	    Match Host lab User nix-ssh
-                IdentitiesOnly yes
-                IdentityFile /etc/ssh/ssh_host_ed25519_key
-    '';
     _1password = {
       enable = true;
       package = unstable._1password-cli;
@@ -274,14 +211,6 @@
     # Install firefox.
     firefox = {
       enable = true;
-      languagePacks = [
-        "en-US"
-        "en-GB"
-        "fi"
-        "de"
-        "fr"
-      ];
-
     };
 
     vim = {
@@ -290,14 +219,5 @@
 
   };
 
-  nixpkgs.config = {
-    packageOverrides = pkgs: {
-      ffmpeg-full = pkgs.ffmpeg-full.override {
-        withUnfree = true;
-        withOpengl = true;
-      };
-
-    };
-  };
   system.stateVersion = "24.11"; # Did you read the comment?
 }

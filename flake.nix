@@ -142,14 +142,14 @@
 
         nixosModules = {
           rclone-sync = import ./modules/rclone-sync;
-          common = import ./modules/common.nix;
+          personal-defaults = import ./modules/personal-default.nix;
+          nix-companion = import ./modules/nix-companion-server.nix;
           user-markus = import ./users/markus;
           user-markus-full = import ./users/markus/full.nix;
           user-sara = import ./users/sara;
           apple-hardware = import ./modules/apple-hardware.nix;
           mac-mini-2018 = import ./hardware/mac-mini-2018.nix;
           macbook-air = import ./hardware/macbook-air.nix;
-          jyl-nix-config = import ./modules/nix-config.nix;
           jyl-cachix = import ./modules/cachix.nix;
         };
 
@@ -170,10 +170,10 @@
               stylix.nixosModules.stylix
               ./hosts/desktop
               nixos-hardware.nixosModules.common-gpu-amd
-              self.nixosModules.common
+              self.nixosModules.personal-defaults
+              self.nixosModules.nix-companion
               self.nixosModules.user-markus-full
               self.nixosModules.user-sara
-              self.nixosModules.jyl-nix-config
               self.nixosModules.jyl-cachix
             ];
           };
@@ -192,10 +192,10 @@
               }
               stylix.nixosModules.stylix
               ./hosts/macbook-air
-              self.nixosModules.common
+              self.nixosModules.personal-defaults
+              self.nixosModules.nix-companion
               self.nixosModules.user-markus-full
               self.nixosModules.user-sara
-              self.nixosModules.jyl-nix-config
               self.nixosModules.jyl-cachix
             ];
           };

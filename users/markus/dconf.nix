@@ -1,5 +1,5 @@
 # Generated via dconf2nix: https://github.com/gvolpe/dconf2nix
-{ lib, config, ... }:
+{ lib, ... }:
 
 with lib.hm.gvariant;
 
@@ -12,7 +12,7 @@ with lib.hm.gvariant;
         "&MUSIC"
         "&PICTURES"
         "&VIDEOS"
-        "${config.home-manager.users.markus.home.homeDirectory}/Developer"
+        "/home/markus/Developer"
       ];
     };
 
