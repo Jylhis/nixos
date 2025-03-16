@@ -116,203 +116,162 @@
       nixpkgs-unstable,
       deploy-rs,
       disko,
-      nixos-anywhere,
       emacs-overlay,
       treefmt-nix,
-      flake-utils,
       home-manager,
       nixos-hardware,
       sops-nix,
       srvos,
       ...
     }@attrs:
+    let
+      systems = [
+        "x86_64-linux"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
 
-    flake-utils.lib.eachDefaultSystemPassThrough (
-      system:
-      let
-        unstable = import nixpkgs-unstable {
+      pkgs-stable = forAllSystems (
+        system:
+        import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+          overlays = [
+            emacs-overlay.overlay
+            deploy-rs.overlay
+            #      nixos-anywhere.overlay
+          ];
+        }
+      );
+
+      pkgs-unstable = forAllSystems (
+        system:
+        import nixpkgs-unstable {
           inherit system;
           config.allowUnfree = true;
           overlays = [
             emacs-overlay.overlay
           ];
-        };
-      in
-      {
+        }
+      );
 
-        nixosModules = {
-          rclone-sync = import ./modules/rclone-sync;
-          personal-defaults = import ./modules/personal-default.nix;
-          nix-companion = import ./modules/nix-companion-server.nix;
-          user-markus = import ./users/markus;
-          user-markus-full = import ./users/markus/full.nix;
-          user-sara = import ./users/sara;
-          apple-hardware = import ./modules/apple-hardware.nix;
-          mac-mini-2018 = import ./hardware/mac-mini-2018.nix;
-          macbook-air = import ./hardware/macbook-air.nix;
-          jyl-cachix = import ./modules/cachix.nix;
-        };
+      treefmtEval = forAllSystems (
+        system: treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix
+      );
+    in
+    {
+      checks =
+        forAllSystems (system: deploy-rs.lib.${system}.deployChecks self.deploy)
+        // forAllSystems (system: {
+          formatting = treefmtEval.${system}.config.build.check self;
+        });
 
-        nixosConfigurations = {
-          mac-mini = nixpkgs.lib.nixosSystem {
-            system = "x86_64-linux";
-            specialArgs = attrs // {
-              inherit unstable;
-            };
-            modules = [
-              home-manager.nixosModules.home-manager
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                };
-              }
-              stylix.nixosModules.stylix
-              ./hosts/desktop
-              nixos-hardware.nixosModules.common-gpu-amd
-              self.nixosModules.personal-defaults
-              self.nixosModules.nix-companion
-              self.nixosModules.user-markus-full
-              self.nixosModules.user-sara
-              self.nixosModules.jyl-cachix
-            ];
-          };
-          macbook-air = nixpkgs.lib.nixosSystem {
-            system = "x86_64-linux";
-            specialArgs = attrs // {
-              inherit unstable;
-            };
-            modules = [
-              home-manager.nixosModules.home-manager
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                };
-              }
-              stylix.nixosModules.stylix
-              ./hosts/macbook-air
-              self.nixosModules.personal-defaults
-              self.nixosModules.nix-companion
-              self.nixosModules.user-markus-full
-              self.nixosModules.user-sara
-              self.nixosModules.jyl-cachix
-            ];
-          };
+      # TODO emacs overlay
+      packages = forAllSystems (system: import ./pkgs pkgs-stable.${system});
 
-          server = nixpkgs-unstable.lib.nixosSystem {
-            system = "x86_64-linux";
-            specialArgs = attrs;
+      formatter = forAllSystems (system: treefmtEval.${system}.config.build.wrapper);
 
-            modules = [
-              srvos.nixosModules.server
-              srvos.nixosModules.hardware-hetzner-online-intel
-              sops-nix.nixosModules.sops
-              disko.nixosModules.disko
-              self.nixosModules.jyl-cachix
-              self.nixosModules.user-markus
-              self.nixosModules.rclone-sync
-              ./hosts/server
-            ];
-          };
-        };
+      apps = forAllSystems (system: import ./apps nixpkgs.legacyPackages.${system});
 
-        deploy.nodes = {
-          server = {
-            hostname = "lab";
-            sshUser = "root";
-            autoRollback = true;
-            magicRollback = true;
-            profiles.system = {
-              user = "root";
-              path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.server;
-            };
-          };
-        };
+      devShells.x86-linux.default =
+        let
+          pkgs = pkgs-stable.x86_64-linux;
+        in
+        pkgs.mkShellNoCC {
+          buildInputs = [
+            # Deployment tools
+            #   pkgs.deploy-rs
+            #   pkgs.nixos-anywhere
+            pkgs.age
+            pkgs.sops
+            pkgs.ssh-to-age
+            pkgs.git-agecrypt
 
-      }
-    )
-    // flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = import nixpkgs {
-          inherit system;
-          config.allowUnfree = true;
-          overlays = [
-            emacs-overlay.overlay
+            # Other tools
+            pkgs.dconf2nix
           ];
         };
 
-        treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
-      in
-      {
-        checks = {
-          formatting = treefmtEval.config.build.check self;
-        } // deploy-rs.lib.${system}.deployChecks self.deploy;
+      #overlays = import ./overlays {inherit inputs;};
 
-        packages = {
+      nixosModules = import ./modules/nixos // (import ./users);
+      #homeManagerModules = import ./modules/home-manager;
 
-          # Cross compilation
-          #hello-cross = nixpkgs.legacyPackages.${system}.pkgsCross.aarch64-multiplatform.hello;
-
-          emacs-markus = pkgs.callPackage ./packages/emacs-markus { };
-
-          brcm-firmware = pkgs.callPackage ./packages/brcm-firmware.nix { };
-          grafana-treemap-panel = pkgs.callPackage ./packages/grafana-treemap-panel.nix {
-            inherit (pkgs.grafanaPlugins) grafanaPlugin;
+      nixosConfigurations = {
+        mac-mini = nixpkgs.lib.nixosSystem rec {
+          system = "x86_64-linux";
+          specialArgs = attrs // {
+            unstable = pkgs-unstable.${system};
           };
-
+          modules = [
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+              };
+            }
+            stylix.nixosModules.stylix
+            ./hosts/desktop
+            nixos-hardware.nixosModules.common-gpu-amd
+            self.nixosModules.personal-defaults
+            self.nixosModules.nix-companion
+            self.nixosModules.user-markus-full
+            self.nixosModules.user-sara
+            self.nixosModules.jyl-cachix
+          ];
+        };
+        macbook-air = nixpkgs.lib.nixosSystem rec {
+          system = "x86_64-linux";
+          specialArgs = attrs // {
+            unstable = pkgs-unstable.${system};
+          };
+          modules = [
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+              };
+            }
+            stylix.nixosModules.stylix
+            ./hosts/macbook-air
+            self.nixosModules.personal-defaults
+            self.nixosModules.nix-companion
+            self.nixosModules.user-markus-full
+            self.nixosModules.user-sara
+            self.nixosModules.jyl-cachix
+          ];
         };
 
-        formatter = treefmtEval.config.build.wrapper;
-        apps = {
-          dconf-dump = {
-            type = "app";
-            program = pkgs.lib.getExe (
-              pkgs.writeShellApplication {
-                name = "dconf-dump";
-                runtimeInputs = [
-                  pkgs.dconf2nix
-                  pkgs.gnused
-                  pkgs.nixfmt-rfc-style
-                ];
-                bashOptions = [
-                  "errexit"
-                  "pipefail"
-                ];
-                # sed command is due to this: https://github.com/nix-community/dconf2nix/issues/112
-                text = ''
-                                    if [ -z "$1" ]; then
-                                        echo "Usage: nix run .#dconf-dump path/to/output-file.nix"
-                                        exit 1
-                                    fi
+        server = nixpkgs-unstable.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = attrs;
 
-                                    dconf dump / \
-                                    | sed "/mru-sources/d" \
-                                    | dconf2nix \
-                  		  | nixfmt > "$1"
-                '';
-              }
-            );
+          modules = [
+            srvos.nixosModules.server
+            srvos.nixosModules.hardware-hetzner-online-intel
+            sops-nix.nixosModules.sops
+            disko.nixosModules.disko
+            self.nixosModules.jyl-cachix
+            self.nixosModules.user-markus
+            self.nixosModules.rclone-sync
+            ./hosts/server
+          ];
+        };
+      };
+
+      deploy.nodes = {
+        server = {
+          hostname = "lab";
+          sshUser = "root";
+          autoRollback = true;
+          magicRollback = true;
+          profiles.system = {
+            user = "root";
+            path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.server;
           };
         };
-        devShells = {
-          default = pkgs.mkShellNoCC {
-            buildInputs = [
-              # Deployment tools
-              deploy-rs.packages.${system}.deploy-rs
-              nixos-anywhere.packages.${system}.nixos-anywhere
-              pkgs.age
-              pkgs.sops
-              pkgs.ssh-to-age
-              pkgs.git-agecrypt
+      };
 
-              # Other tools
-              pkgs.dconf2nix
-            ];
-          };
-
-        };
-      }
-    );
+    };
 }
