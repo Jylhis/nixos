@@ -122,15 +122,9 @@ with lib.hm.gvariant;
 
     "org/gnome/desktop/interface" = {
       color-scheme = "default";
-      cursor-size = 32;
-      cursor-theme = "Adwaita";
-      document-font-name = "DejaVu Serif  11";
       enable-hot-corners = false;
       font-antialiasing = "rgba";
       font-hinting = "full";
-      font-name = "DejaVu Sans 12";
-      gtk-theme = "adw-gtk3";
-      monospace-font-name = "DejaVu Sans Mono 12";
       toolkit-accessibility = false;
     };
 
@@ -285,19 +279,25 @@ with lib.hm.gvariant;
 
     "org/gnome/shell" = {
       disable-user-extensions = false;
-      disabled-extensions = [ ];
+      disabled-extensions = [
+        "apps-menu@gnome-shell-extensions.gcampax.github.com"
+        "auto-move-windows@gnome-shell-extensions.gcampax.github.com"
+        "light-style@gnome-shell-extensions.gcampax.github.com"
+        "window-list@gnome-shell-extensions.gcampax.github.com"
+        "windowsNavigator@gnome-shell-extensions.gcampax.github.com"
+        "workspace-indicator@gnome-shell-extensions.gcampax.github.com"
+      ];
       enabled-extensions = [
         "appindicatorsupport@rgcjonas.gmail.com"
         "solaar-extension@sidevesh"
         "status-icons@gnome-shell-extensions.gcampax.github.com"
         "system-monitor@gnome-shell-extensions.gcampax.github.com"
-        "user-theme@gnome-shell-extensions.gcampax.github.com"
       ];
       favorite-apps = [
         "org.gnome.Nautilus.desktop"
         "emacsclient.desktop"
         "org.gnome.Console.desktop"
-        "firefox.desktop"
+        "brave-browser.desktop"
         "spotify.desktop"
         "todoist.desktop"
       ];
@@ -306,11 +306,7 @@ with lib.hm.gvariant;
     };
 
     "org/gnome/shell/extensions/system-monitor" = {
-      show-swap = false;
-    };
-
-    "org/gnome/shell/extensions/user-theme" = {
-      name = "Stylix";
+      show-swap = true;
     };
 
     "org/gnome/shell/world-clocks" = {

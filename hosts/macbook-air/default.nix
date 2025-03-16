@@ -1,26 +1,41 @@
-# Edit this configuration file to define what should be installed on
-# your system. Help is available in the configuration.nix(5) man page, on
-# https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 {
   self,
   lib,
+  nix-software-center,
+  nixos-conf-editor,
   unstable,
   pkgs,
   config,
   ...
 }:
-
 {
   imports = [
     self.nixosModules.macbook-air
     ./hardware-configuration.nix
   ];
+
+  # Disable the GNOME3/GDM auto-suspend feature that cannot be disabled in GUI!
+  # If no user is logged in, the machine will power down after 20 minutes.
+  systemd = {
+    services = {
+      # FIXME: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
+      "getty@tty1".enable = false;
+      "autovt@tty1".enable = false;
+    };
+    coredump.enable = false; # Disable coredumps
+  };
+
+  # Bootloader.
   boot = {
-    # Use the systemd-boot EFI boot loader.
+    extraModprobeConfig = ''
+      options i915 mitigations=off
+    '';
     loader = {
-      systemd-boot.enable = true;
-      systemd-boot.configurationLimit = 5;
       efi.canTouchEfiVariables = true;
+      systemd-boot = {
+        enable = true;
+        configurationLimit = 3;
+      };
     };
     plymouth = {
       enable = true;
@@ -29,12 +44,25 @@
 
     kernel.sysctl = {
       "kernel.sysrq" = 1;
+      "kernel.core_pattern" = "|/bin/false"; # Disable core dumps
     };
+    initrd = {
+      systemd.enable = true;
 
+      # Enable "Silent Boot"
+      verbose = false;
+    };
+    consoleLogLevel = 0;
     kernelParams = [
       "mitigations=off"
+      "quiet"
+      "boot.shell_on_fail"
+      "loglevel=3"
+      "rd.systemd.show_status=false"
+      "rd.udev.log_level=3"
+      "udev.log_priority=3"
     ];
-
+    loader.timeout = 5;
   };
 
   networking = {
@@ -65,21 +93,28 @@
   # systemd.services.NetworkManager-wait-online.enable = false;
   # systemd.network.wait-online.enable = false;
   # boot.initrd.systemd.network.wait-online.enable = false;
-
   services = {
-
+    earlyoom.enable = true;
     tailscale.enable = true;
     hardware.bolt.enable = true;
+    fstrim.enable = true;
 
+    # Automatically connect any thunderbolt device
     udev.extraRules = ''
       ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
     '';
+
     udev.packages = [
       pkgs.gnome-settings-daemon
     ];
 
     xserver = {
       enable = true;
+      videoDrivers = [
+        "modesetting"
+        "fbdev"
+        # "amdgpu" # TODO(amdgpu)
+      ];
       displayManager.gdm.enable = true;
       desktopManager.gnome.enable = true;
       desktopManager.gnome = {
@@ -87,14 +122,11 @@
           [org.gnome.desktop.input-sources]
           sources=[('xkb', 'us'), ('xkb', 'fi')]
 
-          [org.gnome.desktop.interface]
-          gtk-theme='org.gnome.desktop.interface'
-          color-scheme='prefer-dark'
-
           [org.freedesktop.ibus.panel.emoji]
           hotkey="[]"
         '';
       };
+
       xkb = {
         layout = "us,fi";
         variant = "";
@@ -104,7 +136,28 @@
       enable = true;
       drivers = [ pkgs.gutenprint ];
     };
+    pipewire = {
+      enable = true;
+      alsa.enable = true;
+      #alsa.support32Bit = false;
+      pulse.enable = true;
+      # If you want to use JACK applications, uncomment this
+      #jack.enable = true;
+      audio.enable = true;
+      # use the example session manager (no others are packaged yet so this is enabled by default,
+      # no need to redefine it in your config for now)
+      #media-session.enable = true;
+    };
 
+  };
+
+  documentation = {
+    enable = true;
+    doc.enable = true;
+    nixos.enable = true;
+    man.enable = true;
+    dev.enable = true;
+    info.enable = true;
   };
 
   nix.buildMachines = [
@@ -130,15 +183,17 @@
   nix.settings = {
     builders-use-substitutes = true;
   };
+
   environment = {
-    gnome.excludePackages = with pkgs; [
-      totem
-      rhythmbox
-      geary
-      gnome-weather
-      gnome-maps
-      gnome-music
-      epiphany
+    gnome.excludePackages = [
+      pkgs.epiphany
+      pkgs.geary
+      pkgs.gnome-maps
+      pkgs.gnome-music
+      pkgs.gnome-weather
+      pkgs.rhythmbox
+      pkgs.totem
+      pkgs.gnome-tour
     ];
 
     # List packages installed in system profile. To search, run:
@@ -147,46 +202,25 @@
     systemPackages =
       with pkgs;
       [
+        nix-software-center.packages.${system}.nix-software-center
+        nixos-conf-editor.packages.${system}.nixos-conf-editor
         sops
         age
         ssh-to-age
         git-agecrypt
-
+        ffmpeg-full
         unzip
         bash-completion
-        btop
-
-        curlie
-        delta
-        direnv
-
-        # duf
-        #dust
-        #eza
-        fd
-
         gnome-tweaks
-        gnumake
-        htop
-        iotop
-        jq
-
-        lsof
-        nix-direnv
-        nix-ld
-
-        openssl
-        pandoc
-        pciutils
         planify
-        #sd
-
-        #sshpass
-        starship
-
         vlc
-        yq
-        #zoxide
+        file
+        jq
+        lsof
+        openssl
+        pciutils
+        tailscale
+        vim
       ]
       ++ (with pkgs.gnomeExtensions; [
         solaar-extension
@@ -195,11 +229,17 @@
   };
 
   hardware = {
+    graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
     logitech.wireless = {
       enable = true;
       enableGraphical = true; # for solaar to be included
     };
   };
+
+  security.rtkit.enable = true;
 
   programs = {
     ssh.extraConfig = ''
@@ -231,6 +271,7 @@
         "de"
         "fr"
       ];
+
     };
 
     vim = {
@@ -248,7 +289,5 @@
 
     };
   };
-
   system.stateVersion = "24.11"; # Did you read the comment?
-
 }

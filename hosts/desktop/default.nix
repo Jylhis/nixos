@@ -1,6 +1,3 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
 {
   self,
   lib,
@@ -14,8 +11,6 @@
 {
   imports = [
     self.nixosModules.mac-mini-2018
-
-    # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
 
@@ -91,10 +86,8 @@
     networkmanager.enable = true;
   };
 
-  # Set your time zone.
   time.timeZone = "Europe/Zurich";
   powerManagement.cpuFreqGovernor = "performance";
-  # Select internationalisation properties.
   i18n = {
     defaultLocale = "en_US.UTF-8";
     extraLocaleSettings = {
@@ -113,8 +106,8 @@
   console.useXkbConfig = true;
 
   services = {
-    hardware.bolt.enable = true;
     tailscale.enable = true;
+    hardware.bolt.enable = true;
     fstrim.enable = true;
 
     # Automatically connect any thunderbolt device
@@ -141,10 +134,6 @@
           [org.gnome.desktop.input-sources]
           sources=[('xkb', 'us'), ('xkb', 'fi')]
 
-          [org.gnome.desktop.interface]
-          gtk-theme='org.gnome.desktop.interface'
-          color-scheme='prefer-dark'
-
           [org.freedesktop.ibus.panel.emoji]
           hotkey="[]"
         '';
@@ -155,8 +144,6 @@
         variant = "";
       };
     };
-
-    # Enable CUPS to print documents.
     printing = {
       enable = true;
       drivers = [ pkgs.gutenprint ];
@@ -292,7 +279,6 @@
       enable = true;
       enableGraphical = true; # for solaar to be included
     };
-    #pulseaudio.enable = lib.mkForce false;
   };
 
   security.rtkit.enable = true;
@@ -345,11 +331,5 @@
 
     };
   };
-  # This value determines the NixOS release from which the default
-  # settings for stateful data,like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.05"; # Did you read the comment?
 }

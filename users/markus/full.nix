@@ -26,7 +26,10 @@
 
   config = {
 
+    # Wayland support for chrome
+    environment.sessionVariables.NIXOS_OZONE_WL = "1";
     environment.systemPackages = with pkgs; [
+      brave
       digikam
       starship
       sops
