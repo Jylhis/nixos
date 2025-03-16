@@ -1,5 +1,5 @@
 # Generated via dconf2nix: https://github.com/gvolpe/dconf2nix
-{ lib, ... }:
+{ lib, config, ... }:
 
 with lib.hm.gvariant;
 
@@ -12,16 +12,11 @@ with lib.hm.gvariant;
         "&MUSIC"
         "&PICTURES"
         "&VIDEOS"
-        "/home/markus/Developer"
+        "${config.home-manager.users.markus.home.homeDirectory}/Developer"
       ];
     };
 
     "org/gnome/Console" = {
-      last-window-maximised = false;
-      last-window-size = mkTuple [
-        652
-        480
-      ];
       theme = "auto";
     };
 
@@ -38,69 +33,11 @@ with lib.hm.gvariant;
       source-units = "degree";
       target-currency = "";
       target-units = "radian";
-      window-maximized = false;
-      window-size = mkTuple [
-        680
-        788
-      ];
       word-size = 64;
-    };
-
-    "org/gnome/control-center" = {
-      last-panel = "system";
-      window-state = mkTuple [
-        980
-        640
-        false
-      ];
     };
 
     "org/gnome/desktop/a11y/applications" = {
       screen-keyboard-enabled = false;
-    };
-
-    "org/gnome/desktop/app-folders" = {
-      folder-children = [
-        "Utilities"
-        "YaST"
-        "Pardus"
-      ];
-    };
-
-    "org/gnome/desktop/app-folders/folders/Pardus" = {
-      categories = [ "X-Pardus-Apps" ];
-      name = "X-Pardus-Apps.directory";
-      translate = true;
-    };
-
-    "org/gnome/desktop/app-folders/folders/Utilities" = {
-      apps = [
-        "gnome-abrt.desktop"
-        "gnome-system-log.desktop"
-        "nm-connection-editor.desktop"
-        "org.gnome.baobab.desktop"
-        "org.gnome.Connections.desktop"
-        "org.gnome.DejaDup.desktop"
-        "org.gnome.Dictionary.desktop"
-        "org.gnome.DiskUtility.desktop"
-        "org.gnome.Evince.desktop"
-        "org.gnome.FileRoller.desktop"
-        "org.gnome.fonts.desktop"
-        "org.gnome.Loupe.desktop"
-        "org.gnome.seahorse.Application.desktop"
-        "org.gnome.tweaks.desktop"
-        "org.gnome.Usage.desktop"
-        "vinagre.desktop"
-      ];
-      categories = [ "X-GNOME-Utilities" ];
-      name = "X-GNOME-Utilities.directory";
-      translate = true;
-    };
-
-    "org/gnome/desktop/app-folders/folders/YaST" = {
-      categories = [ "X-SuSE-YaST" ];
-      name = "suse-yast.directory";
-      translate = true;
     };
 
     "org/gnome/desktop/input-sources" = {
@@ -120,26 +57,12 @@ with lib.hm.gvariant;
       ];
     };
 
-    "org/gnome/desktop/interface" = {
-      color-scheme = "default";
-      enable-hot-corners = false;
-      font-antialiasing = "rgba";
-      font-hinting = "full";
-      toolkit-accessibility = false;
-    };
-
-    "org/gnome/desktop/notifications" = {
-      application-children = [
-        "org-gnome-console"
-        "gnome-power-panel"
-        "org-gnome-fileroller"
-        "org-gnome-nautilus"
-        "emacs"
-      ];
-    };
-
     "org/gnome/desktop/notifications/application/1password" = {
       application-id = "1password.desktop";
+    };
+
+    "org/gnome/desktop/notifications/application/brave-browser" = {
+      application-id = "brave-browser.desktop";
     };
 
     "org/gnome/desktop/notifications/application/emacs" = {
@@ -212,49 +135,13 @@ with lib.hm.gvariant;
       focus-mode = "click";
     };
 
-    "org/gnome/evolution-data-server" = {
-      migrated = true;
-    };
-
-    "org/gnome/file-roller/listing" = {
-      list-mode = "as-folder";
-      name-column-width = 158;
-      show-path = false;
-      sort-method = "name";
-      sort-type = "ascending";
-    };
-
-    "org/gnome/file-roller/ui" = {
-      sidebar-width = 200;
-      window-height = 480;
-      window-width = 600;
-    };
-
     "org/gnome/mutter" = {
       dynamic-workspaces = true;
       edge-tiling = true;
     };
 
-    "org/gnome/nautilus/preferences" = {
-      default-folder-viewer = "icon-view";
-      migrated-gtk-settings = true;
-      search-filter-time-type = "last_modified";
-    };
-
-    "org/gnome/nautilus/window-state" = {
-      initial-size = mkTuple [
-        890
-        550
-      ];
-      initial-size-file-chooser = mkTuple [
-        890
-        550
-      ];
-    };
-
-    "org/gnome/nm-applet/eap/9e61cb2b-9f73-3ad7-8c16-6ceacaaaa316" = {
-      ignore-ca-cert = false;
-      ignore-phase2-ca-cert = false;
+    "org/gnome/portal/filechooser/brave-browser" = {
+      last-folder-path = "/home/markus/Downloads";
     };
 
     "org/gnome/settings-daemon/plugins/color" = {
@@ -269,12 +156,6 @@ with lib.hm.gvariant;
         "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
       ];
       home = [ "<Super>e" ];
-    };
-
-    "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
-      binding = "";
-      command = "emacsclient --create-frame";
-      name = "emacs";
     };
 
     "org/gnome/shell" = {
@@ -292,6 +173,7 @@ with lib.hm.gvariant;
         "solaar-extension@sidevesh"
         "status-icons@gnome-shell-extensions.gcampax.github.com"
         "system-monitor@gnome-shell-extensions.gcampax.github.com"
+        "user-theme@gnome-shell-extensions.gcampax.github.com"
       ];
       favorite-apps = [
         "org.gnome.Nautilus.desktop"
@@ -301,7 +183,6 @@ with lib.hm.gvariant;
         "spotify.desktop"
         "todoist.desktop"
       ];
-      last-selected-power-profile = "performance";
       welcome-dialog-last-shown-version = "47.1";
     };
 
@@ -309,33 +190,8 @@ with lib.hm.gvariant;
       show-swap = true;
     };
 
-    "org/gnome/shell/world-clocks" = {
-      locations = [ ];
-    };
-
-    "org/gnome/tweaks" = {
-      show-extensions-notice = false;
-    };
-
-    "org/gtk/settings/file-chooser" = {
-      date-format = "regular";
-      location-mode = "path-bar";
-      show-hidden = true;
-      show-size-column = true;
-      show-type-column = true;
-      sidebar-width = 157;
-      sort-column = "name";
-      sort-directories-first = false;
-      sort-order = "ascending";
-      type-format = "category";
-      window-position = mkTuple [
-        26
-        23
-      ];
-      window-size = mkTuple [
-        1231
-        902
-      ];
+    "org/gnome/shell/extensions/user-theme" = {
+      name = "Stylix";
     };
 
     "system/locale" = {
