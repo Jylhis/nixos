@@ -235,16 +235,12 @@
     // flake-utils.lib.eachDefaultSystem (
       system:
       let
-        unstable = import nixpkgs-unstable {
+        pkgs = import nixpkgs {
           inherit system;
           config.allowUnfree = true;
           overlays = [
             emacs-overlay.overlay
           ];
-        };
-        pkgs = import nixpkgs {
-          inherit system;
-          config.allowUnfree = true;
         };
 
         treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
@@ -259,9 +255,7 @@
           # Cross compilation
           #hello-cross = nixpkgs.legacyPackages.${system}.pkgsCross.aarch64-multiplatform.hello;
 
-          emacs-markus = unstable.callPackage ./packages/emacs-markus {
-            emacs = unstable.emacs30;
-          };
+          emacs-markus = pkgs.callPackage ./packages/emacs-markus { };
 
           brcm-firmware = pkgs.callPackage ./packages/brcm-firmware.nix { };
           grafana-treemap-panel = pkgs.callPackage ./packages/grafana-treemap-panel.nix {

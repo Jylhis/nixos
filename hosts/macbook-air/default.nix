@@ -115,16 +115,26 @@
         "fbdev"
         # "amdgpu" # TODO(amdgpu)
       ];
-      displayManager.gdm.enable = true;
-      desktopManager.gnome.enable = true;
-      desktopManager.gnome = {
-        extraGSettingsOverrides = ''
-          [org.gnome.desktop.input-sources]
-          sources=[('xkb', 'us'), ('xkb', 'fi')]
+      displayManager.gdm = {
+        enable = true;
+        wayland = true;
+      };
 
-          [org.freedesktop.ibus.panel.emoji]
-          hotkey="[]"
+      desktopManager.gnome = {
+        enable = true;
+        extraGSettingsOverridePackages = [ pkgs.mutter ];
+
+        extraGSettingsOverrides = ''
+          	  [org.gnome.mutter]
+                    experimental-features=['scale-monitor-framebuffer']
+
+                    [org.gnome.desktop.input-sources]
+                    sources=[('xkb', 'us'), ('xkb', 'fi')]
+
+                    [org.freedesktop.ibus.panel.emoji]
+                    hotkey="[]"
         '';
+
       };
 
       xkb = {
