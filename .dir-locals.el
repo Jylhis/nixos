@@ -12,7 +12,6 @@
 	 :nixd
 	  (:nixpkgs (:expr "import <nixpkgs> { }")
 		    :options (:nixos (:expr "(builtins.getFlake \"/etc/nixos\").nixosConfigurations.mac-mini.options")
-				     :nixos-server (:expr "(builtins.getFlake \"/etc/nixos\").nixosConfigurations.server.options")
 				     :home-manager (:expr "(builtins.getFlake \"/etc/nixos\").nixosConfigurations.mac-mini.options.home-manager.users.type.getSubOptions []")
 
 
