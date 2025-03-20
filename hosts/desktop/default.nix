@@ -42,7 +42,7 @@
       efi.canTouchEfiVariables = true;
       systemd-boot = {
         enable = true;
-        configurationLimit = 3;
+        configurationLimit = 2;
       };
     };
     plymouth = {
@@ -311,6 +311,9 @@
       ffmpeg-full = pkgs.ffmpeg-full.override {
         withUnfree = true;
         withOpengl = true;
+      };
+      brave = pkgs.brave.override {
+        commandLineArgs = "--enable-features=VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,Vulkan,VulkanFromANGLE,DefaultANGLEVulkan,VaapiIgnoreDriverChecks,VaapiVideoDecoder,PlatformHEVCDecoderSupport,UseMultiPlaneFormatForHardwareVideo,UseOzonePlatform --ozone-platform=wayland";
       };
 
     };

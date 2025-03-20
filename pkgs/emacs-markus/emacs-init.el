@@ -553,7 +553,7 @@ point reaches the beginning or end of the buffer, stop there."
  direnv
  ;; TODO: ? envrc https://github.com/purcell/envrc
  :ensure
- :config 
+ :config
  (direnv-mode)
  (add-to-list 'warning-suppress-types '(direnv))
  )
@@ -920,6 +920,10 @@ active region is added to the search string."
                   :nix (:flake (:autoArchive t :autoEvalInputs t)))
                  :gopls (:usePlaceholders t :gofumpt t)
                  :nixd (:formatting (:command ["nixfmt"])))))
+
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook 'eglot-format nil t)))
 
 (setq eglot-report-progress nil) ; Prevent Eglot minibuffer spam
 (setq eglot-extend-to-xref t) ; Activate Eglot in cross-referenced non-project files

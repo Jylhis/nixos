@@ -1,6 +1,7 @@
 {
   pkgs,
   nixpkgs,
+  #  nil-lsp,
   ...
 }:
 {
@@ -51,6 +52,7 @@
       # Nix
       statix
       nixd
+      #      nil-lsp.packages.x86_64-linux.nil
       nvd
       nixfmt-rfc-style
       nix-diff

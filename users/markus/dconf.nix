@@ -109,6 +109,10 @@ with lib.hm.gvariant;
       application-id = "org.gnome.Settings.desktop";
     };
 
+    "org/gnome/desktop/notifications/application/proton-mail" = {
+      application-id = "proton-mail.desktop";
+    };
+
     "org/gnome/desktop/notifications/application/signal-desktop" = {
       application-id = "signal-desktop.desktop";
     };
@@ -182,6 +186,7 @@ with lib.hm.gvariant;
         "brave-browser.desktop"
         "spotify.desktop"
         "todoist.desktop"
+        "proton-mail.desktop"
       ];
       welcome-dialog-last-shown-version = "47.1";
     };

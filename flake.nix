@@ -103,7 +103,10 @@
     disko = {
       url = "github:nix-community/disko/latest";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
 
+    nil-lsp = {
+      url = "github:oxalica/nil";
     };
     systems.url = "github:nix-systems/default";
 
@@ -209,6 +212,7 @@
                 useGlobalPkgs = true;
                 useUserPackages = true;
               };
+
             }
             stylix.nixosModules.stylix
             ./hosts/desktop

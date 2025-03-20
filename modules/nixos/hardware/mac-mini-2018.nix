@@ -25,13 +25,15 @@
 
   config = {
     nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-    hardware.intelgpu.vaapiDriver = "intel-media-driver";
-    hardware.graphics.extraPackages = lib.optionals config.hardware.graphics.enable [
-      pkgs.intel-media-driver
-      pkgs.vaapiVdpau
-      pkgs.intel-compute-runtime # OpenCL filter support (hardware tonemapping and subtitle burn-in)
-      pkgs.intel-media-sdk # QSV up to 11th gen
-    ];
+    hardware = {
+      intelgpu.vaapiDriver = "intel-media-driver";
+      graphics.extraPackages = lib.optionals config.hardware.graphics.enable [
+        pkgs.intel-media-driver
+        pkgs.vaapiVdpau
+        pkgs.intel-compute-runtime # OpenCL filter support (hardware tonemapping and subtitle burn-in)
+        pkgs.intel-media-sdk # QSV up to 11th gen
+      ];
+    };
     programs.firefox.preferences =
       lib.mkIf (config.hardware.graphics.enable && config.programs.firefox.enable)
         {
