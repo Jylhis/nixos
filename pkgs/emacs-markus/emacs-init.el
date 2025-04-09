@@ -781,6 +781,7 @@ active region is added to the search string."
  :config (add-hook 'prog-mode-hook #'diff-hl-mode))
 (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
 
+(use-package haskell-mode :ensure )
 
 (use-package diff-mode :ensure nil :mode "\\.patch[0-9]*\\'")
 
