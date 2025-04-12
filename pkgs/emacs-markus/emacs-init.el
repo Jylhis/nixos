@@ -940,6 +940,19 @@ active region is added to the search string."
 ;;   ("C-TAB" . 'copilot-accept-completion-by-word)
 ;;   ("C-<tab>" . 'copilot-accept-completion-by-word)))
 
+(use-package dape
+  :config
+  ;; Info buffers like gud (gdb-mi)
+   (setq dape-buffer-window-arrangement 'gud)
+   (setq dape-info-hide-mode-line nil)
+   ;; Showing inlay hints
+   (setq dape-inlay-hints t)
+   )
+
+;; Enable repeat mode for more ergonomic `dape' use
+(use-package repeat
+  :config
+  (repeat-mode))
 
 ;; eldoc-box?
 (use-package eldoc :init (global-eldoc-mode))

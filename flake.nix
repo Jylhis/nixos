@@ -109,6 +109,10 @@
       url = "github:oxalica/nil";
     };
     systems.url = "github:nix-systems/default";
+    musnix = {
+      url = "github:musnix/musnix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
   };
   outputs =
@@ -128,61 +132,49 @@
       ...
     }@attrs:
     let
-      systems = [
-        "x86_64-linux"
-      ];
-      forAllSystems = nixpkgs.lib.genAttrs systems;
+      system = "x86_64-linux";
 
-      pkgs-stable = forAllSystems (
-        system:
-        import nixpkgs {
-          inherit system;
-          config.allowUnfree = true;
-          overlays = [
-            emacs-overlay.overlay
-            deploy-rs.overlay
-            #      nixos-anywhere.overlay
-          ];
-        }
-      );
+      pkgs-stable = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+        overlays = [
+          emacs-overlay.overlay
+          #      nixos-anywhere.overlay
+        ];
+      };
 
-      pkgs-unstable = forAllSystems (
-        system:
-        import nixpkgs-unstable {
-          inherit system;
-          config.allowUnfree = true;
-          overlays = [
-            emacs-overlay.overlay
-          ];
-        }
-      );
+      pkgs-unstable = import nixpkgs-unstable {
+        inherit system;
+        config.allowUnfree = true;
+        overlays = [
+          emacs-overlay.overlay
+        ];
+      };
 
-      treefmtEval = forAllSystems (
-        system: treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix
-      );
+      treefmtEval = treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix;
     in
     {
-      checks =
-        forAllSystems (system: deploy-rs.lib.${system}.deployChecks self.deploy)
-        // forAllSystems (system: {
-          formatting = treefmtEval.${system}.config.build.check self;
-        });
+      checks = deploy-rs.lib.${system}.deployChecks self.deploy // {
+        ${system} = {
+          formatting = treefmtEval.config.build.check self;
+        };
+      };
 
       # TODO emacs overlay
-      packages = forAllSystems (system: import ./pkgs pkgs-stable.${system});
+      packages.${system} = import ./pkgs pkgs-stable;
 
-      formatter = forAllSystems (system: treefmtEval.${system}.config.build.wrapper);
+      formatter.${system} = treefmtEval.config.build.wrapper;
 
-      apps = forAllSystems (system: import ./apps nixpkgs.legacyPackages.${system});
+      apps.${system} = import ./apps nixpkgs.legacyPackages.${system};
 
-      devShells.x86-linux.default =
+      devShells.${system}.default =
         let
-          pkgs = pkgs-stable.x86_64-linux;
+          pkgs = pkgs-stable;
         in
         pkgs.mkShellNoCC {
           buildInputs = [
             # Deployment tools
-            #   pkgs.deploy-rs
+            deploy-rs.packages.${system}.deploy-rs
             #   pkgs.nixos-anywhere
             pkgs.age
             pkgs.sops
@@ -200,10 +192,10 @@
       #homeManagerModules = import ./modules/home-manager;
 
       nixosConfigurations = {
-        mac-mini = nixpkgs.lib.nixosSystem rec {
-          system = "x86_64-linux";
+        mac-mini = nixpkgs.lib.nixosSystem {
+          inherit system;
           specialArgs = attrs // {
-            unstable = pkgs-unstable.${system};
+            unstable = pkgs-unstable;
           };
           modules = [
             home-manager.nixosModules.home-manager
@@ -225,9 +217,9 @@
           ];
         };
         macbook-air = nixpkgs.lib.nixosSystem rec {
-          system = "x86_64-linux";
+          inherit system;
           specialArgs = attrs // {
-            unstable = pkgs-unstable.${system};
+            unstable = pkgs-unstable;
           };
           modules = [
             home-manager.nixosModules.home-manager
@@ -248,8 +240,10 @@
         };
 
         server = nixpkgs-unstable.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = attrs;
+          inherit system;
+          specialArgs = attrs // {
+            unstable = pkgs-unstable;
+          };
 
           modules = [
             srvos.nixosModules.server
@@ -272,7 +266,7 @@
           magicRollback = true;
           profiles.system = {
             user = "root";
-            path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.server;
+            path = deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.server;
           };
         };
       };

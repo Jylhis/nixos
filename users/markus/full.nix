@@ -16,6 +16,7 @@
     # Compose this module out of smaller ones.
     ./.
     ./dev.nix
+    ./music.nix
   ];
 
   options = {

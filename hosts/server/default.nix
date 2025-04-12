@@ -5,6 +5,7 @@
   lib,
   self,
   pkgs,
+  unstable,
   config,
   ...
 }:
@@ -196,9 +197,24 @@ in
     };
   };
 
+  users.users.immich.extraGroups = [
+    "video"
+    "render"
+  ];
+
   # Disable default sync folder syncthing
   systemd.services.syncthing.environment.STNODEFAULTFOLDER = "true"; # Don't create default ~/Sync folder
   services = {
+
+    immich = {
+      enable = true;
+      openFirewall = true;
+      host = "0.0.0.0";
+      # `null` will give access to all devices.
+      # You may want to restrict this by using something like `[ "/dev/dri/renderD128" ]`
+      accelerationDevices = null;
+      mediaLocation = "/data/Photos";
+    };
 
     rclone-sync = {
       enable = false;
@@ -241,38 +257,6 @@ in
       enable = true;
       openFirewall = true;
       authKeyFile = config.sops.secrets.tailscale_auth_key.path;
-    };
-
-    open-webui = {
-      enable = false;
-      host = "0.0.0.0";
-      environment = {
-        ENABLE_SIGNUP = "false";
-        ENABLE_LOGIN_FORM = "false";
-        WEBUI_AUTH = "WEBUI_AUTH";
-        ENABLE_EVALUATION_ARENA_MODELS = "false";
-      };
-    };
-
-    ollama = {
-      enable = false;
-      # Starts unreliably
-      # loadModels = [
-      #   # Coding
-      #   "qwen2.5-coder:7b" # Coding
-      #
-      #   # General
-      #   "qwen2.5:7b"
-      #   "deepseek-r1:8b" # general?
-      #   "llama3.2:3b"
-      #   "phi3:3.8b"
-      #
-      #   # Testings
-      #   "mistral:7b"
-      #   "deepseek-coder-v2:6.7b"
-      #   "deepseek-r1:1.5b"
-      #   "dolphin-llama3:8b"
-      # ];
     };
 
     sonarr = {
@@ -579,6 +563,7 @@ in
       "alloy/config.alloy".source = ./config.alloy;
     };
     systemPackages = with pkgs; [
+      rclone
       tailscale
       vim
       sops
@@ -602,19 +587,24 @@ in
   nixpkgs.config = {
     allowUnfree = true;
     packageOverrides = pkgs: {
-      ffmpeg-full = pkgs.ffmpeg-full.override {
+      ffmpeg-full = unstable.ffmpeg-full.override {
         withUnfree = true;
         withOpengl = true;
       };
 
-      bazarr = pkgs.bazarr.override {
+      bazarr = unstable.bazarr.override {
         ffmpeg = pkgs.ffmpeg-full;
       };
 
-      sonarr = pkgs.sonarr.override {
+      sonarr = unstable.sonarr.override {
         ffmpeg = pkgs.ffmpeg-full;
         withFFmpeg = true;
       };
+      inherit (unstable) jellyfin;
+      inherit (unstable) lidarr;
+      inherit (unstable) radarr;
+      inherit (unstable) readarr;
+      inherit (unstable) prowlarr;
     };
 
     permittedInsecurePackages = [
