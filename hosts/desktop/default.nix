@@ -31,6 +31,12 @@
     };
   };
 
+  # NetworkManager-wait-online.service fails to start
+  # https://github.com/NixOS/nixpkgs/issues/180175
+  systemd.services.NetworkManager-wait-online.enable = false;
+  systemd.network.wait-online.enable = false;
+  boot.initrd.systemd.network.wait-online.enable = false;
+
   # Bootloader.
   boot = {
 
@@ -52,7 +58,7 @@
     kernel.sysctl = {
       "kernel.sysrq" = 1;
       "kernel.core_pattern" = "|/bin/false"; # Disable core dumps
-      "vm.swappiness" = 1;
+      #"vm.swappiness" = 1;
       # https://wiki.archlinux.org/title/Sysctl#Virtual_memory
       "vm.dirty_background_bytes" = 4194304;
       "vm.dirty_bytes" = 4194304;

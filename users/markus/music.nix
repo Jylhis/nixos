@@ -9,7 +9,7 @@
     musnix.nixosModules.musnix
   ];
   config = {
-    musnix.enable = false;
+    musnix.enable = true;
     users.users.markus = {
       extraGroups = [ "audio" ];
       packages = with pkgs; [

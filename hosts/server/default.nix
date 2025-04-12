@@ -37,9 +37,10 @@ in
     enable = true;
     extraPackages = with pkgs; [
       intel-media-driver
-      #intel-vaapi-driver
+      intel-vaapi-driver
       vaapiVdpau
       intel-compute-runtime # OpenCL filter support (hardware tonemapping and subtitle burn-in)
+      #intel-compute-runtime-legacy1
       #vpl-gpu-rt # QSV on 11th gen or newer
       intel-media-sdk # QSV up to 11th gen
     ];
@@ -206,10 +207,24 @@ in
   systemd.services.syncthing.environment.STNODEFAULTFOLDER = "true"; # Don't create default ~/Sync folder
   services = {
 
+    hydra = {
+      enable = false;
+      port = 4000;
+      #  maxServers = 1;
+      #  minSpareServers = 0;
+      # hydraURL = "http://localhost:3000"; # externally visible URL
+      #notificationSender = "hydra@localhost"; # e-mail of Hydra service
+      # a standalone Hydra will require you to unset the buildMachinesFiles list to avoid using a nonexistant /etc/nix/machines
+      buildMachinesFiles = [ ];
+      # you will probably also want, otherwise *everything* will be built from scratch
+      useSubstitutes = true;
+    };
+
     immich = {
       enable = true;
       openFirewall = true;
       host = "0.0.0.0";
+      settings = builtins.fromJSON (builtins.readFile ./immich.json);
       # `null` will give access to all devices.
       # You may want to restrict this by using something like `[ "/dev/dri/renderD128" ]`
       accelerationDevices = null;
@@ -563,6 +578,9 @@ in
       "alloy/config.alloy".source = ./config.alloy;
     };
     systemPackages = with pkgs; [
+      jellyfin
+      jellyfin-web
+      jellyfin-ffmpeg
       rclone
       tailscale
       vim
@@ -611,10 +629,9 @@ in
       "dotnet-sdk-6.0.428"
       "aspnetcore-runtime-6.0.36"
     ];
-    # TODO
-    # packageOverrides = pkgs: {
-    #   vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
-    # };
+
+    vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
+
   };
 
   system.stateVersion = "24.11";
