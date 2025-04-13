@@ -51,9 +51,7 @@
         configurationLimit = 2;
       };
     };
-    plymouth = {
-      enable = true;
-    };
+    plymouth.enable = true;
 
     kernel.sysctl = {
       "kernel.sysrq" = 1;
@@ -64,6 +62,7 @@
       "vm.dirty_bytes" = 4194304;
       #"vm.vfs_cache_pressure" = 50;
     };
+
     initrd = {
       systemd.enable = true;
       #kernelModules = [ "i915" ];
@@ -96,14 +95,10 @@
   console.useXkbConfig = true;
 
   services = {
+    earlyoom.enable = true;
     tailscale.enable = true;
     hardware.bolt.enable = true;
     fstrim.enable = true;
-
-    # Automatically connect any thunderbolt device
-    udev.extraRules = ''
-      ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
-    '';
 
     udev.packages = [
       pkgs.gnome-settings-daemon
@@ -135,7 +130,6 @@
                     [org.freedesktop.ibus.panel.emoji]
                     hotkey="[]"
         '';
-
       };
 
       xkb = {
@@ -147,37 +141,18 @@
       enable = true;
       drivers = [ pkgs.gutenprint ];
     };
-    avahi = {
-      enable = false;
-    };
-
     pipewire = {
       enable = true;
       alsa.enable = true;
-      #alsa.support32Bit = false;
       pulse.enable = true;
-      # If you want to use JACK applications, uncomment this
-      #jack.enable = true;
       audio.enable = true;
-      # use the example session manager (no others are packaged yet so this is enabled by default,
-      # no need to redefine it in your config for now)
-      #media-session.enable = true;
     };
-
   };
 
-  documentation = {
-    enable = true;
-    doc.enable = true;
-    nixos.enable = true;
-    man.enable = true;
-    dev.enable = true;
-    info.enable = true;
-  };
+  documentation.enable = true;
 
   virtualisation = {
     virtualbox.host.enable = true;
-    #virtualbox.host.enableExtensionPack = true;
     containers.enable = true;
 
     docker = {
@@ -193,42 +168,7 @@
     config.users.groups.dialout.name # Serial console access. Used for virtualbox
   ];
 
-  nix.buildMachines = [
-    {
-      hostName = "lab";
-      system = "x86_64-linux";
-      sshUser = "nixremote";
-      protocol = "ssh-ng";
-      publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUcxRmxmRW9lck1Ma1kvYTEvY0l4NTdkbGc2Z2JlcXBzeGJ6SEI4VjlYNksgcm9vdEBtYWNib29rLWFpcgo=";
-      sshKey = "/etc/ssh/ssh_host_ed25519_key";
-      maxJobs = 3;
-      speedFactor = 4;
-      supportedFeatures = [
-        "nixos-test"
-        "benchmark"
-        "big-parallel"
-        "kvm"
-      ];
-      mandatoryFeatures = [ ];
-    }
-  ];
-  nix.distributedBuilds = true;
-  nix.settings = {
-    builders-use-substitutes = true;
-  };
-
   environment = {
-    gnome.excludePackages = [
-      pkgs.epiphany
-      pkgs.geary
-      pkgs.gnome-maps
-      pkgs.gnome-music
-      pkgs.gnome-weather
-      pkgs.rhythmbox
-      pkgs.totem
-      pkgs.gnome-tour
-    ];
-
     # List packages installed in system profile. To search, run:
     # $ nix search wget
     # NOTE: Install packages system wide
@@ -283,15 +223,14 @@
   security.rtkit.enable = true;
 
   programs = {
-    ssh.extraConfig = ''
-      	    Match Host lab User nix-ssh
-                IdentitiesOnly yes
-                IdentityFile /etc/ssh/ssh_host_ed25519_key
-    '';
+    # ssh.extraConfig = ''
+    #   	    Match Host lab User nix-ssh
+    #             IdentitiesOnly yes
+    #             IdentityFile /etc/ssh/ssh_host_ed25519_key
+    # '';
     _1password = {
       enable = true;
       package = unstable._1password-cli;
-
     };
     _1password-gui = {
       enable = true;
@@ -312,7 +251,6 @@
         "de"
         "fr"
       ];
-
     };
 
     vim = {

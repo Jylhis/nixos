@@ -177,7 +177,10 @@ in
   networking = {
     hostId = "91312b0a";
     hostName = "server";
-    firewall.allowedTCPPorts = [ config.services.grafana.settings.server.http_port ];
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ config.services.grafana.settings.server.http_port ];
+    };
   };
 
   time.timeZone = "Europe/Zurich";
@@ -206,7 +209,35 @@ in
   # Disable default sync folder syncthing
   systemd.services.syncthing.environment.STNODEFAULTFOLDER = "true"; # Don't create default ~/Sync folder
   services = {
-
+    samba = {
+      enable = true;
+      nmbd.enable = false;
+      settings = {
+        global = {
+          "workgroup" = "WORKGROUP";
+          "server string" = "smbnix";
+          "netbios name" = "smbnix";
+          "hosts allow" = "100. 192.168.0. localhost 127.0.0.1";
+          "hosts deny" = "0.0.0.0/0";
+        };
+        "homes" = {
+          "path" = "/data/samba/%S";
+          "read only" = "no";
+        };
+        "data" = {
+          "path" = "/data";
+          "browseable" = "yes";
+          "read only" = "no";
+          "guest ok" = "no";
+          "valid users" = config.users.users.markus.name;
+          "create mask" = "0644";
+          "directory mask" = "0755";
+          "inherit permissions" = "yes";
+          #      "force user" = config.users.users.markus.name;
+          #      "force group" = config.users.users.markus.group;
+        };
+      };
+    };
     hydra = {
       enable = false;
       port = 4000;
@@ -222,7 +253,7 @@ in
 
     immich = {
       enable = true;
-      openFirewall = true;
+      #openFirewall = true;
       host = "0.0.0.0";
       settings = builtins.fromJSON (builtins.readFile ./immich.json);
       # `null` will give access to all devices.
@@ -477,6 +508,9 @@ in
     loki = {
       enable = true;
       configFile = ./loki-config.yaml;
+      extraFlags = [
+        "-reporting.enabled=0"
+      ];
     };
 
     alloy = {

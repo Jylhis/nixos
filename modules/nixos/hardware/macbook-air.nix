@@ -44,6 +44,8 @@
       hash = "sha256-YEDh9tljjDSReQaoNwiuzODAiYRAAt1ls77XBXRaJUs=";
     };
 
-    services.thermald.enable = true;
+    services = {
+      thermald.enable = true;
+    };
   };
 }

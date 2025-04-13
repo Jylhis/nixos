@@ -35,9 +35,7 @@
         enable = true;
       };
     };
-    plymouth = {
-      enable = true;
-    };
+    plymouth.enable = true;
 
     kernel.sysctl = {
       "kernel.sysrq" = 1;
@@ -71,19 +69,14 @@
 
   # NetworkManager-wait-online.service fails to start
   # https://github.com/NixOS/nixpkgs/issues/180175
-  # systemd.services.NetworkManager-wait-online.enable = false;
-  # systemd.network.wait-online.enable = false;
-  # boot.initrd.systemd.network.wait-online.enable = false;
+  systemd.services.NetworkManager-wait-online.enable = false;
+  systemd.network.wait-online.enable = false;
+  boot.initrd.systemd.network.wait-online.enable = false;
   services = {
     earlyoom.enable = true;
     tailscale.enable = true;
     hardware.bolt.enable = true;
     fstrim.enable = true;
-
-    # Automatically connect any thunderbolt device
-    udev.extraRules = ''
-      ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
-    '';
 
     udev.packages = [
       pkgs.gnome-settings-daemon
@@ -130,24 +123,14 @@
     pipewire = {
       enable = true;
       alsa.enable = true;
-      #alsa.support32Bit = false;
       pulse.enable = true;
-      # If you want to use JACK applications, uncomment this
-      #jack.enable = true;
       audio.enable = true;
-      # use the example session manager (no others are packaged yet so this is enabled by default,
-      # no need to redefine it in your config for now)
-      #media-session.enable = true;
     };
-
   };
 
-  documentation = {
-    enable = true;
-  };
+  documentation.enable = true;
 
   environment = {
-
     # List packages installed in system profile. To search, run:
     # $ nix search wget
     # NOTE: Install packages system wide

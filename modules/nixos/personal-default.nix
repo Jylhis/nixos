@@ -40,6 +40,8 @@
 
     boot.plymouth.theme = lib.mkIf config.boot.plymouth.enable (lib.mkDefault "breeze");
 
+    # Automatically connect any thunderbolt device
+    services.udev.extraRules = lib.mkDefault ''ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"'';
     time.timeZone = lib.mkDefault "Europe/Zurich";
 
     i18n = {
@@ -111,6 +113,13 @@
           pkgs.totem
           pkgs.gnome-tour
         ];
+
+    # Enable HEIC support
+    environment.systemPackages = [
+      pkgs.libheif
+      pkgs.libheif.out
+    ];
+    environment.pathsToLink = [ "share/thumbnailers" ];
 
     programs.firefox.languagePacks = lib.optionals config.programs.firefox.enable [
       "en-US"
