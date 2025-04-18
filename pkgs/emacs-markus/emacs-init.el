@@ -716,6 +716,9 @@ active region is added to the search string."
  :ensure
  :init (marginalia-mode))
 
+(use-package wgrep
+  :ensure)
+
 (use-package
  embark
  :ensure
@@ -951,6 +954,7 @@ active region is added to the search string."
 
 ;; Enable repeat mode for more ergonomic `dape' use
 (use-package repeat
+  :ensure nil
   :config
   (repeat-mode))
 

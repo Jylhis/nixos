@@ -241,9 +241,7 @@
 
         server = nixpkgs-unstable.lib.nixosSystem {
           inherit system;
-          specialArgs = attrs // {
-            unstable = pkgs-unstable;
-          };
+          specialArgs = attrs;
 
           modules = [
             srvos.nixosModules.server

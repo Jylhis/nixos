@@ -186,3 +186,13 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Keys.html
 - kbd:[Alt+g] kbd:[k]		consult-global-mark
 - kbd:[Alt+g] kbd:[m]		consult-mark
 - kbd:[Alt+g] kbd:[o]		consult-outline
+
+== Useful stuff
+
+=== Rename bunch of stuff
+
+. Consult search
+. embark-act
+. toggle wgrep
+. modify
+. save

@@ -5,7 +5,6 @@
   lib,
   self,
   pkgs,
-  unstable,
   config,
   ...
 }:
@@ -27,6 +26,7 @@ in
     ./disko-config.nix
     ./hardware-configuration.nix
     ./networking-details.nix
+    ./private.nix
   ];
 
   # TODO: Hetzner serial access
@@ -72,6 +72,7 @@ in
       trusted-users = [
         config.users.users.root.name
         config.users.users.nixremote.name
+        "@${config.users.groups.wheel.name}"
       ];
     };
   };
@@ -79,8 +80,20 @@ in
   users = {
 
     groups = {
+      wheel.members = [
+        config.users.users.markus.name
+      ];
       media-srv = {
-        members = [ "markus" ];
+        members = [
+          config.users.users.markus.name
+          config.users.users.sonarr.name
+          config.users.users.radarr.name
+          config.users.users.lidarr.name
+          #config.users.users.prowlarr.name
+          config.users.users.readarr.name
+          config.users.users.jellyfin.name
+          config.users.users.syncthing.name
+        ];
 
       };
       nixremote = { };
@@ -207,7 +220,12 @@ in
   ];
 
   # Disable default sync folder syncthing
-  systemd.services.syncthing.environment.STNODEFAULTFOLDER = "true"; # Don't create default ~/Sync folder
+  systemd.services = {
+    syncthing = {
+      serviceConfig.UMask = "0002";
+      environment.STNODEFAULTFOLDER = "true"; # Don't create default ~/Sync folder
+    };
+  };
   services = {
     samba = {
       enable = true;
@@ -291,7 +309,7 @@ in
     zfs.autoScrub.enable = true;
     openssh = {
       enable = true;
-      allowSFTP = true;
+      allowSFTP = false;
       settings = {
         PasswordAuthentication = false;
         PermitRootLogin = "prohibit-password";
@@ -305,48 +323,36 @@ in
       authKeyFile = config.sops.secrets.tailscale_auth_key.path;
     };
 
+    recyclarr = {
+      # TODO
+      enable = false;
+    };
     sonarr = {
       enable = true; # port: 8989
-      user = "media-srv";
-      group = "media-srv";
-
     };
     radarr = {
       enable = true; # port: 7878
-      user = "media-srv";
-      group = "media-srv";
     };
     lidarr = {
-      user = "media-srv";
-      group = "media-srv";
       enable = true; # port: 8686
     };
     bazarr = {
-      user = "media-srv";
-      group = "media-srv";
       enable = true; # port: 6767
     };
     prowlarr = {
-
       enable = true; # port: 9696
     };
     readarr = {
-      user = "media-srv";
-      group = "media-srv";
       enable = true; # port: 8787
 
     };
     jellyfin = {
       enable = true; # port: https: 8920 & http: 8096
-      user = "media-srv";
-      group = "media-srv";
     };
 
     syncthing = {
       enable = true;
       openDefaultPorts = true;
-      user = "media-srv";
-      group = "media-srv";
       guiAddress = "0.0.0.0:8384";
       settings = {
         options = {
@@ -403,9 +409,9 @@ in
       ];
       exporters = {
         exportarr-bazarr = {
+          enable = true;
           port = 9708;
           url = "http://localhost:6767";
-          enable = true;
           apiKeyFile = config.sops.secrets.bazarr_api_key.path;
           environment = {
             ENABLE_ADDITIONAL_METRICS = "true";
@@ -414,9 +420,9 @@ in
         };
 
         exportarr-lidarr = {
+          enable = true;
           port = 9709;
           url = "http://localhost:8686";
-          enable = true;
           apiKeyFile = config.sops.secrets.lidarr_api_key.path;
           environment = {
             ENABLE_ADDITIONAL_METRICS = "true";
@@ -425,9 +431,9 @@ in
         };
 
         exportarr-prowlarr = {
+          enable = true;
           port = 9710;
           url = "http://localhost:9696";
-          enable = true;
           apiKeyFile = config.sops.secrets.prowlarr_api_key.path;
           environment = {
             ENABLE_ADDITIONAL_METRICS = "true";
@@ -436,9 +442,9 @@ in
         };
 
         exportarr-radarr = {
+          enable = true;
           port = 9711;
           url = "http://localhost:7878";
-          enable = true;
           apiKeyFile = config.sops.secrets.radarr_api_key.path;
           environment = {
             ENABLE_ADDITIONAL_METRICS = "true";
@@ -447,9 +453,9 @@ in
         };
 
         exportarr-readarr = {
+          enable = true;
           port = 9712;
           url = "http://localhost:8787";
-          enable = true;
           apiKeyFile = config.sops.secrets.readarr_api_key.path;
           environment = {
             ENABLE_ADDITIONAL_METRICS = "true";
@@ -458,9 +464,9 @@ in
         };
 
         exportarr-sonarr = {
+          enable = true;
           port = 9713;
           url = "http://localhost:8989";
-          enable = true;
           apiKeyFile = config.sops.secrets.sonarr_api_key.path;
           environment = {
             ENABLE_ADDITIONAL_METRICS = "true";
@@ -471,7 +477,6 @@ in
         zfs.enable = true;
 
         node = {
-
           enable = true;
           enabledCollectors = [
             "logind"
@@ -604,6 +609,10 @@ in
         mode = "0444";
       };
 
+      jwt = {
+        mode = "0444";
+      };
+
     };
   };
 
@@ -620,12 +629,10 @@ in
       vim
       sops
       age
+      ffmpeg-full
+      python3
     ];
   };
-
-  users.groups.wheel.members = [
-    config.users.users.markus.name
-  ];
   security = {
     sudo.wheelNeedsPassword = false;
     tpm2 = {
@@ -639,24 +646,20 @@ in
   nixpkgs.config = {
     allowUnfree = true;
     packageOverrides = pkgs: {
-      ffmpeg-full = unstable.ffmpeg-full.override {
+      ffmpeg-full = pkgs.ffmpeg-full.override {
         withUnfree = true;
         withOpengl = true;
       };
 
-      bazarr = unstable.bazarr.override {
+      bazarr = pkgs.bazarr.override {
         ffmpeg = pkgs.ffmpeg-full;
       };
 
-      sonarr = unstable.sonarr.override {
+      sonarr = pkgs.sonarr.override {
         ffmpeg = pkgs.ffmpeg-full;
         withFFmpeg = true;
       };
-      inherit (unstable) jellyfin;
-      inherit (unstable) lidarr;
-      inherit (unstable) radarr;
-      inherit (unstable) readarr;
-      inherit (unstable) prowlarr;
+
     };
 
     permittedInsecurePackages = [

@@ -50,6 +50,7 @@
         enable = true;
         configurationLimit = 2;
       };
+      grub.configurationLimit = 2;
     };
     plymouth.enable = true;
 
