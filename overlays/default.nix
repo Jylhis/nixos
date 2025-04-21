@@ -1,5 +1,9 @@
 # This file defines overlays
-_: {
+{ lib, ... }:
+{
+
+  by-name = import ./by-name-overlay.nix ../pkgs/by-name lib;
+
   # This one brings our custom packages from the 'pkgs' directory
   additions = final: _prev: import ../pkgs final.pkgs;
 

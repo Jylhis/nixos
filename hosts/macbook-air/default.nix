@@ -9,7 +9,7 @@
 }:
 {
   imports = [
-    self.nixosModules.macbook-air
+    self.nixosModules.hardware-macbook-air
     ./hardware-configuration.nix
   ];
 

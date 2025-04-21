@@ -2,9 +2,43 @@
 :experimental:
 
 
+.Docs
+* https://emacsdocs.org/
+
+
+* https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ui.el
+
+
+.Learn
+* How does adaptive fill work?
+** https://github.com/seagle0128/.emacs.d/blob/master/init-mini.el#L53-L54
+* IDO
+* Icomplete
+* ediff
+
+.CHECK
+
+
+* https://github.com/editor-bootstrap/emacs-bootstrap
+* https://github.com/ianyepan/yay-evil-emacs
+* https://github.com/daviwil/emacs-from-scratch
+* https://github.com/jamescherti/minimal-emacs.d
+* https://codeberg.org/ashton314/emacs-bedrock
+* https://github.com/caisah/emacs.dz
+* https://github.com/pierre-lecocq/emacs4developers
+* https://emacsredux.com/
+* https://sachachua.com/blog/category/emacs/
+* https://github.com/serras/emacs-haskell-tutorial/blob/master/tutorial.md
+* https://github.com/doomemacs/doomemacs
+* https://github.com/syl20bnr/spacemacs
+
+.FIX
+* autocomplete
+** currently autocopmlete suggest unrelated stuff, usually elisp things
+
 .Goals:
 * Comfortable development environment by using as much as possible of emacs builtin capabilities
-* Works with emacs and emacsclient
+* Works with Emacs and emacsclient
 
 == TODO
 * Move text keybinding to more standard emacs
@@ -24,7 +58,7 @@
 * flymake
 * eldoc
 * xref
-* imenu
+* imenu TODO: can this be improved?
 * font-lock
 * which-key
 
@@ -188,6 +222,9 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Keys.html
 - kbd:[Alt+g] kbd:[o]		consult-outline
 
 == Useful stuff
+
+- kbd:[Alt+X] execute-extended-command-for-buffer
+
 
 === Rename bunch of stuff
 

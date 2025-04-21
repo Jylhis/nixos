@@ -10,9 +10,12 @@
 }:
 {
   imports = [
-    self.nixosModules.mac-mini-2018
+    self.nixosModules.hardware-mac-mini-2018
     ./hardware-configuration.nix
+    ../../modules/roles/desktop
   ];
+
+  jylhis.role.desktop.enable = true;
 
   # Disable the GNOME3/GDM auto-suspend feature that cannot be disabled in GUI!
   # If no user is logged in, the machine will power down after 20 minutes.
@@ -74,7 +77,6 @@
     };
     consoleLogLevel = 0;
     kernelParams = [
-      "mitigations=off"
       "quiet"
       "boot.shell_on_fail"
       "loglevel=3"
@@ -215,6 +217,8 @@
       #   driversi686Linux.amdvlk
       # ];
     };
+    bluetooth.enable = true;
+    flipperzero.enable = true;
     logitech.wireless = {
       enable = true;
       enableGraphical = true; # for solaar to be included
@@ -244,7 +248,7 @@
 
     # Install firefox.
     firefox = {
-      enable = true;
+      enable = false;
       languagePacks = [
         "en-US"
         "en-GB"

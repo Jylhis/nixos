@@ -7,7 +7,7 @@
 }:
 with lib;
 let
-  cfg = config.apple-hardware;
+  cfg = config.hardware-apple;
 in
 {
   imports = [
@@ -16,7 +16,7 @@ in
     nixos-hardware.nixosModules.apple-t2
   ];
 
-  options.apple-hardware = {
+  options.hardware-apple = {
 
     enableFirmware = mkOption {
       type = lib.types.bool;

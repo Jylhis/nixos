@@ -6,7 +6,7 @@
 }:
 {
   imports = [
-    self.nixosModules.apple-hardware
+    self.nixosModules.hardware-apple
     nixos-hardware.nixosModules.common-cpu-intel
     nixos-hardware.nixosModules.common-pc-laptop
     nixos-hardware.nixosModules.common-pc-laptop-ssd
@@ -38,8 +38,8 @@
     };
     powerManagement.enable = true;
 
-    apple-hardware.enableFirmware = true;
-    apple-hardware.firmware = self.outputs.packages.x86_64-linux.brcm-firmware.override {
+    hardware-apple.enableFirmware = true;
+    hardware-apple.firmware = self.outputs.packages.x86_64-linux.brcm-firmware.override {
       name = "macbook-air-firmware.tar";
       hash = "sha256-YEDh9tljjDSReQaoNwiuzODAiYRAAt1ls77XBXRaJUs=";
     };

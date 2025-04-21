@@ -1,33 +1,21 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
 {
   lib,
-  self,
   pkgs,
   config,
   ...
 }:
-let
-  zfsCompatibleKernelPackages = lib.filterAttrs (
-    name: kernelPackages:
-    (builtins.match "linux_[0-9]+_[0-9]+" name) != null
-    && (builtins.tryEval kernelPackages).success
-    && (!kernelPackages.${config.boot.zfs.package.kernelModuleAttribute}.meta.broken)
-  ) pkgs.linuxKernel.packages;
-  latestKernelPackage = lib.last (
-    lib.sort (a: b: (lib.versionOlder a.kernel.version b.kernel.version)) (
-      builtins.attrValues zfsCompatibleKernelPackages
-    )
-  );
-in
 {
   imports = [
     ./disko-config.nix
     ./hardware-configuration.nix
     ./networking-details.nix
     ./private.nix
+    ../../modules/roles/server
   ];
+
+  jylhis = {
+    role.server.enable = true;
+  };
 
   # TODO: Hetzner serial access
   disko.devices.disk.main.device = "/dev/sda";
@@ -47,7 +35,6 @@ in
   };
 
   nix = {
-
     sshServe = {
       enable = true;
       keys =
@@ -78,7 +65,6 @@ in
   };
 
   users = {
-
     groups = {
       wheel.members = [
         config.users.users.markus.name
@@ -88,6 +74,7 @@ in
           config.users.users.markus.name
           config.users.users.sonarr.name
           config.users.users.radarr.name
+          config.users.users.bazarr.name
           config.users.users.lidarr.name
           #config.users.users.prowlarr.name
           config.users.users.readarr.name
@@ -131,20 +118,11 @@ in
       "nosgx"
     ];
     supportedFilesystems = [ "zfs" ];
-    zfs = {
 
-      devNodes = "/dev";
-      forceImportRoot = false;
-      forceImportAll = false;
-      passwordTimeout = 60;
-      requestEncryptionCredentials = false;
-    };
-    kernelPackages = latestKernelPackage;
     loader = {
       #efi.canTouchEfiVariables = true;
       grub = {
         enable = true;
-        zfsSupport = true;
         efiSupport = true;
         efiInstallAsRemovable = true;
         mirroredBoots = [
@@ -167,21 +145,6 @@ in
         # Static ip addresses might be configured using the ip argument in kernel command line:
         # https://www.kernel.org/doc/Documentation/filesystems/nfs/nfsroot.txt
         enable = true;
-        ssh = {
-          enable = false; # TODO
-          # To prevent ssh clients from freaking out because a different host key is used,
-          # a different port for ssh is useful (assuming the same host has also a regular sshd running)
-          port = 2222;
-          # hostKeys paths must be unquoted strings, otherwise you'll run into issues with boot.initrd.secrets
-          # the keys are copied to initrd from the path specified; multiple keys can be set
-          # you can generate any number of host keys using
-          # `ssh-keygen -t ed25519 -N "" -f /path/to/ssh_host_ed25519_key`
-          #          hostKeys = [ /path/to/ssh_host_rsa_key ];
-          # public ssh key used for login
-          authorizedKeys = [
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEPS1QmyH3mqvHXANosiq2h/TCacV9nXFsbWBtEC45GW"
-          ];
-        };
       };
     };
 
@@ -190,28 +153,13 @@ in
   networking = {
     hostId = "91312b0a";
     hostName = "server";
-    firewall = {
-      enable = true;
-      allowedTCPPorts = [ config.services.grafana.settings.server.http_port ];
-    };
   };
 
   time.timeZone = "Europe/Zurich";
 
-  # Select internationalisation properties.
+  # Select internationalization properties.
   i18n = {
     defaultLocale = "en_US.UTF-8";
-    extraLocaleSettings = {
-      LC_ADDRESS = "de_CH.UTF-8";
-      LC_IDENTIFICATION = "de_CH.UTF-8";
-      LC_MEASUREMENT = "de_CH.UTF-8";
-      LC_MONETARY = "de_CH.UTF-8";
-      LC_NAME = "de_CH.UTF-8";
-      LC_NUMERIC = "de_CH.UTF-8";
-      LC_PAPER = "de_CH.UTF-8";
-      LC_TELEPHONE = "de_CH.UTF-8";
-      LC_TIME = "de_CH.UTF-8";
-    };
   };
 
   users.users.immich.extraGroups = [
@@ -219,14 +167,125 @@ in
     "render"
   ];
 
-  # Disable default sync folder syncthing
-  systemd.services = {
-    syncthing = {
-      serviceConfig.UMask = "0002";
-      environment.STNODEFAULTFOLDER = "true"; # Don't create default ~/Sync folder
-    };
-  };
   services = {
+    opensearch-dashboards = {
+      enable = false;
+      listenAddress = "0.0.0.0";
+    };
+
+    paperless = {
+      enable = true;
+      address = "0.0.0.0";
+      consumptionDirIsPublic = true;
+      settings = {
+        PAPERLESS_CONSUMER_IGNORE_PATTERN = [
+          ".DS_STORE/*"
+          "desktop.ini"
+        ];
+        PAPERLESS_OCR_LANGUAGE = "fin+eng+fra+deu";
+      };
+    };
+
+    # NOTES
+    # livebook
+    # daliytxt?
+
+    # BUDGET
+    # firefly-iii
+    # actual
+
+    # TOOLS
+    # cyberchef
+    # https://string.is/
+    # https://github.com/yourselfhosted/slash
+
+    # MEDIA
+    # watcharr
+    # komga
+    # kavita
+    # atsumeru
+    # mylar3
+    # LazyLibrarian
+    # bookbounty
+    # bitmagnet
+
+    # BOOKMARK
+    # shiori
+    # karakeep
+
+    fluent-bit = {
+      enable = false;
+      settings = {
+        pipeline = {
+          inputs = [
+            {
+              name = "systemd";
+              tag = "host.*";
+              #systemd_filter = "_SYSTEMD_UNIT=sonarr.service";
+            }
+            # { FIXME: Permission denied
+            #   name = "kmsg";
+            #   tag = "kernel";
+            # }
+            # {
+            #   name = "node_exporter_metrics";
+            #   tag = "node_metrics";
+            #   scrape_interval = 2;
+            # }
+            # {
+            #   name = "process_exporter_metrics";
+            #   tag = "process_metrics";
+            #   scrape_interval = 2;
+            # }
+
+          ];
+          outputs = [
+            {
+              name = "opensearch";
+              match = "*";
+              host = "127.0.0.1";
+              index = "fluent-bit";
+              suppress_type_name = true;
+              port = 9200;
+            }
+          ];
+        };
+        service = {
+          grace = 30;
+        };
+      };
+    };
+    opensearch = {
+      enable = false;
+      package = pkgs.opensearch.overrideAttrs (old: {
+        # Workaround for packaging bug (deleting opensearch-cli breaks opensearch-plugin command)
+        installPhase =
+          builtins.replaceStrings [ "rm $out/bin/opensearch-cli\n" "--replace" ] [ "" "--replace-fail" ]
+            old.installPhase;
+
+        # postInstall = ''
+        #   # Install some plugins
+        #   $out/bin/opensearch-plugin install analysis-icu analysis-smartcn analysis-kuromoji analysis-stempel
+        # '';
+      });
+      settings = {
+        "network.host" = "0.0.0.0";
+        "plugins.query.datasources.encryption.masterkey" = "2ccc9d70a449ace1a8858604"; # FIXME
+      };
+    };
+    suricata = {
+      enable = false;
+      settings = {
+        af-packet = [
+          {
+            inherit (config.networking.defaultGateway) interface;
+            cluster-id = 99;
+            cluster-type = "cluster_flow";
+            defrag = "yes";
+          }
+        ];
+      };
+    };
     samba = {
       enable = true;
       nmbd.enable = false;
@@ -251,22 +310,8 @@ in
           "create mask" = "0644";
           "directory mask" = "0755";
           "inherit permissions" = "yes";
-          #      "force user" = config.users.users.markus.name;
-          #      "force group" = config.users.users.markus.group;
         };
       };
-    };
-    hydra = {
-      enable = false;
-      port = 4000;
-      #  maxServers = 1;
-      #  minSpareServers = 0;
-      # hydraURL = "http://localhost:3000"; # externally visible URL
-      #notificationSender = "hydra@localhost"; # e-mail of Hydra service
-      # a standalone Hydra will require you to unset the buildMachinesFiles list to avoid using a nonexistant /etc/nix/machines
-      buildMachinesFiles = [ ];
-      # you will probably also want, otherwise *everything* will be built from scratch
-      useSubstitutes = true;
     };
 
     immich = {
@@ -280,43 +325,18 @@ in
       mediaLocation = "/data/Photos";
     };
 
-    rclone-sync = {
-      enable = false;
-      source = "OneDrive:/";
-      destination = "/data/personal/OneDrive/";
-      extraArgs = [
-        "--dry-run"
-        "--no-update-modtime"
-        "--backup-dir=/data/personal/rclone-backup"
-      ];
-    };
-
     fail2ban = {
       enable = true;
-      maxretry = 5;
-      bantime = "15m";
-      bantime-increment = {
-        enable = true;
-        formula = "ban.Time * math.exp(float(ban.Count+1)*banFactor)/math.exp(1*banFactor)";
-        factor = "4";
-        maxtime = "168h"; # Do not ban for more than 1 week
-      };
       ignoreIP = [
         "100.64.0.0/10"
         "127.0.0.1/8"
       ];
     };
-    zfs.autoScrub.enable = true;
+
     openssh = {
       enable = true;
-      allowSFTP = false;
-      settings = {
-        PasswordAuthentication = false;
-        PermitRootLogin = "prohibit-password";
-        X11Forwarding = false;
-      };
-
     };
+
     tailscale = {
       enable = true;
       openFirewall = true;
@@ -357,23 +377,13 @@ in
       settings = {
         options = {
           urAccepted = -1;
-
         };
-        gui = {
-          user = "myuser";
-          password = "mypassword";
-        };
-        devices = import ./syncthing-devices.nix;
-
-        folders = import ./syncthing-folders.nix { inherit config; };
       };
     };
 
-    # Monitoring
-
     # port: 9090
     prometheus = {
-      enable = true;
+      enable = false;
       scrapeConfigs = [
         {
           job_name = "main";
@@ -496,8 +506,8 @@ in
         process = {
           enable = true;
           settings.process_names = [
-            # Remove nix store path from process name
             {
+              # Remove nix store path from process name
               name = "{{.Matches.Wrapped}} {{ .Matches.Args }}";
               cmdline = [ "^/nix/store[^ ]*/(?P<Wrapped>[^ /]*) (?P<Args>.*)" ];
             }
@@ -510,39 +520,33 @@ in
       };
     };
 
-    loki = {
-      enable = true;
-      configFile = ./loki-config.yaml;
-      extraFlags = [
-        "-reporting.enabled=0"
-      ];
+    graylog = {
+      enable = false;
+      elasticsearchHosts = [ "http://127.0.0.1:9200" ];
+      package = pkgs.graylog-6_0;
+      extraConfig = ''
+        	http_bind_address = 0.0.0.0:9000
+        	'';
+    };
+    mongodb = {
+      enable = false;
+      package = pkgs.mongodb-6_0;
     };
 
-    alloy = {
-      enable = true;
-      extraFlags = [ "--disable-reporting" ];
-    };
     # Port: 3000
     grafana = {
-      enable = true;
+      # TODO: grafana-opensearch-datasource plugin
+      enable = false;
       declarativePlugins = [
-        self.packages.x86_64-linux.grafana-treemap-panel
+        pkgs.grafana-treemap-panel
       ];
       settings = {
-        analytics = {
-          reporting_enabled = false;
-          feedback_links_enabled = false;
-          check_for_updates = false;
-          check_for_plugin_updates = false;
-
-        };
         server = {
           enforce_domain = false;
           enable_gzip = true;
           http_addr = "0.0.0.0";
         };
         security = {
-          disable_gravatar = true;
           admin_user = "admin";
           admin_password = "$__file{${config.sops.secrets.grafana_admin_password.path}}";
         };
@@ -567,11 +571,6 @@ in
       };
     };
 
-    # Experimental
-    #shiori.enable = true;
-    #outline.enable = true;
-    #your_spotify.enable = true;
-
   };
 
   sops = {
@@ -582,7 +581,7 @@ in
     secrets = {
       tailscale_auth_key = { };
       grafana_admin_password = {
-        owner = config.systemd.services.grafana.serviceConfig.User;
+        owner = lib.mkIf config.services.grafana.enable config.systemd.services.grafana.serviceConfig.User;
       };
 
       sonarr_api_key = {
@@ -617,10 +616,10 @@ in
   };
 
   environment = {
-    etc = {
-      "alloy/config.alloy".source = ./config.alloy;
-    };
+
     systemPackages = with pkgs; [
+      btop
+      opensearch-cli
       jellyfin
       jellyfin-web
       jellyfin-ffmpeg
@@ -634,6 +633,8 @@ in
     ];
   };
   security = {
+    auditd.enable = true;
+    audit.enable = true;
     sudo.wheelNeedsPassword = false;
     tpm2 = {
       enable = true;
@@ -659,7 +660,6 @@ in
         ffmpeg = pkgs.ffmpeg-full;
         withFFmpeg = true;
       };
-
     };
 
     permittedInsecurePackages = [

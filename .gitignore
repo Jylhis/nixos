@@ -6,3 +6,4 @@ result-man
 .devenv
 .direnv
 .pre-commit-config.yaml
+*.html

@@ -12,7 +12,7 @@
     nixos-hardware.nixosModules.common-cpu-intel
     nixos-hardware.nixosModules.common-pc
     nixos-hardware.nixosModules.common-pc-ssd
-    self.nixosModules.apple-hardware
+    self.nixosModules.hardware-apple
     # Paths to other modules.
     # Compose this module out of smaller ones.
   ];
@@ -56,8 +56,8 @@
         ];
       };
     };
-    apple-hardware.enableFirmware = false;
-    apple-hardware.firmware = self.outputs.packages.x86_64-linux.brcm-firmware.override {
+    hardware-apple.enableFirmware = false;
+    hardware-apple.firmware = self.outputs.packages.x86_64-linux.brcm-firmware.override {
       name = "firmware-mac-mini.tar";
       hash = "sha256-nQmzaCAIcApl0ihSz/dV2z8iYPTGKBo04+Wxr3Uh7hc=";
     };

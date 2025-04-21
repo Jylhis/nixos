@@ -40,6 +40,10 @@ with lib.hm.gvariant;
       screen-keyboard-enabled = false;
     };
 
+    "org/gnome/desktop/datetime" = {
+      automatic-timezone = true;
+    };
+
     "org/gnome/desktop/input-sources" = {
       sources = [
         (mkTuple [
@@ -151,7 +155,8 @@ with lib.hm.gvariant;
     "org/gnome/settings-daemon/plugins/color" = {
       night-light-enabled = true;
       night-light-schedule-automatic = false;
-      night-light-schedule-from = 18.0;
+      night-light-schedule-from = 21.0;
+      night-light-schedule-to = 4.0;
       night-light-temperature = mkUint32 2581;
     };
 

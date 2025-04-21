@@ -1,8 +1,6 @@
 {
   description = "Jylhis personal flake";
 
-  # TODO: deadnix
-  # TODO: statix
   inputs = {
 
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
@@ -28,7 +26,6 @@
     nixos-conf-editor = {
       url = "github:snowfallorg/nixos-conf-editor";
       inputs = {
-
         nixpkgs.follows = "nixpkgs";
         flake-compat.follows = "flake-compat";
       };
@@ -139,7 +136,8 @@
         config.allowUnfree = true;
         overlays = [
           emacs-overlay.overlay
-          #      nixos-anywhere.overlay
+          self.overlays.by-name
+          self.overlays.additions
         ];
       };
 
@@ -148,17 +146,23 @@
         config.allowUnfree = true;
         overlays = [
           emacs-overlay.overlay
+          self.overlays.by-name
+          self.overlays.additions
         ];
       };
 
       treefmtEval = treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix;
     in
     {
-      checks = deploy-rs.lib.${system}.deployChecks self.deploy // {
-        ${system} = {
-          formatting = treefmtEval.config.build.check self;
+      checks =
+        (builtins.mapAttrs (_system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib)
+        // {
+          ${system} = {
+            formatting = treefmtEval.config.build.check self;
+            # TODO: disko tests
+            # TODO: nixos tests
+          };
         };
-      };
 
       # TODO emacs overlay
       packages.${system} = import ./pkgs pkgs-stable;
@@ -183,12 +187,16 @@
 
             # Other tools
             pkgs.dconf2nix
+
+            # SEC
+            pkgs.vulnix
+            pkgs.sbomnix
+
           ];
         };
 
-      #overlays = import ./overlays {inherit inputs;};
-
-      nixosModules = import ./modules/nixos // (import ./users);
+      overlays = import ./overlays { inherit (nixpkgs) lib; };
+      nixosModules = import ./modules;
       #homeManagerModules = import ./modules/home-manager;
 
       nixosConfigurations = {
@@ -198,22 +206,28 @@
             unstable = pkgs-unstable;
           };
           modules = [
+            self.nixosModules.config
             home-manager.nixosModules.home-manager
             {
               home-manager = {
                 useGlobalPkgs = true;
                 useUserPackages = true;
               };
-
+            }
+            {
+              nixpkgs.overlays = [
+                self.overlays.by-name
+                self.overlays.additions
+                emacs-overlay.overlay
+              ];
             }
             stylix.nixosModules.stylix
             ./hosts/desktop
             nixos-hardware.nixosModules.common-gpu-amd
-            self.nixosModules.personal-defaults
-            self.nixosModules.nix-companion
-            self.nixosModules.user-markus-full
-            self.nixosModules.user-sara
-            self.nixosModules.jyl-cachix
+            self.nixosModules.roles-nix-companion-server
+            ./users/markus/full.nix
+            ./users/sara/nixos.nix
+
           ];
         };
         macbook-air = nixpkgs.lib.nixosSystem rec {
@@ -222,6 +236,7 @@
             unstable = pkgs-unstable;
           };
           modules = [
+            self.nixosModules.config
             home-manager.nixosModules.home-manager
             {
               home-manager = {
@@ -229,13 +244,18 @@
                 useUserPackages = true;
               };
             }
+            {
+              nixpkgs.overlays = [
+                self.overlays.by-name
+                self.overlays.additions
+                emacs-overlay.overlay
+              ];
+            }
             stylix.nixosModules.stylix
             ./hosts/macbook-air
-            self.nixosModules.personal-defaults
-            self.nixosModules.nix-companion
-            self.nixosModules.user-markus-full
-            self.nixosModules.user-sara
-            self.nixosModules.jyl-cachix
+            self.nixosModules.roles-nix-companion-server
+            ./users/markus/full.nix
+            ./users/sara/nixos.nix
           ];
         };
 
@@ -244,14 +264,21 @@
           specialArgs = attrs;
 
           modules = [
+            self.nixosModules.services-opensearch-dashboards
+            self.nixosModules.config
             srvos.nixosModules.server
             srvos.nixosModules.hardware-hetzner-online-intel
             sops-nix.nixosModules.sops
             disko.nixosModules.disko
-            self.nixosModules.jyl-cachix
-            self.nixosModules.user-markus
-            self.nixosModules.rclone-sync
+            ./users/markus/nixos.nix
+            self.nixosModules.services-rclone-sync
             ./hosts/server
+            {
+              nixpkgs.overlays = [
+                self.overlays.by-name
+                #self.overlays.additions
+              ];
+            }
           ];
         };
       };
