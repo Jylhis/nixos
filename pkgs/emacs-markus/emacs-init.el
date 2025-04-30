@@ -924,9 +924,9 @@ active region is added to the search string."
                  :gopls (:usePlaceholders t :gofumpt t)
                  :nixd (:formatting (:command ["nixfmt"])))))
 
-(add-hook 'prog-mode-hook
-          (lambda ()
-            (add-hook 'before-save-hook 'eglot-format nil t)))
+;;(add-hook 'prog-mode-hook
+;;          (lambda ()
+;;            (add-hook 'before-save-hook 'eglot-format nil t)))
 
 (setq eglot-report-progress nil) ; Prevent Eglot minibuffer spam
 (setq eglot-extend-to-xref t) ; Activate Eglot in cross-referenced non-project files
