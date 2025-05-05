@@ -31,7 +31,7 @@ in
       kernelPackages = latestKernelPackage;
 
       loader = {
-        grub.zfsSupport = true;
+        grub.zfsSupport = lib.mkDefault true;
       };
     };
     services = {

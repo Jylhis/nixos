@@ -95,7 +95,7 @@ in
         kexecTime = lib.mkDefault "1m";
       };
 
-      sleep.extraConfig = ''
+      sleep.extraConfig = lib.mkDefault ''
         AllowSuspend=no
         AllowHibernation=no
       '';

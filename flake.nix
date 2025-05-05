@@ -224,7 +224,6 @@
             stylix.nixosModules.stylix
             ./hosts/desktop
             nixos-hardware.nixosModules.common-gpu-amd
-            self.nixosModules.roles-nix-companion-server
             ./users/markus/full.nix
             ./users/sara/nixos.nix
 
@@ -264,14 +263,11 @@
           specialArgs = attrs;
 
           modules = [
-            self.nixosModules.services-opensearch-dashboards
-            self.nixosModules.config
             srvos.nixosModules.server
             srvos.nixosModules.hardware-hetzner-online-intel
             sops-nix.nixosModules.sops
             disko.nixosModules.disko
             ./users/markus/nixos.nix
-            self.nixosModules.services-rclone-sync
             ./hosts/server
             {
               nixpkgs.overlays = [

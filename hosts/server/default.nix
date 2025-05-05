@@ -11,6 +11,8 @@
     ./networking-details.nix
     ./private.nix
     ../../modules/roles/server
+    ../../modules/services/opensearch-dashboards
+    ../../modules/config
   ];
 
   jylhis = {
@@ -57,9 +59,7 @@
         "flakes"
       ];
       trusted-users = [
-        config.users.users.root.name
         config.users.users.nixremote.name
-        "@${config.users.groups.wheel.name}"
       ];
     };
   };
@@ -330,6 +330,9 @@
       ignoreIP = [
         "100.64.0.0/10"
         "127.0.0.1/8"
+        "10.0.0.0/8"
+        "192.168.0.0/16"
+        "100.98.15.56/32"
       ];
     };
 

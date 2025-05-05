@@ -13,6 +13,7 @@
     self.nixosModules.hardware-mac-mini-2018
     ./hardware-configuration.nix
     ../../modules/roles/desktop
+    ../../modules/roles/nix-companion-server.nix
   ];
 
   jylhis.role.desktop.enable = true;

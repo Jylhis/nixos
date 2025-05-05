@@ -4,7 +4,7 @@
 
 ;;; Code:
 
-(setq debug-on-error t) ; Produce backtraces when errors occur: can be helpful to diagnose startup issues
+;;(setq debug-on-error t) ; Produce backtraces when errors occur: can be helpful to diagnose startup issues
 
 ;; Defer garbage collection further back in the startup process
 (setq gc-cons-threshold most-positive-fixnum)
@@ -13,7 +13,8 @@
 (setq read-process-output-max #x10000)  ; 64kb
 
 ;; Don't ping things that look like domain names.
-(use-package ffap :ensure nil :custom
+(use-package ffap
+  :custom
   (ffap-machine-p-known 'reject))
 
 ;; `use-package' is builtin since 29.
@@ -36,13 +37,10 @@
 ;; from emacs (especially on Microsoft Windows)
 (prefer-coding-system 'utf-8)
 
-
 ;; In noninteractive sessions, prioritize non-byte-compiled source files to
 ;; prevent the use of stale byte-code. Otherwise, it saves us a little IO time
 ;; to skip the mtime checks on every *.elc file.
 (setq load-prefer-newer noninteractive)
-
-(add-to-list 'load-path (locate-user-emacs-file "lisp"))
 
 ;; Store automatic customisation options elsewhere
 (setq custom-file (locate-user-emacs-file "custom.el"))
@@ -50,69 +48,57 @@
   (load custom-file))
 
 (use-package emacs
- :init
- (tool-bar-mode -1)
- (when scroll-bar-mode
-   (scroll-bar-mode -1))
- (menu-bar-mode -1)
+  :init
+  (tool-bar-mode -1)
+  (when scroll-bar-mode
+	(scroll-bar-mode -1))
+  (menu-bar-mode -1)
 
- :custom
- ;; Enable indentation+completion using the TAB key.
- ;; `completion-at-point' is often bound to M-TAB.
- (tab-always-indent 'complete)
+  :custom
+  ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (tab-always-indent 'complete)
 
- (enable-recursive-minibuffers t "Support opening new minibuffers from inside existing minibuffers")
- (minibuffer-prompt-properties
-  '(read-only t cursor-intangible t face minibuffer-prompt) "Do not allow the cursor in the minibuffer prompt")
- (read-buffer-completion-ignore-case t "Ignore case when reading buffer name")
- (completion-ignore-case t "Don't condifer case significant in completion")
+  (enable-recursive-minibuffers t "Support opening new minibuffers from inside existing minibuffers")
+  (minibuffer-prompt-properties
+   '(read-only t cursor-intangible t face minibuffer-prompt) "Do not allow the cursor in the minibuffer prompt")
+  (read-buffer-completion-ignore-case t "Ignore case when reading buffer name")
+  (completion-ignore-case t "Don't condifer case significant in completion")
 
- (delete-by-moving-to-trash t "Delete by moving to trahs in interactive mode")
+  (delete-by-moving-to-trash t "Delete by moving to trahs in interactive mode")
 
-(sentence-end-double-space nil "Disable the obsolete practice of end-of-line spacing from the typewriter era.")
-
-
- ;; NOTE: the inhibit-startup-message Emacs option
- ;; cannot be set here since Emacs disallows setting it from the default
- ;; initialization file.
- (inhibit-startup-message t "Disable startup message")
- (inhibit-splash-screen t "Disable splash screen")
- (initial-scratch-message nil "Disable initial scratch message")
- (inhibit-startup-screen t "Disable initial startup screen")
-
- ;;(set-mark-command-repeat-pop t "Repeating C-SPC after popping mark pops it again")
+  (sentence-end-double-space nil "Disable the obsolete practice of end-of-line spacing from the typewriter era.")
 
 
+  ;; NOTE: the inhibit-startup-message Emacs option
+  ;; cannot be set here since Emacs disallows setting it from the default
+  ;; initialization file.
+  (inhibit-startup-message t "Disable startup message")
+  (inhibit-splash-screen t "Disable splash screen")
+  (initial-scratch-message nil "Disable initial scratch message")
+  (inhibit-startup-screen t "Disable initial startup screen")
 
- (use-short-answers t "life is too short to type yes or no")
- (tab-width 4)
-;; (save-place-mode t "Automatically save your place in files")
+  ;; (set-mark-command-repeat-pop t "Repeating C-SPC after popping mark pops it again")
 
- (cursor-type 'bar)
+  (use-short-answers t "life is too short to type yes or no")
+  (tab-width 4)
+  (save-place-mode t "Automatically save your place in files")
 
- (word-wrap t "Continue wrapped lines at whitespace rather than breaking in the middle of a word.")
+  (cursor-type 'bar)
 
- (visible-bell nil "No blinking")
- (ring-bell-function #'ignore "No beeping")
+  (word-wrap t "Continue wrapped lines at whitespace rather than breaking in the middle of a word.")
 
- (sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*") ; REVIEW
- (sentence-end-double-space nil); REVIEW
+  (visible-bell nil "No blinking")
+  (ring-bell-function #'ignore "No beeping")
 
- ;; Smoother scrolling
- (scroll-margin 0)
- (scroll-step 1)
+  (sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*") ; REVIEW
+  (sentence-end-double-space nil); REVIEW
 
- (scroll-conservatively 10000)
- (scroll-preserve-screen-position 1)
-)
 
-;; Autosave stuff to /tmp
-;;(setq auto-save-default nil)
-;;(setq make-backup-files nil)
-(setq backup-directory-alist
-      `((".*" . ,temporary-file-directory)))
-(setq auto-save-file-name-transforms
-      `((".*" ,temporary-file-directory t)))
+  (scroll-margin 15 "Keep 15 line margin from top and bottom")
+
+  (scroll-conservatively 10000)
+  (scroll-preserve-screen-position 1 "keep the cursor in the same position while scrolling"))
 
 (use-package super-save
   :ensure t
@@ -123,24 +109,22 @@
   :config
   (super-save-mode +1))
 
+;; Persist history over Emacs restarts. Vertico sorts by history position.
 (use-package savehist
-  :ensure nil
-  :custom
-  (savehist-mode t "Save history in minibuffer to keep recent commands easily accessible"))
+  :hook (after-init . savehist-mode))
 
-(use-package newcomment :ensure nil
+(setopt comment-multi-line t)
+
+(use-package newcomment
   :custom
-  (comment-multi-line t "Enable multi-line commenting which ensures that") ; FIXME
-   (comment-empty-lines t "Ensures that empty lines within the commented region are also commented out")
-  )
+  (comment-multi-line t "Enable multi-line commenting which ensures that")
+  (comment-empty-lines t "Ensures that empty lines within the commented region are also commented out"))
 
 (use-package elec-pair
-  :ensure nil
   :diminish
   :hook (after-init . electric-pair-mode))
 
 (use-package subword
-  :ensure nil
   :diminish
   :hook ((prog-mode . subword-mode)
          (minibuffer-setup . subword-mode)))
@@ -149,169 +133,155 @@
 (use-package so-long
   :hook (after-init . global-so-long-mode))
 
-(use-package files :ensure nil
+(use-package files
   :hook
   (before-save . delete-trailing-whitespace)
- (after-save . executable-make-buffer-file-executable-if-script-p) ; Make script file executable by default
+  (after-save . executable-make-buffer-file-executable-if-script-p) ; Make script file executable by default
   :custom
   (require-final-newline t "Add new line at the end of the file")
   (find-file-visit-truename t "Resolve symlinks")
-   (backup-by-copying t)
- (delete-old-versions t)
- (kept-new-versions 6)
- (kept-old-versions 2)
- (version-control t)
- (confirm-kill-processes nil "when quitting emacs, just kill processes")
+  (confirm-kill-processes nil "when quitting emacs, just kill processes")
   (enable-local-variables t "ask if local variables are safe once")
+  :config
+  ;; Disable autosave and backups
+  (setq auto-save-default nil)
+  (setq make-backup-files nil)
   )
 
-(use-package custom :ensure nil :custom
- (custom-safe-themes t "Mark all custom themes safe")
- )
+(use-package custom
+  :custom
+  (custom-safe-themes t "Mark all custom themes safe"))
 
+(use-package font-core
+  :custom
+  (global-font-lock-mode 1 "always highlight code"))
 
-(use-package font-core :ensure nil :custom
-   (global-font-lock-mode 1 "always highlight code"))
-
-(use-package paren :ensure nil :custom
-
+(use-package paren
+  :custom
   (show-paren-mode t "Visualize matching parens")
   (show-paren-context-when-offscreen t)
- (show-paren-delay 0.1)
- (show-paren-highlight-openparen t)
- (show-paren-when-point-inside-paren t)
- (show-paren-when-point-in-periphery t)
+  (show-paren-delay 0.1)
+  (show-paren-highlight-openparen t)
+  (show-paren-when-point-inside-paren t)
+  (show-paren-when-point-in-periphery t)
   )
+
 (use-package dired
-  :ensure nil
   :bind (:map dired-mode-map
-         ("C-c C-p" . wdired-change-to-wdired-mode))
+			  ("C-c C-p" . wdired-change-to-wdired-mode))
   :custom
- (dired-free-space nil)
- (dired-dwim-target t "Propose a target for intelligent moving or copying.")
- ;;(dired-deletion-confirmer 'y-or-n-p)
- (dired-filter-verbose nil)
- (dired-recursive-deletes 'top)
- (dired-recursive-copies 'always)
- (dired-create-destination-dirs 'ask)
- (dired-auto-revert-buffer #'dired-buffer-stale-p "Revert the Dired buffer without prompting.")
- (image-dired-thumb-size 150)
- (dired-listing-switches "-alh --group-directories-first" "In dired, show hidden files and human readable sizes")
- (dired-vc-rename-file t)
- (dired-clean-confirm-killing-deleted-buffers nil "Disable the prompt about killing the Dired buffer for a deleted directory.")
- (dired-omit-verbose nil)
- (dired-omit-files
-      (concat
-       "\\`[.]?#\\|\\`[.][.]?\\'"
-       "\\|\\(?:\\.js\\)?\\.meta\\'"
-       "\\|\\.\\(?:elc|a\\|o\\|pyc\\|pyo\\|swp\\|class\\)\\'"
-       "\\|^\\.DS_Store\\'"
-       "\\|^\\.\\(?:svn\\|git\\)\\'"
-       "\\|^\\.ccls-cache\\'"
-       "\\|^__pycache__\\'"
-       "\\|^\\.project\\(?:ile\\)?\\'"
-       "\\|^flycheck_.*"
-       "\\|^flymake_.*"))
- )
+  (dired-free-space nil)
+  (dired-dwim-target t "Propose a target for intelligent moving or copying.")
+  ;;(dired-deletion-confirmer 'y-or-n-p)
+  (dired-filter-verbose nil)
+  (dired-recursive-deletes 'top)
+  (dired-recursive-copies 'always)
+  (dired-create-destination-dirs 'ask)
+  (dired-auto-revert-buffer #'dired-buffer-stale-p "Revert the Dired buffer without prompting.")
+  (image-dired-thumb-size 150)
+  (dired-listing-switches "-alh --group-directories-first" "In dired, show hidden files and human readable sizes")
+  (dired-vc-rename-file t)
+  (dired-clean-confirm-killing-deleted-buffers nil "Disable the prompt about killing the Dired buffer for a deleted directory.")
+  (dired-omit-verbose nil)
+  (dired-omit-files
+   (concat
+    "\\`[.]?#\\|\\`[.][.]?\\'"
+    "\\|\\(?:\\.js\\)?\\.meta\\'"
+    "\\|\\.\\(?:elc|a\\|o\\|pyc\\|pyo\\|swp\\|class\\)\\'"
+    "\\|^\\.DS_Store\\'"
+    "\\|^\\.\\(?:svn\\|git\\)\\'"
+    "\\|^\\.ccls-cache\\'"
+    "\\|^__pycache__\\'"
+    "\\|^\\.project\\(?:ile\\)?\\'"
+    "\\|^flycheck_.*"
+    "\\|^flymake_.*"))
+  )
 
-(use-package dired-x :ensure nil
+(use-package dired-x
   :after dired)
 
-(use-package dired-hacks-utils :ensure
+(use-package dired-hacks-utils
+  :ensure
   :after dired)
 
-(use-package text-mode :ensure nil :custom
- ;; Emacs 30 and newer: Disable Ispell completion function.
- ;; Try `cape-dict' as an alternative.
+(use-package text-mode
+  :custom
+  ;; Emacs 30 and newer: Disable Ispell completion function.
+  ;; Try `cape-dict' as an alternative.
   (text-mode-ispell-word-completion nil))
 
-
-(use-package simple :ensure nil
+(use-package simple
   :custom
- ;; commands are hidden in normal buffers. This setting is useful beyond
- ;; Vertico.
- (read-extended-command-predicate
-  #'command-completion-default-include-p "Hide commands in M-x which do not work in the current mode")
+  ;; commands are hidden in normal buffers. This setting is useful beyond
+  ;; Vertico.
+  (read-extended-command-predicate
+   #'command-completion-default-include-p "Hide commands in M-x which do not work in the current mode")
 
- (kill-do-not-save-duplicates t "Remove duplicates from the kill ring to reduce clutter")
- (next-line-add-newlines nil)
- (line-number-mode t "Show line number in modeline")
+  (kill-do-not-save-duplicates t "Remove duplicates from the kill ring to reduce clutter")
+  (next-line-add-newlines nil)
+  (line-number-mode t "Show line number in modeline")
   (column-number-mode t "Show column number")
- )
-
-(use-package mwheel :ensure nil :custom
- (mouse-wheel-follow-mouse t "Scroll the windows that mouse is over")
- )
-
-(use-package xt-mouse :ensure nil :custom
- (xterm-mouse-mode 1 "Enable mouse in terminal")
   )
 
-(use-package minibuffer :ensure nil :custom
-  (read-file-name-completion-ignore-case t "ignore case when reading file name")
+(use-package mwheel
+  :custom
+  (mouse-wheel-follow-mouse t "Scroll the windows that mouse is over"))
 
-  )
+(use-package xt-mouse
+  :custom
+  (xterm-mouse-mode 1 "Enable mouse in terminal"))
 
-(use-package autorevert :ensure nil :custom
+(use-package minibuffer
+  :custom
+  (read-file-name-completion-ignore-case t "ignore case when reading file name"))
+
+(global-set-key (kbd "C-<tab>") 'completion-at-point) ;; TODO: Move inside of the use-package
+
+(use-package autorevert
+  :custom
   (global-auto-revert-mode t "Automatically refrech buffer if changed on disk")
-  (global-auto-revert-non-file-buffers t "Revert also non-file buffers")
+  (global-auto-revert-non-file-buffers t "Revert also non-file buffers"))
 
-  )
+;; (use-package mouse
+;;   :custom
+;;   (mouse-yank-at-point t))
 
-(use-package mouse :ensure nil :custom
+(use-package recentf
+  :custom
+  (recentf-mode t "Keep track of open files"))
 
-  (mouse-yank-at-point t)
-
-  )
-
-(use-package recentf :ensure nil :custom
-  (recentf-mode t "Keep track of open files")
-
-  )
-
-(use-package window :ensure nil :custom
+(use-package window
+  :custom
+  ;; Prefer side by side splitting
   (split-width-threshold 170)
-  (split-height-threshold nil)
+  (split-height-threshold nil))
 
-  )
+(use-package vc-hooks
+  :custom
+  (vc-follow-symlinks t "Always follow symlinks when opening files"))
 
-(use-package vc-hooks :ensure nil :custom
- (vc-follow-symlinks t "Always follow symlinks when opening files")
-  )
-
- ;; Show git info in dired
+;; Show git info in dired
 (use-package dired-git-info
   :ensure
-    :bind (:map dired-mode-map
-				(")" . dired-git-info-mode)))
-
- ;; Allow rsync from dired buffers
-  ;; (use-package dired-rsync
-  ;;   :bind (:map dired-mode-map
-  ;; 				("C-c C-r" . dired-rsync)))
+  :bind (:map dired-mode-map
+			  (")" . dired-git-info-mode)))
 
 ;; `find-dired' alternative using `fd'
-
-(use-package fd-dired :ensure)
+(use-package fd-dired
+  :ensure)
 
 (use-package hl-line
-  :ensure nil
   :hook ((after-init . global-hl-line-mode)
          ((dashboard-mode eshell-mode shell-mode term-mode vterm-mode) .
-          (lambda () (setq-local global-hl-line-mode nil))))
-  )
+          (lambda () (setq-local global-hl-line-mode nil)))))
 
 (use-package smerge-mode
-  :ensure nil
   :diminish)
 
 (use-package org
-  :ensure nil
   :bind (
 		 ("C-c a" . org-agenda)
-		 ("C-c c" . org-capture)
-		 )
-  )
+		 ("C-c c" . org-capture)))
 
 ;; Drag stuff (lines, words, region, etc...) around
 (use-package drag-stuff
@@ -324,30 +294,29 @@
   (drag-stuff-define-keys))
 
 
-(use-package ox-man :ensure nil :after org-mode)
-(use-package htmlize :ensure :after org-mode)
+(use-package ox-man
+  :after org-mode)
+
+(use-package htmlize
+  :ensure
+  :after org-mode)
 
 (use-package delsel
-  :ensure nil
-  :hook (after-init . delete-selection-mode)
- )
+  :hook (after-init . delete-selection-mode))
 
 (use-package cursor-sensor
-  :ensure nil
   :hook  (minibuffer-setup . cursor-intangible-mode))
 
 (use-package cc-mode
-  :ensure nil
   :custom
   (c-basic-offset 4))
 
 (use-package
- leuven-theme
- :ensure
- :config
- (load-theme 'leuven t t)
- (load-theme 'leuven-dark t t)
- )
+  leuven-theme
+  :ensure
+  :config
+  (load-theme 'leuven t t)
+  (load-theme 'leuven-dark t t))
 
 (use-package auto-dark
   :ensure
@@ -366,7 +335,7 @@
     (auto-dark-dark-theme 'leuven-dark)
     (auto-dark-light-theme 'leuven)
     )
-    (remove-hook 'after-make-frame-functions #'id/server-auto-dark)
+  (remove-hook 'after-make-frame-functions #'id/server-auto-dark)
   )
 (add-hook 'after-make-frame-functions #'id/server-auto-dark)
 
@@ -388,11 +357,11 @@
 ;; 	  ))
 
 (use-package
- centered-cursor-mode
- :ensure
- :disabled
- :config
- (global-centered-cursor-mode))
+  centered-cursor-mode
+  :ensure
+  :disabled
+  :config
+  (global-centered-cursor-mode))
 
 
 ;; REVIEW
@@ -402,57 +371,44 @@
 
 (cond
  ((font-available-p "Source Code Pro")
-  (set-frame-font "Source Code Pro 12")
-  ))
+  (set-frame-font "Source Code Pro 12")))
 
 ;;(add-to-list 'default-frame-alist '(font . "Source Code Pro 12"))
 
 ;; https://emacsredux.com/blog/2023/03/14/avoid-accidentally-minimizing-emacs/
 (global-unset-key (kbd "C-z"))
 
-
 ;;;;; Web
 (use-package
- web-mode
- :ensure t
- :custom
- (web-mode-enable-auto-closing t)
+  web-mode
+  :ensure t
+  :custom
+  (web-mode-enable-auto-closing t)
   (web-mode-enable-auto-opening t)
   (web-mode-enable-auto-pairing t)
   (web-mode-enable-auto-indentation t)
   (web-mode-enable-auto-quoting t)
   (web-mode-enable-current-column-highlight t)
   (web-mode-enable-current-element-highlight t)
- :mode
- (("\\.phtml\\'" . web-mode)
-  ("\\.php\\'" . web-mode)
-  ("\\.tpl\\'" . web-mode)
-  ("\\.[agj]sp\\'" . web-mode)
-  ("\\.as[cp]x\\'" . web-mode)
-  ("\\.erb\\'" . web-mode)
-  ("\\.mustache\\'" . web-mode)
-  ("\\.djhtml\\'" . web-mode)
-  ("\\.js\\'" . web-mode)
-  ("\\.html\\'" . web-mode)))
-
-
-;; Do not notify the user each time Python tries to guess the indentation offset
-;;(setq python-indent-guess-indent-offset-verbose nil)
-
-
+  :mode
+  (("\\.phtml\\'" . web-mode)
+   ("\\.php\\'" . web-mode)
+   ("\\.tpl\\'" . web-mode)
+   ("\\.[agj]sp\\'" . web-mode)
+   ("\\.as[cp]x\\'" . web-mode)
+   ("\\.erb\\'" . web-mode)
+   ("\\.mustache\\'" . web-mode)
+   ("\\.djhtml\\'" . web-mode)
+   ("\\.js\\'" . web-mode)
+   ("\\.html\\'" . web-mode)))
 
 (use-package adoc-mode :ensure) ; AsciiDoc
 
-
 (use-package vterm :ensure) ; Terminal inside emacs
-
-(use-package which-func
-  :ensure nil)
 
 (use-package rainbow-delimiters
   :ensure
-  :hook((lisp-mode emacs-lisp-mode) . rainbow-delimiters-mode)
-		)
+  :hook((lisp-mode emacs-lisp-mode) . rainbow-delimiters-mode))
 
 
 ;; Smarter move beginning of the line
@@ -476,6 +432,7 @@ point reaches the beginning or end of the buffer, stop there."
     (back-to-indentation)
     (when (= orig-point (point))
       (move-beginning-of-line 1))))
+
 (global-set-key (kbd "C-a") 'smarter-move-beginning-of-line) ; NOTE: Use M-a to move beginning of the line
 (global-set-key (kbd "s-<left>") 'smarter-move-beginning-of-line)
 
@@ -486,32 +443,27 @@ point reaches the beginning or end of the buffer, stop there."
 ;; Define super modifier key. This is sometimes neededn but it's not defined
 (define-key function-key-map (kbd "M-]") 'event-apply-super-modifier)
 
-
 (use-package treesit
- ;; Builtin tree-sitter
- :ensure nil
-:custom
-(treesit-font-lock-level 4)
-(major-mode-remap-alist
-  '(
-    ;; tag::tree-sit-mapping[]
-    ((js-mode javascript-mode) . js-ts-mode)
-    (bash-mode . bash-ts-mode)
-    (c++-mode . c++-ts-mode)
-    (c-mode . c-ts-mode)
-    (cmake-mode . cmake-ts-mode)
-    (css-mode . css-ts-mode)
-    (dockerfile-mode . dockerfile-ts-mode)
-    (go-mode . go-ts-mode)
-    (html-mode . html-ts-mde)
-    (json-mode . json-ts-mode)
-    (nix-mode . nix-ts-mode)
-    (python-mode . python-ts-mode)
-    (sh-mode . bash-ts-mode)
-    (typescript-mode . typescript-ts-mode)
-    (yaml-mode . yaml-ts-mode)
-    ;; end::tree-sit-mapping[]
-    )))
+  :custom
+  (treesit-font-lock-level 4)
+  (major-mode-remap-alist
+   '(
+     ((js-mode javascript-mode) . js-ts-mode)
+     (bash-mode . bash-ts-mode)
+     (c++-mode . c++-ts-mode)
+     (c-mode . c-ts-mode)
+     (cmake-mode . cmake-ts-mode)
+     (css-mode . css-ts-mode)
+     (dockerfile-mode . dockerfile-ts-mode)
+     (go-mode . go-ts-mode)
+     (html-mode . html-ts-mde)
+     (json-mode . json-ts-mode)
+     (nix-mode . nix-ts-mode)
+     (python-mode . python-ts-mode)
+     (sh-mode . bash-ts-mode)
+     (typescript-mode . typescript-ts-mode)
+     (yaml-mode . yaml-ts-mode)
+     )))
 
 ;; Code folding
 (use-package treesit-fold
@@ -521,29 +473,28 @@ point reaches the beginning or end of the buffer, stop there."
 
 
 (use-package hl-todo
- ;; Highlight comments
- :hook (prog-mode . hl-todo-mode)
- :config
- (setq
-  hl-todo-highlight-punctuation ":"
-  hl-todo-keyword-faces
-  `(("TODO" warning bold)
-    ("FIXME" error bold)
-    ("HACK" font-lock-constant-face bold)
-    ("REVIEW" font-lock-keyword-face bold)
-    ("NOTE" success bold)
-    ("DEPRECATED" font-lock-doc-face bold))))
+  ;; Highlight comments
+  :hook (prog-mode . hl-todo-mode)
+  :config
+  (setq
+   hl-todo-highlight-punctuation ":"
+   hl-todo-keyword-faces
+   `(("TODO" warning bold)
+     ("FIXME" error bold)
+     ("HACK" font-lock-constant-face bold)
+     ("REVIEW" font-lock-keyword-face bold)
+     ("NOTE" success bold)
+     ("DEPRECATED" font-lock-doc-face bold))))
 
 (use-package which-key
   :diminish
-  :ensure nil
   :bind ("C-h M-m" . which-key-show-major-mode)
   :hook (after-init . which-key-mode)
   :init (setq which-key-max-description-length 30
               which-key-lighter nil
               which-key-show-remaining-keys t)
   :config
-  (which-key-add-key-based-replacements "C-c &" "yasnippet")
+  ;;(which-key-add-key-based-replacements "C-c &" "yasnippet")
   (which-key-add-key-based-replacements "C-c @" "hideshow")
   (which-key-add-key-based-replacements "C-c c" "consult")
   (which-key-add-key-based-replacements "C-c d" "dict")
@@ -600,10 +551,13 @@ point reaches the beginning or end of the buffer, stop there."
   (which-key-add-major-mode-key-based-replacements 'gfm-mode
     "C-c C-x" "markdown-toggle")
 
-)
+  )
 
 
-(use-package terraform-mode :ensure)
+(use-package terraform-mode
+  :ensure
+  :custom
+  (terraform-format-on-save t))
 
 ;; Minibuffer completion is essential to your Emacs workflow and
 ;; Vertico is currently one of the best out there. There's a lot to
@@ -614,15 +568,15 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package vertico
   :ensure
   :bind (:map vertico-map
-         ("RET" . vertico-directory-enter)
-         ("DEL" . vertico-directory-delete-char)
-         ("M-DEL" . vertico-directory-delete-word))
- :custom
- (vertico-count 15)
- (vertico-cycle t)
- (read-buffer-completion-ignore-case t)
- (read-file-name-completion-ignore-case t)
- :init (vertico-mode))
+			  ("RET" . vertico-directory-enter)
+			  ("DEL" . vertico-directory-delete-char)
+			  ("M-DEL" . vertico-directory-delete-word))
+  :custom
+  (vertico-count 15)
+  (vertico-cycle t)
+  (read-buffer-completion-ignore-case t)
+  (read-file-name-completion-ignore-case t)
+  :init (vertico-mode))
 
 ;; ;; Use `consult-completion-in-region' if Vertico is enabled.
 ;; ;; Otherwise use the default `completion--in-region' function.
@@ -634,60 +588,57 @@ point reaches the beginning or end of the buffer, stop there."
                args)))
 
 (use-package orderless
-:ensure
-:custom
-(  completion-styles '(substring orderless basic))
-;;(  completion-category-defaults nil)
-(  completion-category-overrides
-  '((file (styles partial-completion)) ;; partial-completion is tried first
-    ;; enable initialism by default for symbols
-    (command (styles +orderless-with-initialism))
-    (variable (styles +orderless-with-initialism))
-    (symbol (styles +orderless-with-initialism))
-    (eglot (styles orderless))
-    (eglot-capf (styles orderless))))
-(  orderless-component-separator #'orderless-escapable-split-on-space "allow escaping space with backslash!")
-(  orderless-style-dispatchers (list #'+orderless-consult-dispatch #'orderless-affix-dispatch))
- :config
-
- (defun +orderless--consult-suffix ()
-   "Regexp which matches the end of string with Consult tofu support."
-   (if (and (boundp 'consult--tofu-char)
-            (boundp 'consult--tofu-range))
-       (format "[%c-%c]*$"
-               consult--tofu-char
-               (+ consult--tofu-char consult--tofu-range -1))
-     "$"))
-
-
- ;; Recognizes the following patterns:
- ;; * .ext (file extension)
- ;; * regexp$ (regexp matching at end)
- (defun +orderless-consult-dispatch (word _index _total)
-   (cond
-    ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
-    ((string-suffix-p "$" word)
-     `(orderless-regexp
-       .
-       ,(concat (substring word 0 -1) (+orderless--consult-suffix))))
-    ;; File extensions
-    ((and (or minibuffer-completing-file-name
-              (derived-mode-p 'eshell-mode))
-          (string-match-p "\\`\\.." word))
-     `(orderless-regexp
-       .
-       ,(concat
-         "\\." (substring word 1) (+orderless--consult-suffix))))))
-
- ;;FIXME
-
- ;; Define orderless style with initialism by default
- (orderless-define-completion-style
-  +orderless-with-initialism
-  (orderless-matching-styles
-   '(orderless-initialism orderless-literal orderless-regexp))))
+  :ensure
+  :custom
+  (  completion-styles '(substring orderless basic))
+  ;;(  completion-category-defaults nil)
+  (  completion-category-overrides
+	 '((file (styles partial-completion)) ;; partial-completion is tried first
+       ;; enable initialism by default for symbols
+       (command (styles +orderless-with-initialism))
+       (variable (styles +orderless-with-initialism))
+       (symbol (styles +orderless-with-initialism))
+       (eglot (styles orderless))
+       (eglot-capf (styles orderless))))
+  (  orderless-component-separator #'orderless-escapable-split-on-space "allow escaping space with backslash!")
+  (  orderless-style-dispatchers (list #'+orderless-consult-dispatch #'orderless-affix-dispatch))
+  :config
+  (defun +orderless--consult-suffix ()
+	"Regexp which matches the end of string with Consult tofu support."
+	(if (and (boundp 'consult--tofu-char)
+             (boundp 'consult--tofu-range))
+		(format "[%c-%c]*$"
+				consult--tofu-char
+				(+ consult--tofu-char consult--tofu-range -1))
+      "$"))
 
 
+  ;; Recognizes the following patterns:
+  ;; * .ext (file extension)
+  ;; * regexp$ (regexp matching at end)
+  (defun +orderless-consult-dispatch (word _index _total)
+	(cond
+     ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
+     ((string-suffix-p "$" word)
+      `(orderless-regexp
+		.
+		,(concat (substring word 0 -1) (+orderless--consult-suffix))))
+     ;; File extensions
+     ((and (or minibuffer-completing-file-name
+               (derived-mode-p 'eshell-mode))
+           (string-match-p "\\`\\.." word))
+      `(orderless-regexp
+		.
+		,(concat
+          "\\." (substring word 1) (+orderless--consult-suffix))))))
+
+  ;;FIXME
+
+  ;; Define orderless style with initialism by default
+  (orderless-define-completion-style
+	  +orderless-with-initialism
+	(orderless-matching-styles
+	 '(orderless-initialism orderless-literal orderless-regexp))))
 
 
 
@@ -704,16 +655,16 @@ point reaches the beginning or end of the buffer, stop there."
 ;; search and understand. This configuration uses the keybindings
 ;; recommended by the package author.
 (use-package helpful
- :ensure
- :init (require 'bind-key)
- :bind
- (("C-h f" . #'helpful-callable)
-  ("C-h v" . #'helpful-variable)
-  ("C-h k" . #'helpful-key)
-  ("C-c C-d" . #'helpful-at-point)
-  ("C-h F" . #'helpful-function)
-  ([remap describe-symbol]   . helpful-symbol)
-  ("C-h C" . #'helpful-command)))
+  :ensure
+  :init (require 'bind-key)
+  :bind
+  (("C-h f" . #'helpful-callable)
+   ("C-h v" . #'helpful-variable)
+   ("C-h k" . #'helpful-key)
+   ("C-c C-d" . #'helpful-at-point)
+   ("C-h F" . #'helpful-function)
+   ([remap describe-symbol]   . helpful-symbol)
+   ("C-h C" . #'helpful-command)))
 
 (use-package vundo
   :ensure
@@ -731,27 +682,26 @@ point reaches the beginning or end of the buffer, stop there."
   (breadcrumb-mode))
 
 (use-package expand-region
- ;; Expand selection according to scope
- :ensure
- :bind ("C-=" . er/expand-region))
+  ;; Expand selection according to scope
+  :ensure
+  :bind ("C-=" . er/expand-region))
 
 (use-package easy-kill :ensure
   :bind (([remap kill-ring-save] . easy-kill)
          ([remap mark-sexp] . easy-mark)))
 
 (use-package
- direnv
- :ensure
- :config
- (direnv-mode)
- (add-to-list 'warning-suppress-types '(direnv))
- )
+  direnv
+  :ensure
+  :config
+  (direnv-mode)
+  (add-to-list 'warning-suppress-types '(direnv))
+  )
 
 (use-package git-modes
- :ensure
- :config
- (add-to-list
-  'auto-mode-alist (cons "/.dockerignore\\'" 'gitignore-mode)))
+  :ensure
+  :mode
+  ("/.dockerignore\\'" . gitignore-mode))
 
 
 (defun dn--consult-line-thing-at-point ()
@@ -786,176 +736,163 @@ active region is added to the search string."
 (use-package consult
   :ensure
   :commands consult-customize
- ;; Enable automatic preview at point in the *Completions* buffer. This is
- ;; relevant when you use the default completion UI.
- :hook (completion-list-mode . consult-preview-at-point-mode)
- :bind
- ;; NOTE: What is the diffence between bind and the remap thing
- (([remap isearch-forward]    . consult-line)
-  ([remap Info-search] . consult-info)
-  ([remap recentf-open-files] . consult-recent-file)
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+  :bind
+  ;; NOTE: What is the diffence between bind and the remap thing
+  (([remap isearch-forward]    . consult-line)
+   ([remap Info-search] . consult-info)
+   ([remap recentf-open-files] . consult-recent-file)
 
-  ;; C-c bindings in `mode-specific-map'
-  ("C-c M-x" . consult-mode-command)
-  ("C-c h" . consult-history)
-  ("C-c k" . consult-kmacro)
-  ("C-c m" . consult-man)
-  ("C-c i" . consult-info)
+   ;; C-c bindings in `mode-specific-map'
+   ("C-c M-x" . consult-mode-command)
+   ("C-c h" . consult-history)
+   ("C-c k" . consult-kmacro)
+   ("C-c m" . consult-man)
+   ("C-c i" . consult-info)
 
-  ;; C-x bindings in `ctl-x-map'
-  ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-  ("C-x b"   . consult-buffer)              ;; orig. switch-to-buffer
-  ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-  ("C-x 5 b" . consult-buffer-other-frame) ;; orig. switch-to-buffer-other-frame
-  ("C-x r b" . consult-bookmark) ;; orig. bookmark-jump
-  ("C-x p b" . consult-project-buffer) ;; orig. project-switch-to-buffer
+   ;; C-x bindings in `ctl-x-map'
+   ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+   ("C-x b"   . consult-buffer)              ;; orig. switch-to-buffer
+   ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+   ("C-x 5 b" . consult-buffer-other-frame) ;; orig. switch-to-buffer-other-frame
+   ("C-x r b" . consult-bookmark) ;; orig. bookmark-jump
+   ("C-x p b" . consult-project-buffer) ;; orig. project-switch-to-buffer
 
-  ;; Custom M-# bindings for fast register access
-  ("M-#" . consult-register-load)
-  ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-  ("C-M-#" . consult-register)
+   ;; Custom M-# bindings for fast register access
+   ("M-#" . consult-register-load)
+   ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+   ("C-M-#" . consult-register)
 
-  ;; Other custom bindings
-  ("M-y" . consult-yank-pop) ;; orig. yank-pop
+   ;; Other custom bindings
+   ("M-y" . consult-yank-pop) ;; orig. yank-pop
 
-  ;; M-g bindings in `goto-map'
-;;  ("M-g e" . consult-compile-error)
-  ("M-g f" . consult-flymake) ;; Alternative: consult-flycheck
-  ("M-g g" . consult-goto-line) ;; orig. goto-line
-  ("M-g M-g" . consult-goto-line) ;; orig. goto-line
-  ("M-g o" . consult-outline) ;; Alternative: consult-org-heading
-  ("M-g m" . consult-mark)
-  ("M-g k" . consult-global-mark)
-  ("M-g i" . consult-imenu)
-  ("M-g I" . consult-imenu-multi)
+   ;; M-g bindings in `goto-map'
+   ;;  ("M-g e" . consult-compile-error)
+   ("M-g f" . consult-flymake) ;; Alternative: consult-flycheck
+   ("M-g g" . consult-goto-line) ;; orig. goto-line
+   ("M-g M-g" . consult-goto-line) ;; orig. goto-line
+   ("M-g o" . consult-outline) ;; Alternative: consult-org-heading
+   ("M-g m" . consult-mark)
+   ("M-g k" . consult-global-mark)
+   ("M-g i" . consult-imenu)
+   ("M-g I" . consult-imenu-multi)
 
-  ;; M-s bindings in `search-map'
-  ("M-s ." . dn--consult-line-thing-at-point)
-  ("M-s d" . consult-fd) ;; Alternative: consult-fd
-  ("M-s f" . consult-find)
-  ("M-s c" . consult-locate)
-  ("M-s g" . consult-grep)
-  ("M-s G" . consult-git-grep)
-  ("M-s r" . consult-ripgrep)
-  ("M-s L"   . consult-line-multi)
-  ("M-s k" . consult-keep-lines)
-  ("M-s u" . consult-focus-lines)
+   ;; M-s bindings in `search-map'
+   ("M-s ." . dn--consult-line-thing-at-point)
+   ("M-s d" . consult-fd) ;; Alternative: consult-fd
+   ("M-s f" . consult-find)
+   ("M-s c" . consult-locate)
+   ("M-s g" . consult-grep)
+   ("M-s G" . consult-git-grep)
+   ("M-s r" . consult-ripgrep)
+   ("M-s L"   . consult-line-multi)
+   ("M-s k" . consult-keep-lines)
+   ("M-s u" . consult-focus-lines)
 
-  ;; Isearch integration
-  ("M-s e" . consult-isearch-history)
-  :map isearch-mode-map
-  ("M-s e" . consult-isearch-history) ;; orig. isearch-edit-string
-  ("M-s l" . consult-line) ;; needed by consult-line to detect isearch # FIXME: not defined
-  ("M-s L" . consult-line-multi) ;; needed by consult-line to detect isearch
+   ;; Isearch integration
+   ("M-s e" . consult-isearch-history)
+   :map isearch-mode-map
+   ("M-s e" . consult-isearch-history) ;; orig. isearch-edit-string
+   ("M-s l" . consult-line) ;; needed by consult-line to detect isearch # FIXME: not defined
+   ("M-s L" . consult-line-multi) ;; needed by consult-line to detect isearch
 
-  ;; Minibuffer history
-  :map minibuffer-local-map
-  ("M-s" . consult-history) ;; orig. next-matching-history-element
-  ("M-r" . consult-history) ;; orig. previous-matching-history-element
-  )
+   ;; Minibuffer history
+   :map minibuffer-local-map
+   ("M-s" . consult-history) ;; orig. next-matching-history-element
+   ("M-r" . consult-history) ;; orig. previous-matching-history-element
+   )
 
- :config
- ;; Optionally configure preview. The default value
- ;; is 'any, such that any key triggers the preview.
- ;; (setq consult-preview-key 'any)
- ;; (setq consult-preview-key "M-.")
- ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
- ;; For some commands and buffer sources it is useful to configure the
- ;; :preview-key on a per-command basis using the `consult-customize' macro.
- (consult-customize
-  consult-theme
-  :preview-key
-  '(:debounce 0.2 any)
-  consult-ripgrep
-  consult-git-grep
-  consult-grep
-  consult-bookmark
-  consult-recent-file
-  consult-xref
-  consult--source-bookmark
-  consult--source-file-register
-  consult--source-recent-file
-  consult--source-project-recent-file
-  ;; :preview-key "M-."
-  :preview-key '(:debounce 0.4 any))
+  :config
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key "M-.")
+  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme
+   :preview-key
+   '(:debounce 0.2 any)
+   consult-ripgrep
+   consult-git-grep
+   consult-grep
+   consult-bookmark
+   consult-recent-file
+   consult-xref
+   consult--source-bookmark
+   consult--source-file-register
+   consult--source-recent-file
+   consult--source-project-recent-file
+   ;; :preview-key "M-."
+   :preview-key '(:debounce 0.4 any))
 
- ;; Optionally configure the narrowing key.
- ;; Both < and C-+ work reasonably well.
- (setq consult-narrow-key "<") ;; "C-+"
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  (setq consult-narrow-key "<") ;; "C-+"
 
- (setq
-  read-buffer-completion-ignore-case t
-  read-file-name-completion-ignore-case t
-  completion-ignore-case t)
- :init
- ;; Optionally configure the register formatting. This improves the register
- ;; preview for `consult-register', `consult-register-load',
- ;; `consult-register-store' and the Emacs built-ins.
- (setq
-  register-preview-delay 0.5
-  register-preview-function #'consult-register-format)
+  (setq
+   read-buffer-completion-ignore-case t
+   read-file-name-completion-ignore-case t
+   completion-ignore-case t)
+  :init
+  ;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (setq
+   register-preview-delay 0.5
+   register-preview-function #'consult-register-format)
 
- ;; Optionally tweak the register preview window.
- ;; This adds thin lines, sorting and hides the mode line of the window.
- (advice-add #'register-preview :override #'consult-register-window)
+  ;; Optionally tweak the register preview window.
+  ;; This adds thin lines, sorting and hides the mode line of the window.
+  (advice-add #'register-preview :override #'consult-register-window)
 
- ;; Use Consult to select xref locations with preview
- (setq
-  xref-show-xrefs-function #'consult-xref
-  xref-show-definitions-function #'consult-xref))
+  ;; Use Consult to select xref locations with preview
+  (setq
+   xref-show-xrefs-function #'consult-xref
+   xref-show-definitions-function #'consult-xref))
 
 
 ;; Improve the accessibility of Emacs documentation by placing
 ;; descriptions directly in your minibuffer. Give it a try:
 ;; "M-x find-file".
-(use-package
- marginalia
- :after vertico
- :ensure
- :init (marginalia-mode))
+(use-package marginalia
+  :after vertico
+  :ensure
+  :hook (after-init . marginalia-mode))
 
 (use-package wgrep
-:ensure
-:init
+  :ensure
+  :init
   (setq wgrep-auto-save-buffer t
-        wgrep-change-readonly-file t)
-  )
+        wgrep-change-readonly-file t))
 
 (use-package embark
- :ensure
- :bind
- (("C-." . embark-act) ;; pick some comfortable binding
-  ("C-;" . embark-dwim) ;; good alternative: M-.
+  :ensure
+  :bind
+  (("C-." . embark-act) ;; pick some comfortable binding
+   ("C-;" . embark-dwim) ;; good alternative: M-.
    ([remap describe-bindings] . embark-bindings))
+  :init
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
 
- :init
- ;; Optionally replace the key help with a completing-read interface
- (setq prefix-help-command #'embark-prefix-help-command)
-
- ;; Show the Embark target at point via Eldoc. You may adjust the
- ;; Eldoc strategy, if you want to see the documentation from
- ;; multiple providers. Beware that using this can be a little
- ;; jarring since the message shown in the minibuffer can be more
- ;; than one line, causing the modeline to move up and down:
-
- ;;(add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
-
-
- :config
- ;; Hide the mode line of the Embark live/completions buffers
- (add-to-list
-  'display-buffer-alist
-  '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-    nil
-    (window-parameters (mode-line-format . none)))))
+  :config
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list
+   'display-buffer-alist
+   '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+     nil
+     (window-parameters (mode-line-format . none)))))
 
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
- :ensure ; only need to install it, embark loads it after consult if found
- :hook (embark-collect-mode . consult-preview-at-point-mode)
- :bind (:map minibuffer-mode-map
-         ("C-c C-o" . embark-export))
- )
+  :ensure ; only need to install it, embark loads it after consult if found
+  :hook (embark-collect-mode . consult-preview-at-point-mode)
+  :bind (:map minibuffer-mode-map
+			  ("C-c C-o" . embark-export)))
 
 (use-package consult-eglot
   :ensure
@@ -963,14 +900,17 @@ active region is added to the search string."
   :bind (:map eglot-mode-map
               ("C-M-." . consult-eglot-symbols)))
 
-(use-package consult-eglot-embark :ensure)
+(use-package consult-eglot-embark
+  :ensure
+  :after consult-eglot
+  :config
+  (consult-eglot-embark-mode))
 
 (use-package flyspell
-  :ensure nil
   :diminish
   :if (executable-find "aspell")
   :hook (((text-mode outline-mode) . flyspell-mode)
-          (prog-mode . flyspell-prog-mode)
+         (prog-mode . flyspell-prog-mode)
          (flyspell-mode . (lambda ()
                             (dolist (key '("C-;" "C-," "C-."))
                               (unbind-key key flyspell-mode-map)))))
@@ -978,30 +918,25 @@ active region is added to the search string."
               ispell-program-name "aspell"
               ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together")))
 
-
-
 (use-package consult-flyspell
   :ensure
-   :bind ("M-g s" . consult-flyspell))
-
-(use-package consult-yasnippet
-  :ensure
-  :bind ("M-g y" . consult-yasnippet))
-
+  :bind ("M-g s" . consult-flyspell))
 
 (use-package typescript-mode :ensure)
 
 ;; Icons
 (use-package all-the-icons :ensure)
 (use-package all-the-icons-dired
- :ensure
- :after dired
- :hook (dired-mode . all-the-icons-dired-mode)
- :custom (all-the-icons-dired-monochrome nil)
-)
+  :ensure
+  :after all-the-icons dired
+  :hook (dired-mode . all-the-icons-dired-mode)
+  :custom (all-the-icons-dired-monochrome nil)
+  )
 
 ;; Automatically guess indent offsets, tab, spaces settings, etc.
-(use-package dtrt-indent :ensure)
+(use-package dtrt-indent
+  :ensure
+  :hook (prog-mode . dtrt-indent-mode))
 
 ;;; Indication of local VCS changes
 (use-package diff-hl
@@ -1017,50 +952,81 @@ active region is added to the search string."
   :after magit
   :config
   ;; Highlight on-the-fly
-  (diff-hl-flydiff-mode 1)
-
- )
+  (diff-hl-flydiff-mode 1))
 
 
 (use-package haskell-mode
-  :ensure
-  )
+  :ensure)
 
-(use-package diff-mode :ensure nil :mode "\\.patch[0-9]*\\'")
+(use-package diff-mode :mode "\\.patch[0-9]*\\'")
 
-(use-package cmake-font-lock :ensure)
+(use-package cmake-font-lock :ensure
+  :after cmake-mode)
 
 (use-package cheatsheet :ensure
   :config
   (cheatsheet-add-group 'Common
 						'(:key "C-x C-c" :description "leave Emacs")
 						'(:key "C-x C-f" :description "find file"))
-    (cheatsheet-add-group 'Editing
-						  '(:key "M-w" :description "Easy kill")
-						  '(:key "C-=" :description "Expand region")
-						  '(:key "C-x C-;" :description "Comment line")
-)
+  (cheatsheet-add-group 'Editing
+						'(:key "M-w" :description "Easy kill")
+						'(:key "C-=" :description "Expand region")
+						'(:key "C-x C-;" :description "Comment line")
+						'(:key "C-j" :description "New line and maybe indent")
+						'(:key "M-j" :description "Default newline (supports multiline comments)")
+
+						)
   (cheatsheet-add-group 'Groups
-                      '(:key "M-g" :description "Goto")
-                      '(:key "M-s" :description "Search")
-                      '(:key "C-x p" :description "Project stuff")
-                      '(:key "C-x v" :description "Version control")
-                      '(:key "C-x w" :description "Window")
-                      '(:key "C-x x" :description "buffer")
-					  )
-    (cheatsheet-add-group 'Modifiers
+						'(:key "M-g" :description "Goto")
+						'(:key "M-s" :description "Search")
+						'(:key "C-x p" :description "Project stuff")
+						'(:key "C-x v" :description "Version control")
+						'(:key "C-x w" :description "Window")
+						'(:key "C-x x" :description "buffer")
+						)
+  (cheatsheet-add-group 'Modifiers
 						'(:key "C-x 4" :description "For other window")
 						'(:key "C-x 5" :description "For other frame")
 						)
-
-
   )
 
 ;; TODO: https://github.com/redguardtoo/cpputils-cmake
 (use-package modern-cpp-font-lock :ensure :hook c++-mode-hook)
 
-(use-package google-c-style :ensure)
+(use-package google-c-style :ensure
+  :hook (c-mode-common-hook . google-set-c-style))
 
+
+(use-package tempel
+  :ensure
+  :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+         ("M-*" . tempel-insert))
+
+  :init
+
+  ;; Setup completion at point
+  (defun tempel-setup-capf ()
+    ;; Add the Tempel Capf to `completion-at-point-functions'.
+    ;; `tempel-expand' only triggers on exact matches. Alternatively use
+    ;; `tempel-complete' if you want to see all matches, but then you
+    ;; should also configure `tempel-trigger-prefix', such that Tempel
+    ;; does not trigger too often when you don't expect it. NOTE: We add
+    ;; `tempel-expand' *before* the main programming mode Capf, such
+    ;; that it will be tried first.
+    (setq-local completion-at-point-functions
+                (cons #'tempel-expand
+                      completion-at-point-functions)))
+  (add-hook 'prog-mode-hook 'tempel-setup-capf)
+  (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+  )
+
+(use-package tempel-collection :ensure)
+
+(use-package eglot-tempel
+  :ensure
+  :preface (eglot-tempel-mode)
+  :init
+  (eglot-tempel-mode t))
 
 (use-package multiple-cursors
   :ensure
@@ -1069,59 +1035,57 @@ active region is added to the search string."
    ("M-m s" . mc/mark-next-like-this-symbol)
    ("M-m w" . mc/mark-next-like-this-word))
   :init
-  (global-unset-key (kbd "M-m"))
-  )
-
-;; TODO: https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-edit.el#L299
-
-
-
+  (global-unset-key (kbd "M-m")))
 
 ;; An extremely feature-rich git client. Activate it with "C-c g".
 (use-package magit
- :ensure
- :init (require 'bind-key)
- :bind (("C-c g" . magit-status))
- :custom
- (magit-diff-refine-hunk t "Show word-granularity differences within diff hunks")
- (magit-diff-refine-ignore-whitespace t "Ignore whitespace changes in word-granularity differences")
- (magit-diff-hide-trailing-cr-characters t "Hide trailing ^M")
- (magit-repository-directories
-       '( ;; Directory containing project root directories
-         ("~/Developer" . 2)))
- )
-
-
-(use-package git-timemachine :ensure)
-(use-package git-messenger :ensure)
+  :ensure
+  :init (require 'bind-key)
+  :bind (("C-c g" . magit-status))
+  :custom
+  (magit-diff-refine-hunk t "Show word-granularity differences within diff hunks")
+  (magit-diff-refine-ignore-whitespace t "Ignore whitespace changes in word-granularity differences")
+  (magit-diff-hide-trailing-cr-characters t "Hide trailing ^M")
+  (magit-repository-directories
+   '( ;; Directory containing project root directories
+     ("~/Developer" . 2)))
+  )
 (use-package magit-lfs :ensure :after magit)
 
+(use-package project
+  :custom
+  (project-mode-line t))
+
+(use-package git-timemachine :ensure)
+
+(use-package git-messenger :ensure
+  :custom
+  (git-messenger:use-magit-popup t))
+
+
 (use-package prog-mode
-  :ensure nil
   :hook
   (prog-mode . prettify-symbols-mode)
-   (prog-mode . display-line-numbers-mode) ; Display line numbers only when in programming modes
+  (prog-mode . display-line-numbers-mode) ; Display line numbers only when in programming modes
   )
 
 (use-package magit-todos
- :ensure
- :after magit
- :config (magit-todos-mode 1))
+  :ensure
+  :after magit
+  :config (magit-todos-mode t))
 
 (use-package deadgrep :ensure)
 
-(use-package
- dash
- ;; https://github.com/magnars/dash.el
- :ensure)
+(use-package dash
+  :ensure)
 
 (use-package markdown-mode
- :ensure
- :after dash
- :mode ("README\\.md\\'" . gfm-mode)
- :init (setq markdown-command "multimarkdown")
- :bind (:map markdown-mode-map
-         ("C-c C-e" . markdown-do)))
+  :ensure
+  :after dash
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown")
+  :bind (:map markdown-mode-map
+			  ("C-c C-e" . markdown-do)))
 
 
 
@@ -1129,50 +1093,70 @@ active region is added to the search string."
 
 ;;; Pop-up completion
 (use-package corfu
- :ensure
- :custom
- (corfu-auto t)
- (corfu-cycle t)
- (corfu-auto-prefix 2)
- (corfu-preview-current nil)
- (corfu-auto-delay 0.2)
- (corfu-popupinfo-delay '(0.4 . 0.2))
- :hook ((after-init . global-corfu-mode)
-		global-corfu-mode . (corfu-popupinfo-mode corfu-history-mode corfu-echo-mode))
- )
+  :ensure
+  :custom
+  ;;(corfu-auto t "Enable auto completion")
+  (corfu-cycle t "Enable cycling for `corfu-next/previous'")
+  (corfu-quit-no-match 'separator "configure quitting")
+  (corfu-auto-prefix 3)
+  (corfu-preview-current nil)
+  (corfu-auto-delay 1.0)
+  (corfu-popupinfo-delay '(0.4 . 0.2))
+  :init
+  (global-corfu-mode)
+  (corfu-popupinfo-mode) ;  Display candidate documentation or source in a popup next to the candidate menu.
+  (corfu-history-mode) ; remembers selected candidates and sorts the candidates by their history position and frequency.
+  (corfu-echo-mode) ; displays a brief candidate documentation in the echo area.
+  :config
+  (keymap-unset corfu-map "RET") ; Free the RET key for less intrusive behavior.
+  )
+
+(use-package corfu-candidate-overlay
+  :ensure
+  :after corfu
+  :config
+  ;; enable corfu-candidate-overlay mode globally
+  ;; this relies on having corfu-auto set to nil
+  (corfu-candidate-overlay-mode +1)
+  ;; bind Ctrl + TAB to trigger the completion popup of corfu
+  (global-set-key (kbd "C-<tab>") 'completion-at-point)
+  ;; bind Ctrl + Shift + Tab to trigger completion of the first candidate
+  ;; (keybing <iso-lefttab> may not work for your keyboard model)
+  (global-set-key (kbd "C-<iso-lefttab>") 'corfu-candidate-overlay-complete-at-point))
+
 
 ;; Add extensions
 (use-package cape
- :ensure
- ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
- ;; Press C-c p ? to for help.
- :bind ("C-c p" . cape-prefix-map)
- ;; Alternative keys: M-p, M-+, ...
- ;; Alternatively bind Cape commands individually.
- ;; :bind (("C-c p d" . cape-dabbrev)
- ;;        ("C-c p h" . cape-history)
- ;;        ("C-c p f" . cape-file)
- ;;        ...)
- :init
- ;; Add to the global default value of `completion-at-point-functions' which is
- ;; used by `completion-at-point'.  The order of the functions matters, the
- ;; first function returning a result wins.  Note that the list of buffer-local
- ;; completion functions takes precedence over the global list.
- ;; REVIEW
- (add-hook 'completion-at-point-functions #'cape-dabbrev)
- (add-hook 'completion-at-point-functions #'cape-file)
- (add-hook 'completion-at-point-functions #'cape-elisp-block)
- (add-hook 'completion-at-point-functions #'cape-keyword)
- (add-hook 'completion-at-point-functions #'cape-abbrev)
- (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
- ;;(add-hook 'completion-at-point-functions #'cape-dict)
- ;; Company backends
- ;; (add-hook 'completion-at-point-functions
- ;;              (mapcar #'cape-company-to-capf
- ;;                      (list #'company-files #'company-slime)))
+  :ensure
+  ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
+  ;; Press C-c p ? to for help.
+  :bind ("C-c p" . cape-prefix-map)
+  ;; Alternative keys: M-p, M-+, ...
+  ;; Alternatively bind Cape commands individually.
+  ;; :bind (("C-c p d" . cape-dabbrev)
+  ;;        ("C-c p h" . cape-history)
+  ;;        ("C-c p f" . cape-file)
+  ;;        ...)
+  :init
+  ;; Add to the global default value of `completion-at-point-functions' which is
+  ;; used by `completion-at-point'.  The order of the functions matters, the
+  ;; first function returning a result wins.  Note that the list of buffer-local
+  ;; completion functions takes precedence over the global list.
+  ;; REVIEW
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  (add-hook 'completion-at-point-functions #'cape-keyword)
+  (add-hook 'completion-at-point-functions #'cape-abbrev)
+  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+  ;;(add-hook 'completion-at-point-functions #'cape-dict)
+  ;; Company backends
+  ;; (add-hook 'completion-at-point-functions
+  ;;              (mapcar #'cape-company-to-capf
+  ;;                      (list #'company-files #'company-slime)))
 
 
- )
+  )
 
 
 ;; TODO: https://github.com/minad/corfu/wiki
@@ -1190,26 +1174,26 @@ active region is added to the search string."
 ;;; LSP Support
 ;; tag::eglot-config[]
 (use-package eglot
- :ensure
- :hook ((prog-mode . (lambda ()
-                           (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode 'snippet-mode)
-                             (eglot-ensure))))
-            ((markdown-mode yaml-mode yaml-ts-mode) . eglot-ensure))
- :custom
- (eglot-report-progress nil "Prevent Eglot minibuffer spam")
- (eglot-extend-to-xref t "Activate Eglot in cross-referenced non-project files")
- :init
- (setq read-process-output-max (* 1024 1024)) ; 1MB
- (setq eglot-autoshutdown t
-           eglot-send-changes-idle-time 0.5)
- :config
- (setq-default eglot-workspace-configuration
-               '(:nil
-                 (:formatting
-                  (:command ["nixfmt"])
-                  :nix (:flake (:autoArchive t :autoEvalInputs t)))
-                 :gopls (:usePlaceholders t :gofumpt t)
-                 :nixd (:formatting (:command ["nixfmt"])))))
+  :ensure
+  :hook ((prog-mode . (lambda ()
+                        (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode 'snippet-mode)
+                          (eglot-ensure))))
+         ((markdown-mode yaml-mode yaml-ts-mode) . eglot-ensure))
+  :custom
+  (eglot-report-progress nil "Prevent Eglot minibuffer spam")
+  (eglot-extend-to-xref t "Activate Eglot in cross-referenced non-project files")
+  :init
+  (setq read-process-output-max (* 1024 1024)) ; 1MB
+  (setq eglot-autoshutdown t
+        eglot-send-changes-idle-time 0.5)
+  :config
+  (setq-default eglot-workspace-configuration
+				'(:nil
+                  (:formatting
+                   (:command ["nixfmt"])
+                   :nix (:flake (:autoArchive t :autoEvalInputs t)))
+                  :gopls (:usePlaceholders t :gofumpt t)
+                  :nixd (:formatting (:command ["nixfmt"])))))
 
 ;; End::eglot-config[]
 
@@ -1229,35 +1213,33 @@ active region is added to the search string."
   :ensure
   :custom
   ;; Info buffers like gud (gdb-mi)
-   (dape-buffer-window-arrangement 'gud)
-   ( dape-info-hide-mode-line nil)
+  (dape-buffer-window-arrangement 'gud)
+  ( dape-info-hide-mode-line nil)
 
-   ( dape-inlay-hints t "Showing inlay hints")
-   )
+  ( dape-inlay-hints t "Showing inlay hints")
+  )
 
 ;; Enable repeat mode for more ergonomic `dape' use
 (use-package repeat
-  :ensure nil
   :config
   (repeat-mode))
 
 ;; eldoc-box?
 (use-package eldoc
-  :ensure nil
   :diminish
   :custom
-;; Collects and displays all available documentation immediately, even if
-;; multiple sources provide it. It concatenates the results.
-(eldoc-documentation-strategy
-      'eldoc-documentation-compose-eagerly)
-;;(setq eldoc-documentation-strategy 'eldoc-documentation-compose)
-(eldoc-echo-area-use-multiline-p t)
+  ;; Collects and displays all available documentation immediately, even if
+  ;; multiple sources provide it. It concatenates the results.
+  (eldoc-documentation-strategy
+   'eldoc-documentation-compose-eagerly)
+  ;;(setq eldoc-documentation-strategy 'eldoc-documentation-compose)
+  (eldoc-echo-area-use-multiline-p t)
 
   :init (global-eldoc-mode)
   )
 
 (use-package xref
-  :ensure nil
+
   :init
   ;; Use faster search tool
   (when (executable-find "rg")
@@ -1268,10 +1250,10 @@ active region is added to the search string."
 
 
 (use-package devdocs
- :ensure
- :commands devdocs-install devdocs--available-docs
-:init
-(defconst devdocs-major-mode-docs-alist
+  :ensure
+  :commands devdocs-install devdocs--available-docs
+  :init
+  (defconst devdocs-major-mode-docs-alist
     '((c-mode          . ("c"))
       (c++-mode        . ("cpp"))
       (python-mode     . ("python~3.12" "python~2.7"))
@@ -1283,16 +1265,16 @@ active region is added to the search string."
       (julia-mode      . ("julia~1.8"))
       (js-mode         . ("javascript" "jquery"))
       (emacs-lisp-mode . ("elisp")))
-"Alist of major-mode and docs.")
-(mapc
+	"Alist of major-mode and docs.")
+  (mapc
    (lambda (mode)
      (add-hook (intern (format "%s-hook" (car mode)))
                (lambda ()
                  (setq-local devdocs-current-docs (cdr mode)))))
    devdocs-major-mode-docs-alist)
 
-(setq devdocs-data-dir (expand-file-name "devdocs" user-emacs-directory))
-(defun devdocs-dwim()
+  (setq devdocs-data-dir (expand-file-name "devdocs" user-emacs-directory))
+  (defun devdocs-dwim()
     "Look up a DevDocs documentation entry.
 
 Install the doc if it's not installed."
@@ -1313,61 +1295,61 @@ Install the doc if it's not installed."
 
     ;; Lookup the symbol at point
     (devdocs-lookup nil (thing-at-point 'symbol t)))
-)
+  )
 
 ;; Enabled inline static analysis
 (use-package flymake
-:ensure
-:diminish
-:custom
-(flymake-fringe-indicator-position 'right-fringe)
-(flymake-suppress-zero-counters t "Suppress the display of Flymake error counters when there are no errors.")
-)
+  :ensure
+  :diminish
+  :custom
+  (flymake-fringe-indicator-position 'right-fringe)
+  (flymake-suppress-zero-counters t "Suppress the display of Flymake error counters when there are no errors.")
+  )
 
 
 
 (use-package
- flymake-shellcheck
- :ensure
- :commands flymake-shellcheck-load
- :init (add-hook 'sh-mode-hook 'flymake-shellcheck-load)
- )
+  flymake-shellcheck
+  :ensure
+  :commands flymake-shellcheck-load
+  :init (add-hook 'sh-mode-hook 'flymake-shellcheck-load)
+  )
 
 
 (use-package
- flymake-ruff
- :ensure t
- :hook
- (eglot-managed-mode . flymake-ruff-load)
- ((python-mode python-ts-mode) . flymake-ruff-load))
+  flymake-ruff
+  :ensure t
+  :hook
+  (eglot-managed-mode . flymake-ruff-load)
+  ((python-mode python-ts-mode) . flymake-ruff-load))
 
 (use-package
- flymake-yamllint
- :ensure
- :hook ((yaml-mode yaml-ts-mode) . flymake-yamllint-setup))
+  flymake-yamllint
+  :ensure
+  :hook ((yaml-mode yaml-ts-mode) . flymake-yamllint-setup))
 
 ;; https://github.com/ROCKTAKEY/flymake-elisp-config
 (use-package flymake-elisp-config
   :ensure)
 (use-package
- flymake-ansible-lint
- :ensure
- :commands flymake-ansible-lint-setup
- :hook
- (((yaml-ts-mode yaml-mode) . flymake-ansible-lint-setup)
-  ;;((yaml-ts-mode yaml-mode) . flymake-mode)
-  ))
+  flymake-ansible-lint
+  :ensure
+  :commands flymake-ansible-lint-setup
+  :hook
+  (((yaml-ts-mode yaml-mode) . flymake-ansible-lint-setup)
+   ;;((yaml-ts-mode yaml-mode) . flymake-mode)
+   ))
 
 (use-package
- flymake-hadolint
- :ensure
- :config
- (add-hook 'dockerfile-mode-hook #'flymake-hadolint-setup))
+  flymake-hadolint
+  :ensure
+  :config
+  (add-hook 'dockerfile-mode-hook #'flymake-hadolint-setup))
 
 (use-package
- flymake-json
- :ensure
- :config (add-hook 'json-mode-hook 'flymake-json-load))
+  flymake-json
+  :ensure
+  :config (add-hook 'json-mode-hook 'flymake-json-load))
 
 
 (use-package dockerfile-mode :ensure)
@@ -1388,16 +1370,16 @@ Install the doc if it's not installed."
 (use-package ssh-config-mode :ensure)
 
 (use-package avy ; Jump to things in Emacs tree-style
- :ensure
- :bind (
-		("C-:"   . avy-goto-char)
-		("C-'"   . avy-goto-char-2)
-		("M-g l" . avy-goto-line)
-		("M-g w" . avy-goto-word-1)
+  :ensure
+  :bind (
+		 ("C-:"   . avy-goto-char)
+		 ("C-'"   . avy-goto-char-2)
+		 ("M-g l" . avy-goto-line)
+		 ("M-g w" . avy-goto-word-1)
          ("M-g e" . avy-goto-word-0)
-		)
- :custom (avy-all-windows 'all-frames)
- )
+		 )
+  :custom (avy-all-windows 'all-frames)
+  )
 
 (use-package go-mode
   :ensure
@@ -1406,39 +1388,29 @@ Install the doc if it's not installed."
   )
 
 (use-package
- json-snatcher
- ;; https://github.com/Sterlingg/json-snatcher
- :ensure)
+  json-snatcher
+  ;; https://github.com/Sterlingg/json-snatcher
+  :ensure)
 
 (use-package terraform-mode :ensure)
 
 (use-package
- json-mode
- :ensure
- :mode "\\.json\\'"
- :after (json-snatcher))
+  json-mode
+  :ensure
+  :mode "\\.json\\'"
+  :after (json-snatcher))
 
 (use-package
- nix-ts-mode
- :ensure
- :mode "\\.nix\\'"
- :config
- (add-to-list
-  'eglot-server-programs '((nix-ts-mode nix-mode) "nixd")))
+  nix-ts-mode
+  :ensure
+  :mode "\\.nix\\'"
+  :config
+  (add-to-list
+   'eglot-server-programs '((nix-ts-mode nix-mode) "nixd")))
 
 
 (use-package ruff-format :ensure)
 
-(use-package yasnippet
-  :diminish yas-minor-mode
- :ensure
-:hook (after-init . yas-global-mode))
-
-(use-package yasnippet-snippets :ensure)
-;; Yasnippet Completion At Point Function
-(use-package yasnippet-capf
-  :ensure
-  :init (add-to-list 'completion-at-point-functions #'yasnippet-capf))
 
 ;; Misc programming modes
 (use-package csv-mode :ensure)
