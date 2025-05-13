@@ -1079,6 +1079,13 @@ active region is added to the search string."
 (use-package dash
   :ensure)
 
+(use-package hledger-mode
+  :ensure
+  :after htmlize
+  :mode ("\\.journal\\'" "\\.hledger\\'")
+  :commands hledger-enable-reporting
+  )
+
 (use-package markdown-mode
   :ensure
   :after dash
@@ -1087,7 +1094,11 @@ active region is added to the search string."
   :bind (:map markdown-mode-map
 			  ("C-c C-e" . markdown-do)))
 
-
+;; Display ansi colors in buffer
+(require 'ansi-color)
+(defun display-ansi-colors ()
+  (interactive)
+  (ansi-color-apply-on-region (point-min) (point-max)))
 
 (use-package highlight-indentation :ensure)
 
@@ -1095,7 +1106,7 @@ active region is added to the search string."
 (use-package corfu
   :ensure
   :custom
-  ;;(corfu-auto t "Enable auto completion")
+  (corfu-auto t "Enable auto completion")
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-quit-no-match 'separator "configure quitting")
   (corfu-auto-prefix 3)
@@ -1111,18 +1122,18 @@ active region is added to the search string."
   (keymap-unset corfu-map "RET") ; Free the RET key for less intrusive behavior.
   )
 
-(use-package corfu-candidate-overlay
-  :ensure
-  :after corfu
-  :config
-  ;; enable corfu-candidate-overlay mode globally
-  ;; this relies on having corfu-auto set to nil
-  (corfu-candidate-overlay-mode +1)
-  ;; bind Ctrl + TAB to trigger the completion popup of corfu
-  (global-set-key (kbd "C-<tab>") 'completion-at-point)
-  ;; bind Ctrl + Shift + Tab to trigger completion of the first candidate
-  ;; (keybing <iso-lefttab> may not work for your keyboard model)
-  (global-set-key (kbd "C-<iso-lefttab>") 'corfu-candidate-overlay-complete-at-point))
+;; (use-package corfu-candidate-overlay
+;;   :ensure
+;;   :after corfu
+;;   :config
+;;   ;; enable corfu-candidate-overlay mode globally
+;;   ;; this relies on having corfu-auto set to nil
+;;   (corfu-candidate-overlay-mode +1)
+;;   ;; bind Ctrl + TAB to trigger the completion popup of corfu
+;;   ;;(global-set-key (kbd "C-<tab>") 'completion-at-point)
+;;   ;; bind Ctrl + Shift + Tab to trigger completion of the first candidate
+;;   ;; (keybing <iso-lefttab> may not work for your keyboard model)
+;;   (global-set-key (kbd "C-<tab>") 'corfu-candidate-overlay-complete-at-point))
 
 
 ;; Add extensions

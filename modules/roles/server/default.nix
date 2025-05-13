@@ -10,6 +10,11 @@ in
 
   options.jylhis.role.server = {
     enable = lib.mkEnableOption "This systems is used as server";
+    ports = lib.mkOption {
+      type = lib.types.listOf lib.types.int;
+      default = [ ];
+      description = "List of exposed ports";
+    };
   };
 
   config = lib.mkIf cfg.enable {

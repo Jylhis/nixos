@@ -57,8 +57,10 @@ $ nixos-rebuild switch --use-remote-sudo --flake "$(ROOT_DIR)#server" --target-h
 
 Unlock encrypted volume
 #+begin_src shell
-zfs load-key zroot/data
-zfs mount zroot/data
+  zfs load-key zroot/data
+  zfs load-key zroot/archive
+  zfs mount zroot/data
+  zfs mount zroot/archive
 #+end_src
 
 * dconf

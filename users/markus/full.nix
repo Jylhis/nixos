@@ -75,6 +75,9 @@
         config.users.groups.wheel.name # For sudo
       ];
       packages = with pkgs; [
+        hledger
+        hledger-ui
+
         yank
         rare-regex
         # General applications

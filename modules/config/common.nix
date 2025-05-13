@@ -30,6 +30,8 @@
       };
     };
 
+    hardware.enableAllFirmware = true;
+
     # Automatically connect any thunderbolt device
     services.udev.extraRules = lib.mkDefault ''ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"'';
 

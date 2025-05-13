@@ -45,6 +45,9 @@
         "nosgx"
         "i915.enable_guc=2"
       ];
+      kernel.sysctl = {
+        "i915.perf_stream_paranoid" = 0; # https://wiki.archlinux.org/title/Talk:Intel_graphics#Potential_performance_gains_via_Observation_Architecture
+      };
       initrd = {
         availableKernelModules = [
           "xhci_pci"

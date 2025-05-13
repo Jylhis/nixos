@@ -8,6 +8,11 @@
 
   config = {
 
+    manual = {
+      html.enable = true;
+      manpages.enable = true;
+    };
+
     home = {
       language = {
         address = "de_CH.UTF-8";
@@ -59,6 +64,10 @@
     };
 
     services = {
+      syncthing = {
+        enable = true;
+        tray.enable = true;
+      };
       emacs = {
         enable = true;
         defaultEditor = true;

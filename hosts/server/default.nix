@@ -4,6 +4,9 @@
   config,
   ...
 }:
+let
+  domain = "lab.tenrec-yo.ts.net";
+in
 {
   imports = [
     ./disko-config.nix
@@ -17,6 +20,18 @@
 
   jylhis = {
     role.server.enable = true;
+    role.server.ports = [
+      # config.services.paperless.port
+      # #config.services.immich.port
+      config.services.sonarr.settings.server.port
+      config.services.lidarr.settings.server.port
+      config.services.prowlarr.settings.server.port
+      config.services.readarr.settings.server.port
+      config.services.radarr.settings.server.port
+      #8096 # jellyfin
+      #(lib.toInt (builtins.head (builtins.match ".*:([0-9]+)" config.services.syncthing.guiAddress)))
+
+    ];
   };
 
   # TODO: Hetzner serial access
@@ -160,6 +175,11 @@
   # Select internationalization properties.
   i18n = {
     defaultLocale = "en_US.UTF-8";
+    supportedLocales = [
+      "en_US.UTF-8/UTF-8"
+      "fi_FI.UTF-8/UTF-8"
+      "de_CH.UTF-8/UTF-8"
+    ];
   };
 
   users.users.immich.extraGroups = [
@@ -168,31 +188,63 @@
   ];
 
   services = {
+    caddy = {
+      enable = true;
+      virtualHosts =
+        let
+          inherit domain;
+          inherit (config.jylhis.role.server) ports;
+
+          services = builtins.listToAttrs (
+            map (port: {
+              name = "${domain}:${toString (port + 1)}";
+              value = {
+                extraConfig = ''
+                  reverse_proxy :${toString port} {
+                  }
+                '';
+              };
+            }) ports
+          );
+
+        in
+        services
+        // {
+          "${domain}" = {
+            extraConfig = ''
+              handle_path /syncthing/* {
+                reverse_proxy http://localhost:${(builtins.head (builtins.match ".*:([0-9]+)" config.services.syncthing.guiAddress))} {
+                  header_up Host {upstream_hostport}
+                }
+              }
+            '';
+          };
+        };
+    };
+
     opensearch-dashboards = {
       enable = false;
-      listenAddress = "0.0.0.0";
     };
 
     paperless = {
       enable = true;
-      address = "0.0.0.0";
       consumptionDirIsPublic = true;
       settings = {
         PAPERLESS_CONSUMER_IGNORE_PATTERN = [
           ".DS_STORE/*"
           "desktop.ini"
         ];
+        PAPERLESS_URL = "https://${domain}";
         PAPERLESS_OCR_LANGUAGE = "fin+eng+fra+deu";
+        PAPERLESS_OCR_USER_ARGS = {
+          "continue_on_soft_render_error" = true;
+        };
       };
     };
 
     # NOTES
     # livebook
     # daliytxt?
-
-    # BUDGET
-    # firefly-iii
-    # actual
 
     # TOOLS
     # cyberchef
@@ -269,7 +321,6 @@
         # '';
       });
       settings = {
-        "network.host" = "0.0.0.0";
         "plugins.query.datasources.encryption.masterkey" = "2ccc9d70a449ace1a8858604"; # FIXME
       };
     };
@@ -343,6 +394,7 @@
     tailscale = {
       enable = true;
       openFirewall = true;
+      permitCertUid = config.services.caddy.user;
       authKeyFile = config.sops.secrets.tailscale_auth_key.path;
     };
 
@@ -352,22 +404,27 @@
     };
     sonarr = {
       enable = true; # port: 8989
+      settings.server.bindaddress = "127.0.0.1";
     };
     radarr = {
       enable = true; # port: 7878
+      settings.server.bindaddress = "127.0.0.1";
     };
     lidarr = {
       enable = true; # port: 8686
+      settings.server.bindaddress = "127.0.0.1";
     };
     bazarr = {
       enable = true; # port: 6767
+
     };
     prowlarr = {
       enable = true; # port: 9696
+      settings.server.bindaddress = "127.0.0.1";
     };
     readarr = {
       enable = true; # port: 8787
-
+      settings.server.bindaddress = "127.0.0.1";
     };
     jellyfin = {
       enable = true; # port: https: 8920 & http: 8096
@@ -376,7 +433,6 @@
     syncthing = {
       enable = true;
       openDefaultPorts = true;
-      guiAddress = "0.0.0.0:8384";
       settings = {
         options = {
           urAccepted = -1;
@@ -527,9 +583,6 @@
       enable = false;
       elasticsearchHosts = [ "http://127.0.0.1:9200" ];
       package = pkgs.graylog-6_0;
-      extraConfig = ''
-        	http_bind_address = 0.0.0.0:9000
-        	'';
     };
     mongodb = {
       enable = false;
@@ -547,7 +600,6 @@
         server = {
           enforce_domain = false;
           enable_gzip = true;
-          http_addr = "0.0.0.0";
         };
         security = {
           admin_user = "admin";
@@ -636,8 +688,8 @@
     ];
   };
   security = {
-    auditd.enable = true;
-    audit.enable = true;
+    auditd.enable = false;
+    audit.enable = false;
     sudo.wheelNeedsPassword = false;
     tpm2 = {
       enable = true;

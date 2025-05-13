@@ -24,6 +24,7 @@ in
       supportedLocales = [
         "en_US.UTF-8/UTF-8"
         "fi_FI.UTF-8/UTF-8"
+        "fi_FI/ISO-8859-1"
         "de_CH.UTF-8/UTF-8"
       ];
       # extraLocaleSettings = {
@@ -41,8 +42,13 @@ in
 
     documentation = lib.mkIf config.documentation.enable {
       doc.enable = true;
-      nixos.enable = true;
-      man.enable = true;
+      nixos = {
+        enable = true;
+        #includeAllModules = true;
+      };
+      man = {
+        enable = true;
+      };
       dev.enable = true;
       info.enable = true;
     };
@@ -50,6 +56,11 @@ in
     environment.systemPackages = [
       pkgs.libheif
       pkgs.libheif.out
+      # attempt to fix following errors when plugging in usb stick:
+      # .gvfsd-wsdd-wra[4217]: Failed to spawn the wsdd daemon: Failed to execute child process “wsdd” (No such file or directory)
+      # Couldn't create directory monitor on wsdd:///. Error: Automount failed: Failed to spawn the underlying wsdd daemon.
+      # Source: https://forums.linuxmint.com/viewtopic.php?p=2526298&sid=1221d1580704693bbaaf3be6de57f10c#p2526298
+      pkgs.wsdd
     ];
     environment.pathsToLink = [ "share/thumbnailers" ];
 

@@ -173,12 +173,20 @@
   ];
 
   environment = {
+    #sessionVariables.VK_ICD_FILENAMES = "/run/opengl-driver/share/vulkan/icd.d/nvidia_icd.x86_64.json";
+
     # List packages installed in system profile. To search, run:
     # $ nix search wget
     # NOTE: Install packages system wide
     systemPackages =
       with pkgs;
       [
+        # Graphics debug stuff
+        vulkan-tools
+        libva-utils
+        glxinfo
+        clinfo
+
         nix-software-center.packages.${system}.nix-software-center
         nixos-conf-editor.packages.${system}.nixos-conf-editor
         sops
@@ -229,6 +237,9 @@
   security.rtkit.enable = true;
 
   programs = {
+    nix-ld = {
+      enable = true;
+    };
     # ssh.extraConfig = ''
     #   	    Match Host lab User nix-ssh
     #             IdentitiesOnly yes
