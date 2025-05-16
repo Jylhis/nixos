@@ -1,6 +1,5 @@
 {
   self,
-  lib,
   nix-software-center,
   nixos-conf-editor,
   unstable,
@@ -159,11 +158,7 @@
     virtualbox.host.enable = true;
     containers.enable = true;
 
-    docker = {
-      enable = true;
-      enableOnBoot = true;
-      rootless.enable = lib.mkForce false; # Necessary for CDI injection, see https://github.com/NixOS/nixpkgs/issues/337873#issuecomment-2332332343
-    };
+    podman.enable = true;
   };
 
   users.users.markus.extraGroups = [
@@ -181,6 +176,7 @@
     systemPackages =
       with pkgs;
       [
+        docker-compose
         # Graphics debug stuff
         vulkan-tools
         libva-utils
