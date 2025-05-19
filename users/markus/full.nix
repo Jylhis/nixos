@@ -77,6 +77,7 @@
       packages = with pkgs; [
         hledger
         hledger-ui
+        hledger-web
 
         yank
         rare-regex

@@ -27,7 +27,6 @@
           publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUcxRmxmRW9lck1Ma1kvYTEvY0l4NTdkbGc2Z2JlcXBzeGJ6SEI4VjlYNksgcm9vdEBtYWNib29rLWFpcgo=";
           sshKey = "/etc/ssh/ssh_host_ed25519_key";
           maxJobs = 3;
-          speedFactor = 4;
           supportedFeatures = [
             "nixos-test"
             "benchmark"
@@ -38,7 +37,7 @@
         }
       ];
 
-      distributedBuilds = true;
+      distributedBuilds = false;
       settings = {
         builders-use-substitutes = true;
       };

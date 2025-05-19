@@ -3,7 +3,6 @@
   options,
   lib,
   pkgs,
-  nixpkgs,
   ...
 }:
 let
@@ -34,7 +33,10 @@ in
 
   config = lib.mkIf cfg.enable {
 
-    nix.nixPath = lib.optionals cfg.languages.nix [ "nixpkgs=${nixpkgs}" ];
+    # nix.nixPath = lib.optionals cfg.languages.nix [
+    #   "nixpkgs=${inputs.nixpkgs}"
+    #   "home-manager=${inputs.home-manager}"
+    # ];
 
     environment.systemPackages =
       (lib.optionals cfg.languages.cpp [
@@ -62,6 +64,12 @@ in
         pkgs.nixfmt-rfc-style
         pkgs.nix-ld
         pkgs.nix-output-monitor
+        pkgs.nix-init
+        pkgs.nix-melt
+        pkgs.nix-prefetch
+        pkgs.nix-tree
+        pkgs.nurl
+        pkgs.nvfetcher
       ])
       ++ (lib.optionals cfg.languages.python [
         pkgs.python3

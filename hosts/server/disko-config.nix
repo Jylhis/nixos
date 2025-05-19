@@ -141,23 +141,23 @@
           # Unencrypt after boot
           # zfs load-key zroot/archive
           # zfs mount zroot/archive
-          archive = {
-            type = "zfs_fs";
-            options = {
-              mountpoint = "/data/archive";
-              encryption = "aes-256-gcm";
-              keyformat = "passphrase";
-              keylocation = "file:///tmp/disk.key";
-              canmount = "noauto";
-              aclinherit = "passthrough";
-              dedup = "on";
-              compression = "zstd-15";
-              recordsize = "1M";
-            };
-            postCreateHook = ''
-              zfs set keylocation="prompt" zroot/data
-            '';
-          };
+          # archive = {
+          #   type = "zfs_fs";
+          #   options = {
+          #     mountpoint = "/data/archive";
+          #     encryption = "aes-256-gcm";
+          #     keyformat = "passphrase";
+          #     keylocation = "file:///tmp/disk.key";
+          #     canmount = "noauto";
+          #     aclinherit = "passthrough";
+          #     dedup = "on";
+          #     compression = "zstd-15";
+          #     recordsize = "1M";
+          #   };
+          #   postCreateHook = ''
+          #     zfs set keylocation="prompt" zroot/data
+          #   '';
+          # };
         };
       };
     };

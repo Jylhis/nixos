@@ -1,7 +1,5 @@
 {
   self,
-  nix-software-center,
-  nixos-conf-editor,
   unstable,
   pkgs,
   config,
@@ -162,7 +160,7 @@
   };
 
   users.users.markus.extraGroups = [
-    config.users.groups.docker.name
+    config.users.groups.podman.name
     config.users.groups.vboxusers.name
     config.users.groups.dialout.name # Serial console access. Used for virtualbox
   ];
@@ -183,8 +181,6 @@
         glxinfo
         clinfo
 
-        nix-software-center.packages.${system}.nix-software-center
-        nixos-conf-editor.packages.${system}.nixos-conf-editor
         sops
         age
         ssh-to-age

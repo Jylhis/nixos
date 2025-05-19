@@ -21,7 +21,7 @@ in
   jylhis = {
     role.server.enable = true;
     role.server.ports = [
-      # config.services.paperless.port
+
       # #config.services.immich.port
       config.services.sonarr.settings.server.port
       config.services.lidarr.settings.server.port
@@ -216,6 +216,13 @@ in
                 reverse_proxy http://localhost:${(builtins.head (builtins.match ".*:([0-9]+)" config.services.syncthing.guiAddress))} {
                   header_up Host {upstream_hostport}
                 }
+              }
+            '';
+          };
+          "${domain}:28982" = {
+            extraConfig = ''
+                reverse_proxy http://localhost:${toString config.services.paperless.port} {
+                  header_down Referrer-Policy "strict-origin-when-cross-origin"
               }
             '';
           };
