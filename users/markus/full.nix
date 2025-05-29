@@ -39,10 +39,6 @@
           terminal = 10;
         };
       };
-      cursor = {
-        package = pkgs.adwaita-icon-theme;
-        name = "Adwaita";
-      };
     };
 
     specialisation.night.configuration = {

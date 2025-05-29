@@ -272,16 +272,73 @@
 
 (use-package hl-line
   :hook ((after-init . global-hl-line-mode)
-         ((dashboard-mode eshell-mode shell-mode term-mode vterm-mode) .
+         ((dashboard-mode eshell-mode shell-mode term-mode vterm-mode org-mode) .
           (lambda () (setq-local global-hl-line-mode nil)))))
 
 (use-package smerge-mode
   :diminish)
 
+(use-package gnuplot
+  :ensure)
+
+(use-package org-appear
+  :ensure
+    :hook
+    (org-mode . org-appear-mode)
+    :after org)
+
+(use-package olivetti
+  :ensure
+  :hook
+  (org-mode . olivetti-mode))
+
+(use-package org-modern
+  :ensure
+  :after org
+    :hook
+    (org-mode . global-org-modern-mode)
+    :custom
+    (org-modern-keyword nil)
+    (org-modern-checkbox nil)
+    (org-modern-table nil))
+
 (use-package org
+  :custom
+  (org-hide-emphasis-markers t "Hide / around italics")
+  (org-startup-indented t)
+  ( org-pretty-entities t)
+  (org-use-sub-superscripts "{}")
+  (org-startup-with-inline-images t)
+  (org-image-actual-width '(300))
+  :config
+   (custom-theme-set-faces
+   'user
+   '(org-block ((t (:inherit fixed-pitch))))
+   '(org-code ((t (:inherit (shadow fixed-pitch)))))
+   '(org-document-info ((t (:foreground "dark orange"))))
+   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+   '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+   '(org-link ((t (:foreground "royal blue" :underline t))))
+   '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-property-value ((t (:inherit fixed-pitch))) t)
+   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
+   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+   '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
+  :hook
+  (org-mode . visual-line-mode) ; variable-pitch-mode
   :bind (
 		 ("C-c a" . org-agenda)
 		 ("C-c c" . org-capture)))
+
+(use-package org-bullets
+  :ensure
+  :after org
+  :init
+  (setq org-bullets-bullet-list
+        '("●"))
+  :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 ;; Drag stuff (lines, words, region, etc...) around
 (use-package drag-stuff
@@ -1037,6 +1094,18 @@ active region is added to the search string."
   :init
   (global-unset-key (kbd "M-m")))
 
+;; (use-package difftastic
+;;   :ensure
+;;   :defer)
+;;
+;; (use-package difftastic-bindings
+;;   :ensure difftastic ;; or nil if you prefer manual installation
+;;   :config (difftastic-bindings-mode))
+
+(use-package magit-delta
+  :ensure
+  :hook (magit-mode . magit-delta-mode))
+
 ;; An extremely feature-rich git client. Activate it with "C-c g".
 (use-package magit
   :ensure
@@ -1193,6 +1262,8 @@ active region is added to the search string."
   :custom
   (eglot-report-progress nil "Prevent Eglot minibuffer spam")
   (eglot-extend-to-xref t "Activate Eglot in cross-referenced non-project files")
+  (eglot-autoshutdown t "shutdown language server after closing last file")
+  (eglot-confirm-server-initiated-edits nil "allow edits without confirmation")
   :init
   (setq read-process-output-max (* 1024 1024)) ; 1MB
   (setq eglot-autoshutdown t
@@ -1368,11 +1439,9 @@ Install the doc if it's not installed."
 
 (use-package editorconfig
   :ensure
+  :mode (".editorconfig" . editorconfig-mode)
   :diminish
-  :hook (after-init . editorconfig-mode))
-(use-package editorconfig-generate :ensure)
-(use-package editorconfig-domain-specific :ensure)
-(use-package editorconfig-custom-majormode :ensure)
+)
 
 (use-package gitlab-ci-mode :ensure)
 

@@ -246,7 +246,6 @@
       package = unstable._1password-gui;
       polkitPolicyOwners = [
         config.users.users.markus.name
-        config.users.users.sara.name
       ];
     };
 

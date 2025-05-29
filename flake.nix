@@ -3,7 +3,7 @@
 
   inputs = {
 
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
@@ -11,19 +11,6 @@
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    srvos = {
-      url = "github:nix-community/srvos";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    deploy-rs = {
-      url = "github:serokell/deploy-rs";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        utils.follows = "flake-utils";
-      };
     };
 
     flake-parts.url = "github:hercules-ci/flake-parts";
@@ -47,10 +34,8 @@
     };
 
     stylix = {
-      url = "github:danth/stylix/release-24.11";
-      #url = "github:nix-community/stylix/release-";
+      url = "github:danth/stylix/release-25.05";
       inputs = {
-        flake-utils.follows = "flake-utils";
         flake-compat.follows = "flake-compat";
         home-manager.follows = "home-manager";
         nixpkgs.follows = "nixpkgs";
@@ -69,7 +54,7 @@
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.11";
+      url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -99,14 +84,11 @@
       nixpkgs,
       stylix,
       nixpkgs-unstable,
-      deploy-rs,
-      disko,
       emacs-overlay,
       treefmt-nix,
       home-manager,
       nixos-hardware,
-      sops-nix,
-      srvos,
+
       ...
     }@attrs:
     let
@@ -135,15 +117,12 @@
       treefmtEval = treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix;
     in
     {
-      checks =
-        (builtins.mapAttrs (_system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib)
-        // {
-          ${system} = {
-            formatting = treefmtEval.config.build.check self;
-            # TODO: disko tests
-            # TODO: nixos tests
-          };
-        };
+      checks.${system} = {
+        formatting = treefmtEval.config.build.check self;
+        # TODO: disko tests
+        # TODO: nixos tests
+
+      };
 
       # TODO emacs overlay
       packages.${system} = import ./pkgs pkgs-stable;
@@ -159,7 +138,6 @@
         pkgs.mkShellNoCC {
           buildInputs = [
             # Deployment tools
-            deploy-rs.packages.${system}.deploy-rs
             #   pkgs.nixos-anywhere
             pkgs.age
             pkgs.sops
@@ -206,7 +184,6 @@
             ./hosts/desktop
             nixos-hardware.nixosModules.common-gpu-amd
             ./users/markus/full.nix
-            ./users/sara/nixos.nix
 
           ];
         };
@@ -235,43 +212,8 @@
             ./hosts/macbook-air
             self.nixosModules.roles-nix-companion-server
             ./users/markus/full.nix
-            ./users/sara/nixos.nix
-          ];
-        };
-
-        server = nixpkgs-unstable.lib.nixosSystem {
-          inherit system;
-          specialArgs = attrs;
-
-          modules = [
-            srvos.nixosModules.server
-            srvos.nixosModules.hardware-hetzner-online-intel
-            sops-nix.nixosModules.sops
-            disko.nixosModules.disko
-            ./users/markus/nixos.nix
-            ./hosts/server
-            {
-              nixpkgs.overlays = [
-                self.overlays.by-name
-                #self.overlays.additions
-              ];
-            }
           ];
         };
       };
-
-      deploy.nodes = {
-        server = {
-          hostname = "lab";
-          sshUser = "root";
-          autoRollback = true;
-          magicRollback = true;
-          profiles.system = {
-            user = "root";
-            path = deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.server;
-          };
-        };
-      };
-
     };
 }
