@@ -16,15 +16,6 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-compat.url = "github:nix-community/flake-compat";
 
-    nixos-anywhere = {
-      url = "github:nix-community/nixos-anywhere";
-      inputs = {
-        flake-parts.follows = "flake-parts";
-        disko.follows = "disko";
-        nixos-stable.follows = "nixpkgs";
-        treefmt-nix.follows = "treefmt-nix";
-      };
-    };
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs = {
@@ -58,11 +49,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    sops-nix = {
-      url = "github:Mic92/sops-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     disko = {
       url = "github:nix-community/disko/latest";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -72,25 +58,16 @@
       url = "github:oxalica/nil";
     };
     systems.url = "github:nix-systems/default";
-    musnix = {
-      url = "github:musnix/musnix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
 
   };
   outputs =
     {
       self,
       nixpkgs,
-      stylix,
-      nixpkgs-unstable,
       emacs-overlay,
       treefmt-nix,
-      home-manager,
-      nixos-hardware,
-
       ...
-    }@attrs:
+    }:
     let
       system = "x86_64-linux";
 
@@ -104,27 +81,11 @@
         ];
       };
 
-      pkgs-unstable = import nixpkgs-unstable {
-        inherit system;
-        config.allowUnfree = true;
-        overlays = [
-          emacs-overlay.overlay
-          self.overlays.by-name
-          self.overlays.additions
-        ];
-      };
-
       treefmtEval = treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix;
     in
     {
-      checks.${system} = {
-        formatting = treefmtEval.config.build.check self;
-        # TODO: disko tests
-        # TODO: nixos tests
+      checks.${system}.formatting = treefmtEval.config.build.check self;
 
-      };
-
-      # TODO emacs overlay
       packages.${system} = import ./pkgs pkgs-stable;
 
       formatter.${system} = treefmtEval.config.build.wrapper;
@@ -157,63 +118,5 @@
       overlays = import ./overlays { inherit (nixpkgs) lib; };
       nixosModules = import ./modules;
       #homeManagerModules = import ./modules/home-manager;
-
-      nixosConfigurations = {
-        mac-mini = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = attrs // {
-            unstable = pkgs-unstable;
-          };
-          modules = [
-            self.nixosModules.config
-            home-manager.nixosModules.home-manager
-            {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-              };
-            }
-            {
-              nixpkgs.overlays = [
-                self.overlays.by-name
-                self.overlays.additions
-                emacs-overlay.overlay
-              ];
-            }
-            stylix.nixosModules.stylix
-            ./hosts/desktop
-            nixos-hardware.nixosModules.common-gpu-amd
-            ./users/markus/full.nix
-
-          ];
-        };
-        macbook-air = nixpkgs.lib.nixosSystem rec {
-          inherit system;
-          specialArgs = attrs // {
-            unstable = pkgs-unstable;
-          };
-          modules = [
-            self.nixosModules.config
-            home-manager.nixosModules.home-manager
-            {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-              };
-            }
-            {
-              nixpkgs.overlays = [
-                self.overlays.by-name
-                self.overlays.additions
-                emacs-overlay.overlay
-              ];
-            }
-            stylix.nixosModules.stylix
-            ./hosts/macbook-air
-            self.nixosModules.roles-nix-companion-server
-            ./users/markus/full.nix
-          ];
-        };
-      };
     };
 }
