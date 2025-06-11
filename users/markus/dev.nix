@@ -36,8 +36,10 @@
 
       # CLI utils
       moreutils
-      btop
+      git-open
       htop
+      git-extras
+      git-standup
 
       # Python
       python3Packages.python-lsp-server
@@ -68,7 +70,11 @@
       marksman
       # Extra stuff
       emacs-all-the-icons-fonts
+
+      # Fonts
       source-code-pro
+      etBook
+      fira-code
 
     ];
   };

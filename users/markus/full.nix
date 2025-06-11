@@ -71,6 +71,10 @@
         config.users.groups.wheel.name # For sudo
       ];
       packages = with pkgs; [
+        lnav
+        ack
+        texliveFull
+        gnuplot
         hledger
         hledger-ui
         hledger-web
@@ -106,7 +110,6 @@
 
         jetbrains.datagrip
 
-        #planify
         todoist-electron
       ];
     };

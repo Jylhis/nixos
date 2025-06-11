@@ -103,11 +103,26 @@
         };
       };
       git = {
-        # TODO: use delta package?
         enable = true;
+        difftastic = {
+          enable = false;
+          color = "auto";
+          enableAsDifftool = true;
+        };
+        delta.enable = true;
+        package = pkgs.gitFull;
         lfs = {
           enable = true;
         };
+        signing.format = "ssh";
+        # maintenance = {
+        #   # git maintenance start
+        #   enable = true;
+        #   repositories = [
+        #     "${config.home.homeDirectory}/Developer/j10s"
+        #   ];
+        # };
+
         userEmail = lib.mkForce "markus@jylhis.com";
         userName = "Jylhis";
         ignores = [
@@ -132,12 +147,37 @@
 
         ];
         extraConfig = {
+          core = {
+            untrackedcache = true;
+            fsmonitor = true;
+          };
+          merge = {
+            conflictStyle = "zdiff3";
+          };
+          rebase = {
+            updateRefs = true;
+          };
           color = {
             ui = true;
           };
+          column = {
+            ui = "auto";
+          };
+          fetch = {
+            writeCommitGraph = true;
+          };
+          branch = {
+            sort = "-committerdate";
+          };
+
           pull.rebase = true;
           diff = {
+            colorMoved = "zebra";
+            colorMovedWS = "ignore-space-at-eol";
             "sops-decrypt".textconv = "sops decrypt";
+          };
+          rerere = {
+            enabled = true;
           };
           git-agecrypt =
             if builtins.hasAttr "git-agecrypt" pkgs then
@@ -218,9 +258,23 @@
         '';
       };
 
+      btop.enable = true;
+
       bat.enable = true;
-      fzf.enable = true;
-      eza.enable = true;
+      fzf = {
+        # Keybinds:
+        # Change dir widget: ALT-C
+        # file widget: CTRL-T
+        # history widget: CTRL-R
+        enable = true;
+
+      };
+      eza = {
+        enable = true;
+        colors = "auto";
+        icons = "auto";
+        git = true;
+      };
       fd.enable = true;
       zoxide.enable = true;
       nh = {
