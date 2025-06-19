@@ -847,6 +847,10 @@ Show week numbers
     )
 
 
+(use-package terraform-mode
+  :ensure)
+
+
   (use-package dockerfile-mode :ensure)
   (use-package docker-compose-mode :ensure)
 
