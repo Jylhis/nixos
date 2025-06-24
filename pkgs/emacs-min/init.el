@@ -48,16 +48,10 @@
   (load custom-file))
 
 (use-package emacs
-  :init
-  (tool-bar-mode -1)
-  (when scroll-bar-mode
-	(scroll-bar-mode -1))
-  (menu-bar-mode -1)
-
   :custom
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
-  (tab-always-indent 'complete)
+  ;;(tab-always-indent 'complete)
 
   (enable-recursive-minibuffers t "Support opening new minibuffers from inside existing minibuffers")
   (minibuffer-prompt-properties
@@ -73,10 +67,10 @@
   ;; NOTE: the inhibit-startup-message Emacs option
   ;; cannot be set here since Emacs disallows setting it from the default
   ;; initialization file.
-  (inhibit-startup-message t "Disable startup message")
-  (inhibit-splash-screen t "Disable splash screen")
-  (initial-scratch-message nil "Disable initial scratch message")
-  (inhibit-startup-screen t "Disable initial startup screen")
+  ;;(inhibit-startup-message t "Disable startup message")
+  ;;(inhibit-splash-screen t "Disable splash screen")
+ ;; (initial-scratch-message nil "Disable initial scratch message")
+  ;;(inhibit-startup-screen t "Disable initial startup screen")
 
   ;; (set-mark-command-repeat-pop t "Repeating C-SPC after popping mark pops it again")
 
@@ -84,21 +78,21 @@
   (tab-width 4)
   (save-place-mode t "Automatically save your place in files")
 
-  (cursor-type 'bar)
+  ;;(cursor-type 'bar)
 
   (word-wrap t "Continue wrapped lines at whitespace rather than breaking in the middle of a word.")
 
-  (visible-bell nil "No blinking")
-  (ring-bell-function #'ignore "No beeping")
+  ;;visible-bell nil "No blinking")
+ ;; (ring-bell-function #'ignore "No beeping")
 
-  (sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*") ; REVIEW
-  (sentence-end-double-space nil); REVIEW
+ ;; (sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*") ; REVIEW
+ ;; (sentence-end-double-space nil); REVIEW
 
 
-  (scroll-margin 15 "Keep 15 line margin from top and bottom")
+ ;; (scroll-margin 15 "Keep 15 line margin from top and bottom")
 
-  (scroll-conservatively 10000)
-  (scroll-preserve-screen-position 1 "keep the cursor in the same position while scrolling"))
+ ;; (scroll-conservatively 10000)
+ ;; (scroll-preserve-screen-position 1 "keep the cursor in the same position while scrolling"))
 
 (use-package super-save
   :ensure t
@@ -210,19 +204,11 @@
   :custom
   (recentf-mode t "Keep track of open files"))
 
-(use-package vc-hooks
-  :custom
-  (vc-follow-symlinks t "Always follow symlinks when opening files"))
-
 ;; Show git info in dired
 (use-package dired-git-info
   :ensure
   :bind (:map dired-mode-map
 			  (")" . dired-git-info-mode)))
-
-(use-package smerge-mode
-  :diminish)
-
 ;; Drag stuff (lines, words, region, etc...) around
 (use-package drag-stuff
   :ensure
@@ -720,7 +706,7 @@ active region is added to the search string."
    ("M-m s" . mc/mark-next-like-this-symbol)
    ("M-m w" . mc/mark-next-like-this-word))
   :init
-  (global-unset-key (kbd "M-m")))
+  (global-unset-key (kbd "M-m"))) ;; TODO: use different key inding
 
 ;; An extremely feature-rich git client. Activate it with "C-c g".
 (use-package magit
@@ -740,7 +726,7 @@ active region is added to the search string."
 
 (use-package prog-mode
   :hook
-  (prog-mode . prettify-symbols-mode)
+;;  (prog-mode . prettify-symbols-mode)
   (prog-mode . display-line-numbers-mode) ; Display line numbers only when in programming modes
   )
 
