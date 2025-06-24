@@ -667,10 +667,6 @@ Show week numbers
     (setq make-backup-files nil)
     )
 
-  (use-package vc-hooks
-    :custom
-    (vc-follow-symlinks t "Always follow symlinks when opening files"))
-
 
 #+end_src
 
@@ -1458,11 +1454,11 @@ Show week numbers
     )
   (use-package magit-lfs :ensure :after magit)
 
-  (use-package git-timemachine :ensure)
+  ;; (use-package git-timemachine :ensure)
 
-  (use-package git-messenger :ensure
-    :custom
-    (git-messenger:use-magit-popup t))
+  ;; (use-package git-messenger :ensure
+  ;;  :custom
+  ;;  (git-messenger:use-magit-popup t))
 
 
   (use-package magit-todos
