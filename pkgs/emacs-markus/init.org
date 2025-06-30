@@ -8,7 +8,6 @@ Goal of this configuration is to provide everything I need for text editing/prog
 - Prefer built-in things, but if 3rd-party is clearly better, it's okay to use it, *but it should integrate well with emacs*
 - Things should work with standalone emacs and also client/server
 
-
 * Keybindings
 
 Most used stuff should be at the "root" prefix.
@@ -130,22 +129,65 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Keys.html
 ** Useful stuff
 
 - =Alt-X= execute-extended-command-for-buffer
+** menu bar
+=F10= open the menu bar
 
+=M-`= Interactive keyboard driven menu bar
 
-* Online documentation links
-https://emacsdocs.org/
+** Help
+
+=C-h C-q= Quick help
+
 
 * Questions
 - How does adaptive fill work?
-- IDO
+- FIDO
+- winner-mode
 - Icomplete
+- appt (appointment ments)
 
 * Tasks/TODO
+** Learn Info and help page navigation
 ** Learn Efficient navigation
 ** Learn Optimize autocomplete
-currently autocopmlete suggest unrelated stuff
+currently autocomplete suggest unrelated stuff
 
-* Early performance hack
+* Customize
+
+=M-x customize= displays the Customize interface and all the
+groups.
+=M-x customize-browse= opens a tree group browser. Much
+like the regular Customize interface but without the
+group descriptions.
+=M-x customize-customized= customizes
+options and faces
+that you have changed but not saved. Useful if you
+want to tweak things.
+=M-x customize-changed= displays all options changed since a
+particular Emacs version. Good way to discover new
+features and options.
+=M-x customize-face= prompts for the name of a face to
+Customize. I recommend you put your point on
+the face you want to change. It’ll fill in the name
+automatically.
+=M-x customize-group= prompts
+for a group name (e.g.,
+python) to Customize.
+
+=M-x customize-mode= customizes the major mode of your
+current buffer. You should do this for every major
+mode you use. It’s a quick way to change things and
+gain an overview of what your major mode can do.
+=M-x customize-saved= Displays all your saved options and
+faces. Extremely handy if you want to track down
+and disable errant changes.
+=M-x customize-themes= Shows a list of installed themes you
+can switch to.
+
+
+
+
+* Early stuff & performance hack
 
 #+begin_src emacs-lisp :tangle yes
   ;;; init.el --- My emacs config.	-*- lexical-binding: t -*-
@@ -166,11 +208,6 @@ currently autocopmlete suggest unrelated stuff
           gcmh-auto-idle-delay-factor 10
           gcmh-high-cons-threshold #x1000000)) ; 16MB
 
-#+end_src
-
-* Some early stuff
-#+begin_src emacs-lisp :tangle yes
-
   (use-package ffap
     :custom
     (ffap-machine-p-known 'reject)) ; Don’t attempt to ping unknown hostnames
@@ -179,13 +216,8 @@ currently autocopmlete suggest unrelated stuff
   ;; It must be set before loading `use-package'.
   (setq use-package-enable-imenu-support t)
 
+  ;; Hide minor modes from modeline
   (use-package diminish :ensure)
-  ;; REVIEW
-  ;; (use-package minions
-  ;;   :ensure nil           ; assuming installed via Nix/Emacs 30
-  ;;   :hook (after-init . minions-mode)
-  ;;   :custom (minions-mode-line-lighter "…"))  ; collapse minor modes into “…” menu
-
 
   ;; Explicitly set the prefered coding systems to avoid annoying prompt
   ;; from emacs (especially on Microsoft Windows)
@@ -211,13 +243,17 @@ currently autocopmlete suggest unrelated stuff
     (load-theme 'leuven t t)
     (load-theme 'leuven-dark t)
     (tool-bar-mode -1)
-    (menu-bar-mode -1)
+    (menu-bar-mode t)
     (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
     ;; Keymap
-    (define-key function-key-map (kbd "M-]") 'event-apply-super-modifier) ; Define Super (Meta-]) as super modifier
+    ;;(define-key function-key-map (kbd "M-]") 'event-apply-super-modifier) ; Define Super (Meta-]) as super modifier
     :bind
-    (("C-z" . nil)); Unbind C-z (prevent accidental minimize)
+    (("C-z" . nil) ; Unbind C-z (prevent accidental minimize)
+     ("C-x C-z" . nil) ; Same thing
+     ("M-o" . other-window)
+     )
     :custom
+    (blink-matching-paren-highlight-offscreen t) ;; ORGANIZE
     (inhibit-startup-screen t)
     (initial-scratch-message nil)
     (use-short-answers t "life is too short to type yes or no")
@@ -227,7 +263,7 @@ currently autocopmlete suggest unrelated stuff
      '(read-only t cursor-intangible t face minibuffer-prompt) "Do not allow the cursor in the minibuffer prompt")
 
     ;; Extra file stuff
-    ;;(create-lockfiles nil) ; REVIEW
+    (create-lockfiles nil)
 
     (inhibit-splash-screen t)
     (inhibit-startup-message t "Disable startup message")
@@ -237,8 +273,8 @@ currently autocopmlete suggest unrelated stuff
     (tab-always-indent 'complete)
     (read-buffer-completion-ignore-case t "Ignore case when reading buffer name")
 
-    (completion-ignore-case t "Don't condifer case significant in completion")
-    (delete-by-moving-to-trash t "Delete by moving to trahs in interactive mode")
+    (completion-ignore-case t "Don't consider case significant in completion")
+    (delete-by-moving-to-trash t "Delete by moving to trash in interactive mode")
     (sentence-end-double-space nil "Disable the obsolete practice of end-of-line spacing from the typewriter era.")
     (tab-width 4)
     (save-place-mode t "Automatically save your place in files")
@@ -246,11 +282,13 @@ currently autocopmlete suggest unrelated stuff
     (word-wrap t "Continue wrapped lines at whitespace rather than breaking in the middle of a word.")
     (visible-bell nil "No blinking")
     (ring-bell-function #'ignore "No beeping")
-    (sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*") ; REVIEW
-    (sentence-end-double-space nil); REVIEW
+
     (scroll-margin 15 "Keep 15 line margin from top and bottom")
     (scroll-conservatively 10000)
-    (scroll-preserve-screen-position 1 "keep the cursor in the same position while scrolling"))
+    (scroll-preserve-screen-position 1 "keep the cursor in the same position while scrolling")
+    )
+
+
 
 #+end_src
 
@@ -267,53 +305,53 @@ currently autocopmlete suggest unrelated stuff
 
 
 
-  (use-package devdocs
-    :ensure
-    :commands devdocs-install devdocs--available-docs
-    :init
-    (defconst devdocs-major-mode-docs-alist
-      '((c-mode          . ("c"))
-        (c++-mode        . ("cpp"))
-        (python-mode     . ("python~3.12" "python~2.7"))
-        (ruby-mode       . ("ruby~3.1"))
-
-        (rustic-mode     . ("rust"))
-        (css-mode        . ("css"))
-        (html-mode       . ("html"))
-        (julia-mode      . ("julia~1.8"))
-        (js-mode         . ("javascript" "jquery"))
-        (emacs-lisp-mode . ("elisp")))
-  	"Alist of major-mode and docs.")
-    (mapc
-     (lambda (mode)
-       (add-hook (intern (format "%s-hook" (car mode)))
-                 (lambda ()
-                   (setq-local devdocs-current-docs (cdr mode)))))
-     devdocs-major-mode-docs-alist)
-
-    (setq devdocs-data-dir (expand-file-name "devdocs" user-emacs-directory))
-    (defun devdocs-dwim()
-      "Look up a DevDocs documentation entry.
-
-  Install the doc if it's not installed."
-      (interactive)
-      ;; Install the doc if it's not installed
-      (mapc
-       (lambda (slug)
-         (unless (member slug (let ((default-directory devdocs-data-dir))
-                                (seq-filter #'file-directory-p
-                                            (when (file-directory-p devdocs-data-dir)
-                                              (directory-files "." nil "^[^.]")))))
-           (mapc
-            (lambda (doc)
-              (when (string= (alist-get 'slug doc) slug)
-                (devdocs-install doc)))
-            (devdocs--available-docs))))
-       (alist-get major-mode devdocs-major-mode-docs-alist))
-
-      ;; Lookup the symbol at point
-      (devdocs-lookup nil (thing-at-point 'symbol t)))
-    )
+  ;; (use-package devdocs
+  ;;   :ensure
+  ;;   :commands devdocs-install devdocs--available-docs
+  ;;   :init
+  ;;   (defconst devdocs-major-mode-docs-alist
+  ;;     '((c-mode          . ("c"))
+  ;;       (c++-mode        . ("cpp"))
+  ;;       (python-mode     . ("python~3.12" "python~2.7"))
+  ;;       (ruby-mode       . ("ruby~3.1"))
+  ;;
+  ;;       (rustic-mode     . ("rust"))
+  ;;       (css-mode        . ("css"))
+  ;;       (html-mode       . ("html"))
+  ;;       (julia-mode      . ("julia~1.8"))
+  ;;       (js-mode         . ("javascript" "jquery"))
+  ;;       (emacs-lisp-mode . ("elisp")))
+  ;; 	"Alist of major-mode and docs.")
+  ;;   (mapc
+  ;;    (lambda (mode)
+  ;;      (add-hook (intern (format "%s-hook" (car mode)))
+  ;;                (lambda ()
+  ;;                  (setq-local devdocs-current-docs (cdr mode)))))
+  ;;    devdocs-major-mode-docs-alist)
+  ;;
+  ;;   (setq devdocs-data-dir (expand-file-name "devdocs" user-emacs-directory))
+  ;;   (defun devdocs-dwim()
+  ;;     "Look up a DevDocs documentation entry.
+  ;;
+  ;; Install the doc if it's not installed."
+  ;;     (interactive)
+  ;;     ;; Install the doc if it's not installed
+  ;;     (mapc
+  ;;      (lambda (slug)
+  ;;        (unless (member slug (let ((default-directory devdocs-data-dir))
+  ;;                               (seq-filter #'file-directory-p
+  ;;                                           (when (file-directory-p devdocs-data-dir)
+  ;;                                             (directory-files "." nil "^[^.]")))))
+  ;;          (mapc
+  ;;           (lambda (doc)
+  ;;             (when (string= (alist-get 'slug doc) slug)
+  ;;               (devdocs-install doc)))
+  ;;           (devdocs--available-docs))))
+  ;;      (alist-get major-mode devdocs-major-mode-docs-alist))
+  ;;
+  ;;     ;; Lookup the symbol at point
+  ;;     (devdocs-lookup nil (thing-at-point 'symbol t)))
+  ;;   )
 
   ;; eldoc-box?
   (use-package eldoc
@@ -321,6 +359,7 @@ currently autocopmlete suggest unrelated stuff
     :custom
     ;; Collects and displays all available documentation immediately, even if
     ;; multiple sources provide it. It concatenates the results.
+    ;; REVIEW
     (eldoc-documentation-strategy
      'eldoc-documentation-compose-eagerly)
     ;;(setq eldoc-documentation-strategy 'eldoc-documentation-compose)
@@ -328,6 +367,7 @@ currently autocopmlete suggest unrelated stuff
 
     :init (global-eldoc-mode)
     )
+
   ;; Adds intellisense-style code completion at point that works great
   ;; Add extra context to Emacs documentation to help make it easier to
   ;; search and understand. This configuration uses the keybindings
@@ -352,8 +392,6 @@ currently autocopmlete suggest unrelated stuff
     :after vertico
     :ensure
     :hook (after-init . marginalia-mode))
-
-
 #+end_src
 
 * UI & UX
@@ -369,11 +407,11 @@ currently autocopmlete suggest unrelated stuff
   (cond
    ((font-available-p "Source Code Pro")
     (set-frame-font "Source Code Pro 12")))
+
+
 #+end_src
 ** Other
 #+begin_src emacs-lisp :tangle yes
-
-
   ;; Enable repeat mode for more ergonomic `dape' use
   (use-package repeat
     :config
@@ -496,13 +534,16 @@ currently autocopmlete suggest unrelated stuff
 
 
   (use-package hl-line
-    ;; REVIEW: hl-line-sticky-flag
+
+    :custom
+    (global-hl-line-sticky-flag t)
     :hook ((after-init . global-hl-line-mode)
            ((dashboard-mode eshell-mode shell-mode term-mode vterm-mode org-mode) .
             (lambda () (setq-local global-hl-line-mode nil)))))
 
 
   (use-package auto-dark
+    :diminish
     :ensure
     :after leuven-theme
     :custom
@@ -560,6 +601,7 @@ currently autocopmlete suggest unrelated stuff
   ;; auto save based on event
   ;; For built-in timer based alternative: (auto-save-visited-mode t)
   (use-package super-save
+    :diminish
     :ensure
     :custom
     (super-save-auto-save-when-idle t)
@@ -572,7 +614,17 @@ currently autocopmlete suggest unrelated stuff
   (use-package savehist
     :hook (after-init . savehist-mode))
 
+  ;; (use-package imenu
+  ;;   :bind
+  ;;   ("M-i" . imenu))
+
+  (use-package ibuffer
+    :bind
+    (([remap list-buffers] . ibuffer)))
+
 #+end_src
+
+
 
 ** Calendar
 Show week numbers
@@ -654,7 +706,7 @@ Show week numbers
 
   (use-package files
     :hook
-    (before-save . delete-trailing-whitespace)
+    ;;(before-save . delete-trailing-whitespace)
     (after-save . executable-make-buffer-file-executable-if-script-p) ; Make script file executable by default
     :custom
     (require-final-newline t "Add new line at the end of the file")
@@ -666,8 +718,6 @@ Show week numbers
     (setq auto-save-default nil)
     (setq make-backup-files nil)
     )
-
-
 #+end_src
 
 ** other
@@ -679,33 +729,33 @@ Show week numbers
   (use-package simple
     :preface
     ;; Smarter move beginning of the line
-    (defun smarter-move-beginning-of-line (arg)
-      "Move point back to indentation of beginning of line.
-
-       Move point to the first non-whitespace character on this line.
-       If point is already there, move to the beginning of the line.
-       Effectively toggle between the first non-whitespace character and
-       the beginning of the line.
-
-       If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-       point reaches the beginning or end of the buffer, stop there."
-      (interactive "^p")
-      (setq arg (or arg 1))
-      ;; Move lines first
-      (when (/= arg 1)
-        (let ((line-move-visual nil))
-          (forward-line (1- arg))))
-      (let ((orig-point (point)))
-        (back-to-indentation)
-        (when (= orig-point (point))
-          (move-beginning-of-line 1))))
+    ;; (defun smarter-move-beginning-of-line (arg)
+    ;;   "Move point back to indentation of beginning of line.
+    ;;
+    ;;    Move point to the first non-whitespace character on this line.
+    ;;    If point is already there, move to the beginning of the line.
+    ;;    Effectively toggle between the first non-whitespace character and
+    ;;    the beginning of the line.
+    ;;
+    ;;    If ARG is not nil or 1, move forward ARG - 1 lines first.  If
+    ;;    point reaches the beginning or end of the buffer, stop there."
+    ;;   (interactive "^p")
+    ;;   (setq arg (or arg 1))
+    ;;   ;; Move lines first
+    ;;   (when (/= arg 1)
+    ;;     (let ((line-move-visual nil))
+    ;;       (forward-line (1- arg))))
+    ;;   (let ((orig-point (point)))
+    ;;     (back-to-indentation)
+    ;;     (when (= orig-point (point))
+    ;;       (move-beginning-of-line 1))))
     :bind
-    ("C-a" . smarter-move-beginning-of-line)
+    ;; NOTE: USE M-m
+    ;;("C-a" . smarter-move-beginning-of-line)
     :custom
     ;; commands are hidden in normal buffers. This setting is useful beyond Vertico.
     (read-extended-command-predicate
      #'command-completion-default-include-p "Hide commands in M-x which do not work in the current mode")
-
     (kill-do-not-save-duplicates t "Remove duplicates from the kill ring to reduce clutter")
     (next-line-add-newlines nil)
     (line-number-mode t "Show line number in modeline")
@@ -722,13 +772,10 @@ Show week numbers
     (recentf-max-saved-items 50)
     (recentf-mode t "Keep track of open files"))
 
-  (use-package gnuplot
-    :ensure
-    :mode ("\\.plt\\'" . gnuplot-mode)
-    )
 #+end_src
 
 * Org-mode
+
 #+begin_src emacs-lisp :tangle yes
   (use-package org-appear
     :ensure
@@ -738,22 +785,40 @@ Show week numbers
 
   (use-package olivetti
     :ensure
+    :disabled
     :hook
-    (org-mode . olivetti-mode))
+    (org-mode . olivetti-mode)
+    :custom
+    (olivetti-body-width 100))
+
+  (use-package mermaid-mode :ensure)
+  (use-package ob-mermaid
+    :ensure
+    :after org
+    :config
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((mermaid . t)
+       (scheme . t)       ))
+    )
 
   (use-package org-modern
     :ensure
     :after org
     :hook
     (org-mode . global-org-modern-mode)
-    :custom
-    (org-modern-keyword nil)
-    (org-modern-checkbox nil)
-    (org-modern-table nil))
+    ;;:custom
+    ;;(org-modern-keyword nil)
+    ;;(org-modern-checkbox nil)
+    ;;(org-modern-table nil)
+    )
+
+
 
   ;; TODO: Define org-agenda-files
   (use-package org
     :custom
+    (org-html-html5-fancy t)
     (org-hide-emphasis-markers t)
     (org-startup-indented t)
     (org-pretty-entities t)
@@ -783,8 +848,8 @@ Show week numbers
      '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
     :hook (org-mode . visual-line-mode)
     :bind (
-  		 ("C-c a" . org-agenda)
-  		 ("C-c c" . org-capture)))
+      	 ("C-c a" . org-agenda)
+      	 ("C-c c" . org-capture)))
 
 #+end_src
 
@@ -796,10 +861,14 @@ Show week numbers
 
 #+end_src
 
-* Programming modes
+* Major modes
 
 #+begin_src emacs-lisp :tangle yes
 
+  (use-package gnuplot
+    :ensure
+    :mode ("\\.plt\\'" . gnuplot-mode)
+    )
 
   (use-package markdown-mode
     :ensure
@@ -809,11 +878,11 @@ Show week numbers
     :init (setq markdown-command "multimarkdown")
     :hook (markdown-mode . visual-line-mode)
     :bind (:map markdown-mode-map
-  			  ("C-c C-e" . markdown-do)))
+      		  ("C-c C-e" . markdown-do)))
 
-(use-package dtrt-indent
-  :ensure
-  :hook (prog-mode . dtrt-indent-mode))
+  (use-package dtrt-indent
+    :ensure
+    :hook (prog-mode . dtrt-indent-mode))
 
 
   (use-package prog-mode
@@ -836,15 +905,13 @@ Show week numbers
 
   (use-package conf-mode
     :mode
-    (
-     ("/.dockerignore\\'" . conf-unix-mode)
+    (("/.dockerignore\\'" . conf-unix-mode)
      ("/.gitignore\\'" . conf-unix-mode)
-     )
-    )
+     ))
 
 
-(use-package terraform-mode
-  :ensure)
+  (use-package terraform-mode
+    :ensure)
 
 
   (use-package dockerfile-mode :ensure)
@@ -865,7 +932,7 @@ Show week numbers
 
 
 
-  ;;;;; Web
+      ;;;;; Web
   (use-package
     web-mode
     :ensure
@@ -898,8 +965,7 @@ Show week numbers
   (use-package go-mode
     :ensure  )
 
-  (use-package
-    nix-ts-mode
+  (use-package nix-ts-mode
     :ensure
     :mode "\\.nix\\'"
     :config
@@ -934,101 +1000,101 @@ Show week numbers
   ;; details: https://elpa.gnu.org/packages/vertico.html. The short and
   ;; sweet of it is that you search for commands with "M-x do-thing" and
   ;; the minibuffer will show you a filterable list of matches.
- (use-package vertico
+  (use-package vertico
     ;; builtin alternative: fido-vertical-mode icomplete-vertical
-  :ensure
-  :bind (:map vertico-map
-			  ("RET" . vertico-directory-enter)
-			  ("DEL" . vertico-directory-delete-char)
-			  ("M-DEL" . vertico-directory-delete-word))
-  :custom
-  (vertico-count 15)
-  (vertico-cycle t)
-  (read-buffer-completion-ignore-case t)
-  (read-file-name-completion-ignore-case t)
-  :init (vertico-mode))
+    :ensure
+    :bind (:map vertico-map
+  			  ("RET" . vertico-directory-enter)
+  			  ("DEL" . vertico-directory-delete-char)
+  			  ("M-DEL" . vertico-directory-delete-word))
+    :custom
+    (vertico-count 15)
+    (vertico-cycle t)
+    (read-buffer-completion-ignore-case t)
+    (read-file-name-completion-ignore-case t)
+    :init (vertico-mode))
 
-;; ;; Use `consult-completion-in-region' if Vertico is enabled.
-;; ;; Otherwise use the default `completion--in-region' function.
-(setq completion-in-region-function
-      (lambda (&rest args)
-        (apply (if vertico-mode
-                   #'consult-completion-in-region
-                 #'completion--in-region)
-               args)))
+  ;; ;; Use `consult-completion-in-region' if Vertico is enabled.
+  ;; ;; Otherwise use the default `completion--in-region' function.
+  (setq completion-in-region-function
+        (lambda (&rest args)
+          (apply (if vertico-mode
+                     #'consult-completion-in-region
+                   #'completion--in-region)
+                 args)))
 
-(use-package orderless
-  :ensure
-  :custom
-  (  completion-styles '(substring orderless basic))
-  (  completion-category-overrides
-	 '((file (styles partial-completion)) ;; partial-completion is tried first
-       ;; enable initialism by default for symbols
-       (command (styles +orderless-with-initialism))
-       (variable (styles +orderless-with-initialism))
-       (symbol (styles +orderless-with-initialism))
-       (eglot (styles orderless))
-       (eglot-capf (styles orderless))))
-  (  orderless-component-separator #'orderless-escapable-split-on-space "allow escaping space with backslash!")
-  (  orderless-style-dispatchers (list #'+orderless-consult-dispatch #'orderless-affix-dispatch))
-  :config
-  (defun +orderless--consult-suffix ()
-	"Regexp which matches the end of string with Consult tofu support."
-	(if (and (boundp 'consult--tofu-char)
-             (boundp 'consult--tofu-range))
-		(format "[%c-%c]*$"
-				consult--tofu-char
-				(+ consult--tofu-char consult--tofu-range -1))
-      "$"))
-
-
-  ;; Recognizes the following patterns:
-  ;; * .ext (file extension)
-  ;; * regexp$ (regexp matching at end)
-  (defun +orderless-consult-dispatch (word _index _total)
-	(cond
-     ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
-     ((string-suffix-p "$" word)
-      `(orderless-regexp
-		.
-		,(concat (substring word 0 -1) (+orderless--consult-suffix))))
-     ;; File extensions
-     ((and (or minibuffer-completing-file-name
-               (derived-mode-p 'eshell-mode))
-           (string-match-p "\\`\\.." word))
-      `(orderless-regexp
-		.
-		,(concat
-          "\\." (substring word 1) (+orderless--consult-suffix))))))
-
-  ;;FIXME
-
-  ;; Define orderless style with initialism by default
-  (orderless-define-completion-style
-	  +orderless-with-initialism
-	(orderless-matching-styles
-	 '(orderless-initialism orderless-literal orderless-regexp))))
+  (use-package orderless
+    :ensure
+    :custom
+    (  completion-styles '(substring orderless basic))
+    (  completion-category-overrides
+  	 '((file (styles partial-completion)) ;; partial-completion is tried first
+         ;; enable initialism by default for symbols
+         (command (styles +orderless-with-initialism))
+         (variable (styles +orderless-with-initialism))
+         (symbol (styles +orderless-with-initialism))
+         (eglot (styles orderless))
+         (eglot-capf (styles orderless))))
+    (  orderless-component-separator #'orderless-escapable-split-on-space "allow escaping space with backslash!")
+    (  orderless-style-dispatchers (list #'+orderless-consult-dispatch #'orderless-affix-dispatch))
+    :config
+    (defun +orderless--consult-suffix ()
+  	"Regexp which matches the end of string with Consult tofu support."
+  	(if (and (boundp 'consult--tofu-char)
+               (boundp 'consult--tofu-range))
+  		(format "[%c-%c]*$"
+  				consult--tofu-char
+  				(+ consult--tofu-char consult--tofu-range -1))
+        "$"))
 
 
+    ;; Recognizes the following patterns:
+    ;; * .ext (file extension)
+    ;; * regexp$ (regexp matching at end)
+    (defun +orderless-consult-dispatch (word _index _total)
+  	(cond
+       ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
+       ((string-suffix-p "$" word)
+        `(orderless-regexp
+  		.
+  		,(concat (substring word 0 -1) (+orderless--consult-suffix))))
+       ;; File extensions
+       ((and (or minibuffer-completing-file-name
+                 (derived-mode-p 'eshell-mode))
+             (string-match-p "\\`\\.." word))
+        `(orderless-regexp
+  		.
+  		,(concat
+            "\\." (substring word 1) (+orderless--consult-suffix))))))
 
-(defun consult--orderless-regexp-compiler (input type &rest _config)
-  (setq input (cdr (orderless-compile input)))
-  (cons
-   (mapcar (lambda (r) (consult--convert-regexp r type)) input)
-   (lambda (str) (orderless--highlight input t str))))
+    ;;FIXME
 
-(setq consult--regexp-compiler #'consult--orderless-regexp-compiler)
+    ;; Define orderless style with initialism by default
+    (orderless-define-completion-style
+  	  +orderless-with-initialism
+  	(orderless-matching-styles
+  	 '(orderless-initialism orderless-literal orderless-regexp))))
+
+
+
+  (defun consult--orderless-regexp-compiler (input type &rest _config)
+    (setq input (cdr (orderless-compile input)))
+    (cons
+     (mapcar (lambda (r) (consult--convert-regexp r type)) input)
+     (lambda (str) (orderless--highlight input t str))))
+
+  (setq consult--regexp-compiler #'consult--orderless-regexp-compiler)
 
 
   (use-package avy ; Jump to things in Emacs tree-style
     :ensure
     :bind (
-   		 ("C-:"   . avy-goto-char)
-   		 ("C-'"   . avy-goto-char-2)
-   		 ("M-g l" . avy-goto-line)
-   		 ("M-g w" . avy-goto-word-1)
+     		 ("C-:"   . avy-goto-char)
+     		 ("C-'"   . avy-goto-char-2)
+     		 ("M-g l" . avy-goto-line)
+     		 ("M-g w" . avy-goto-word-1)
            ("M-g e" . avy-goto-word-0)
-   		 )
+     		 )
     :custom (avy-all-windows 'all-frames)
     )
 
@@ -1098,12 +1164,11 @@ Show week numbers
      ("M-g o" . consult-outline) ;; Alternative: consult-org-heading
      ("M-g m" . consult-mark)
      ("M-g k" . consult-global-mark)
-     ("M-g i" . consult-imenu)
+     ("M-i" . consult-imenu)
      ("M-g I" . consult-imenu-multi)
 
      ;; M-s bindings in `search-map'
-     ;;("M-s ." . dn--consult-line-thing-at-point)
-     ("M-s d" . consult-fd) ;; Alternative: consult-fd
+     ("M-s d" . consult-fd)
      ("M-s f" . consult-find)
      ("M-s c" . consult-locate)
      ("M-s g" . consult-grep)
@@ -1216,7 +1281,7 @@ Show week numbers
     :after (embark consult)
     :hook (embark-collect-mode . consult-preview-at-point-mode)
     :bind (:map minibuffer-mode-map
-      		  ("C-c C-o" . embark-export)))
+        		  ("C-c C-o" . embark-export)))
 
   (use-package consult-eglot
     :ensure
@@ -1231,36 +1296,7 @@ Show week numbers
     (consult-eglot-embark-mode))
 
 
-  (use-package cheatsheet :ensure
-    :disabled
-    :config
-    (cheatsheet-add-group 'Common
-      					'(:key "C-x C-c" :description "leave Emacs")
-      					'(:key "C-x C-f" :description "find file"))
-    (cheatsheet-add-group 'Editing
-      					'(:key "M-w" :description "Easy kill")
-      					'(:key "C-=" :description "Expand region")
-      					'(:key "C-x C-;" :description "Comment line")
-      					'(:key "C-j" :description "New line and maybe indent")
-      					'(:key "M-j" :description "Default newline (supports multiline comments)")
-
-      					)
-    (cheatsheet-add-group 'Groups
-      					'(:key "M-g" :description "Goto")
-      					'(:key "M-s" :description "Search")
-      					'(:key "C-x p" :description "Project stuff")
-      					'(:key "C-x v" :description "Version control")
-      					'(:key "C-x w" :description "Window")
-      					'(:key "C-x x" :description "buffer")
-      					)
-    (cheatsheet-add-group 'Modifiers
-      					'(:key "C-x 4" :description "For other window")
-      					'(:key "C-x 5" :description "For other frame")
-      					)
-    )
-
-
-  ;;; Pop-up completion
+    ;;; Pop-up completion
   (use-package corfu
     :ensure
     :custom
@@ -1305,7 +1341,6 @@ Show week numbers
 
 
   (use-package xref
-
     :init
     ;; Use faster search tool
     (when (executable-find "rg")
@@ -1363,11 +1398,8 @@ Show week numbers
   (use-package multiple-cursors
     :ensure
     :bind
-    (("M-m e" . mc/edit-lines)
-     ("M-m s" . mc/mark-next-like-this-symbol)
-     ("M-m w" . mc/mark-next-like-this-word))
-    :init
-    (global-unset-key (kbd "M-m")))
+    (("C->" . mc/mark-next-like-this)
+     ("C-<" . mc/mark-previous-like-this)       ))
 
 
   (use-package expand-region
@@ -1448,9 +1480,6 @@ Show week numbers
     (magit-diff-refine-hunk t "Show word-granularity differences within diff hunks")
     (magit-diff-refine-ignore-whitespace t "Ignore whitespace changes in word-granularity differences")
     (magit-diff-hide-trailing-cr-characters t "Hide trailing ^M")
-    (magit-repository-directories
-     '( ;; Directory containing project root directories
-       ("~/Developer" . 2)))
     )
   (use-package magit-lfs :ensure :after magit)
 
@@ -1466,9 +1495,6 @@ Show week numbers
     :after magit
     :config (magit-todos-mode t))
 
-
-  (use-package smerge-mode
-    :diminish    )
 
 #+end_src
 
@@ -1604,10 +1630,7 @@ Show week numbers
 
 #+end_src
 
-* Other stuff
-
-
-
+* To organize
 #+begin_src emacs-lisp :tangle yes
   (use-package hledger-mode
     :ensure
@@ -1619,13 +1642,15 @@ Show week numbers
 
   (use-package vterm
     ;; REVIEW(alternative): EAT (Emacs Advanced Terminal)
-    :ensure) ; Terminal inside emacs
+    :ensure)
 
 
   (use-package apropos
     :custom
     (apropos-do-all t) ; Enhance `apropos' and related functions to perform more extensive searches
     )
+  (use-package sr-speedbar
+    :ensure)
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
