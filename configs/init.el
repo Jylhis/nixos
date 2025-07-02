@@ -694,6 +694,7 @@
   (vertico-mode))
 
 (use-package orderless
+  :ensure
   :custom
   ;; Configure a custom style dispatcher (see the Consult wiki)
   ;; (orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch))
