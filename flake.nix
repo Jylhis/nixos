@@ -1,37 +1,31 @@
 {
-  description = "Jylhis personal flake";
+  description = "A home-manager template providing useful tools & settings for Nix-based development";
 
   inputs = {
+    # Principle inputs (updated by `nix run .#update`)
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable"; # github:nixos/nixpkgs/nixos-25.05
+    nix-darwin.url = "github:LnL7/nix-darwin";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager.url = "github:nix-community/home-manager"; # github:nix-community/home-manager/release-25.05
+    systems.url = "github:nix-systems/default";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    nixos-unified.url = "github:srid/nixos-unified";
 
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # Software inputs
+    nix-index-database.url = "github:nix-community/nix-index-database";
+    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
+    nixvim.url = "github:nix-community/nixvim";
+    nixvim.inputs.nixpkgs.follows = "nixpkgs";
+    nixvim.inputs.flake-parts.follows = "flake-parts";
 
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    emacs-overlay.url = "github:nix-community/emacs-overlay";
+    stylix.url = "github:danth/stylix"; # github:danth/stylix/release-25.05
+    pkgs-by-name-for-flake-parts.url = "github:drupol/pkgs-by-name-for-flake-parts";
 
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    flake-compat.url = "github:nix-community/flake-compat";
-
-    emacs-overlay = {
-      url = "github:nix-community/emacs-overlay";
-      inputs = {
-        nixpkgs-stable.follows = "nixpkgs";
-        nixpkgs.follows = "nixpkgs-unstable";
-      };
-    };
-
-    stylix = {
-      url = "github:danth/stylix/release-25.05";
-      inputs = {
-        flake-compat.follows = "flake-compat";
-        home-manager.follows = "home-manager";
-        nixpkgs.follows = "nixpkgs";
-        systems.follows = "systems";
-      };
     };
 
     tinted-schemes = {
@@ -39,84 +33,14 @@
       flake = false;
     };
 
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-      inputs.systems.follows = "systems";
-    };
-
-    home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    disko = {
-      url = "github:nix-community/disko/latest";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nil-lsp = {
-      url = "github:oxalica/nil";
-    };
-    systems.url = "github:nix-systems/default";
-
   };
+
+  # TODO: https://flake.parts/overlays.html?highlight=packages#consuming-an-overlay
+  # Wired using https://nixos-unified.org/autowiring.html
   outputs =
-    {
-      self,
-      nixpkgs,
-      emacs-overlay,
-      treefmt-nix,
-      ...
-    }:
-    let
-      system = "x86_64-linux";
-
-      pkgs-stable = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-        overlays = [
-          emacs-overlay.overlay
-          self.overlays.by-name
-          self.overlays.additions
-        ];
-      };
-
-      treefmtEval = treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix;
-    in
-    {
-      checks.${system}.formatting = treefmtEval.config.build.check self;
-
-      packages.${system} = import ./pkgs pkgs-stable;
-
-      formatter.${system} = treefmtEval.config.build.wrapper;
-
-      apps.${system} = import ./apps nixpkgs.legacyPackages.${system};
-
-      devShells.${system}.default =
-        let
-          pkgs = pkgs-stable;
-        in
-        pkgs.mkShellNoCC {
-          buildInputs = [
-            # Deployment tools
-            #   pkgs.nixos-anywhere
-            pkgs.age
-            pkgs.sops
-            pkgs.ssh-to-age
-            pkgs.git-agecrypt
-
-            # Other tools
-            pkgs.dconf2nix
-
-            # SEC
-            pkgs.vulnix
-            pkgs.sbomnix
-
-          ];
-        };
-
-      overlays = import ./overlays { inherit (nixpkgs) lib; };
-      nixosModules = import ./modules;
-      #homeManagerModules = import ./modules/home-manager;
+    inputs:
+    inputs.nixos-unified.lib.mkFlake {
+      inherit inputs;
+      root = ./.;
     };
 }
