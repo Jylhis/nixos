@@ -13,10 +13,10 @@
   # https://nixos.asia/en/git
   programs = {
     git = {
+      enable = true;
       delta.enable = lib.mkDefault true;
       package = lib.mkDefault pkgs.gitFull;
       lfs.enable = lib.mkDefault true;
-      enable = true;
       userName = config.me.fullname;
       userEmail = config.me.email;
       ignores = lib.mkDefault [
@@ -40,6 +40,10 @@
         ".netrwhist"
 
       ];
+
+      aliases = {
+        pclean = "clean --exclude='**/.dir-locals-2.el' --exclude='**/.envrc.private' --exclude='.pre-commit-config.yaml' -dxf";
+      };
 
       extraConfig = {
         init.defaultBranch = lib.mkDefault "main";

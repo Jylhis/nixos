@@ -1,4 +1,9 @@
-{ pkgs, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 {
   # Nix packages to install to $HOME
   #
@@ -30,14 +35,34 @@
     # Better `cat`
     bat.enable = true;
     # Type `<ctrl> + r` to fuzzy search your shell history
+    # Keybinds:
+    # Change dir widget: ALT-C
+    # file widget: CTRL-T
+    # history widget: CTRL-R
     fzf.enable = true;
     jq.enable = true;
     # Install btop https://github.com/aristocratos/btop
     btop.enable = true;
-    # Tmate terminal sharing.
-    tmate = {
+
+    eza = {
       enable = true;
-      #host = ""; #In case you wish to use a server other than tmate.io
+      colors = "auto";
+      icons = "auto";
+      git = true;
     };
+    zoxide.enable = true;
+    fd.enable = true;
+    nh = {
+      enable = true;
+      flake = lib.mkDefault config.me.flakePath;
+    };
+    ripgrep = {
+      enable = true;
+      arguments = lib.mkDefault [
+        "--smart-case"
+        # --type-add 'foo:*.foo'
+      ];
+    };
+
   };
 }
