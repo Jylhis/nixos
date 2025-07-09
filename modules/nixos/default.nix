@@ -35,9 +35,7 @@
         "flakes"
         "ca-derivations"
       ];
-      trusted-users = [
-        "@${config.users.groups.wheel.name}"
-      ];
+
       substituters = [
         "https://nix-community.cachix.org"
         "https://jylhis-nixos.cachix.org"

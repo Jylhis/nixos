@@ -1,0 +1,188 @@
+
+#+title: Markus Emacs configuration
+#+author: Jylhis
+#+TODO: Learn(r) Bug(r) InProgress(i) | Done(d)
+
+Goal of this configuration is to provide everything I need for text editing/programming.
+
+- Prefer built-in things, but if 3rd-party is clearly better, it's okay to use it, *but it should integrate well with emacs*
+- Things should work with standalone emacs and also client/server
+
+* Keybindings
+
+Most used stuff should be at the "root" prefix.
+Each prefix should have category that make sense.
+
+To list personal keybinding: =describe-personal-keybindings=
+and to list all keybindings: =Ctrl-h b= (=describe-bindings=)
+
+NOTE: Universal-argument: =ctrl-u=
+
+https://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Keys.html
+
+** Built-in prefixes
+- Help: =Ctrl-h=
+- mode specific: =Ctrl-c=
+- goto: =Alt-g=
+- search: =Alt-s=
+- tab: =Ctrl-x t=
+- ctrl-x: =Ctrl-x=
+- project specific: =p=
+- Version control: =v=
+- window: =w=
+- buffer: =x=
+- =CTRL-x-4 4= (often do action for other-window)
+- =CTRL-x-5 5= (often do action for other-frame):
+
+
+** General Useful Keybindings
+
+- =Ctrl-s= consult-line
+- =Ctrl-c m= consult-man
+- =Ctrl-c i= consult-info
+- =Ctrl-x b= consult-buffer
+- =Ctrl-x 5 b= consult-buffer-other-frame
+- =Ctrl-x p b= consult-project-buffer
+- =Ctrl-x r b= consult-bookmark
+- =Alt-y= consult-yank-pop
+- =Alt-g f= consult-flymake
+- =Alt-g Alt-g= consult-goto-line
+- =Alt-g m= consult-mark
+- =Alt-g k= consult-global-mark
+- =Alt-g i= consult-imenu
+- =Alt-s .= dn--consult-line-thing-at-point
+- =Alt-s d= consult-fd
+- =Ctrl-c Ctrl-d= helpful-at-point
+- =Alt-s f= consult-find
+- =Alt-s c= consult-locate
+- =Alt-s g= consult-grep
+- =Alt-s G= consult-git-grep
+- =Alt-s r= consult-ripgrep
+- =Alt-s k= consult-keep-lines
+- =Alt-s u= consult-focus-lines
+- =Ctrl-.= embark-act
+- =Ctrl-;= embark-dwim
+- =Ctrl-c g= magit-status
+- =Ctrl-== er/expand-region
+
+
+** buffers, windows, tabs & frames
+- =Ctrl-x Ctrl-b=		list-buffers
+- =Ctrl-x b=		consult-buffer
+- =Ctrl-x 0=		delete-window
+- =Ctrl-x 1=		delete-other-windows
+- =Ctrl-x 2=		split-window-below
+- =Ctrl-x 3=		split-window-right
+- =Ctrl-x k=		kill-buffer
+- =Ctrl-x o=		other-window
+- =Ctrl-x {=		shrink-window-horizontally
+- =Ctrl-x }=		enlarge-window-horizontally
+- =Ctrl-x Ctrl-<left>=	previous-buffer
+- =Ctrl-x Ctrl-<right>=	next-buffer
+- =Ctrl-x <left>=	previous-buffer
+- =Ctrl-x <right>=	next-buffer
+- =Ctrl-x Ctrl-+=		text-scale-adjust
+- =Ctrl-x Ctrl--=		text-scale-adjust
+- =Ctrl-x Ctrl-0=		text-scale-adjust
+
+** filesystem
+
+- =Ctrl-x Ctrl-d=		list-directory
+- =Ctrl-x d=		dired
+- =Ctrl-x Ctrl-j=		dired-jump
+- =Ctrl-x Ctrl-f=		find-file
+- =Ctrl-x Ctrl-w=		write-file
+- =Ctrl-x Ctrl-s=		save-buffer
+- =Ctrl-x [=		backward-page
+- =Ctrl-x ]=		forward-page
+- =Alt-s c=		consult-locate
+- =Alt-s d=		consult-fd
+- =Alt-s f=		consult-find
+
+
+** Text editing
+
+- =Ctrl-x Ctrl-;=		comment-line
+- =Alt-;=			comment-dwim
+- =Ctrl-x i=		insert-file
+- =Ctrl-x u=		undo
+- =Ctrl-/=		undo
+- =Alt-j=			default-indent-new-line
+- =Alt-u=			upcase-word
+
+** file/content navigation
+
+- =Alt-,=			xref-go-back
+- =Alt-.=			xref-find-definitions
+- =Alt-?=			xref-find-references
+- =Ctrl-Alt-.=			xref-find-apropos
+- =Alt-s G=		consult-git-grep
+- =Alt-s g=		consult-grep
+- =Alt-s r=		consult-ripgrep
+- =Alt-s L=		consult-line-multi
+- =Alt-g i=		consult-imenu
+- =Alt-g g=		consult-goto-line
+- =Alt-g k=		consult-global-mark
+- =Alt-g m=		consult-mark
+- =Alt-g o=		consult-outline
+
+** Useful stuff
+
+- =Alt-X= execute-extended-command-for-buffer
+** menu bar
+=F10= open the menu bar
+
+=M-`= Interactive keyboard driven menu bar
+
+** Help
+
+=C-h C-q= Quick help
+
+
+* Questions
+- How does adaptive fill work?
+- FIDO
+- winner-mode
+- Icomplete
+- appt (appointment ments)
+
+* Tasks/TODO
+** Learn Info and help page navigation
+** Learn Efficient navigation
+** Learn Optimize autocomplete
+currently autocomplete suggest unrelated stuff
+
+* Customize
+
+=M-x customize= displays the Customize interface and all the
+groups.
+=M-x customize-browse= opens a tree group browser. Much
+like the regular Customize interface but without the
+group descriptions.
+=M-x customize-customized= customizes
+options and faces
+that you have changed but not saved. Useful if you
+want to tweak things.
+=M-x customize-changed= displays all options changed since a
+particular Emacs version. Good way to discover new
+features and options.
+=M-x customize-face= prompts for the name of a face to
+Customize. I recommend you put your point on
+the face you want to change. It’ll fill in the name
+automatically.
+=M-x customize-group= prompts
+for a group name (e.g.,
+python) to Customize.
+
+=M-x customize-mode= customizes the major mode of your
+current buffer. You should do this for every major
+mode you use. It’s a quick way to change things and
+gain an overview of what your major mode can do.
+=M-x customize-saved= Displays all your saved options and
+faces. Extremely handy if you want to track down
+and disable errant changes.
+=M-x customize-themes= Shows a list of installed themes you
+can switch to.
+
+
+

@@ -1,4 +1,4 @@
-{ config, ... }:
+{ lib, config, ... }:
 {
   programs = {
     # on macOS, you probably don't need this
@@ -96,11 +96,11 @@
     fd.enable = true;
     nh = {
       enable = true;
-      flake = config.me.flakePath;
+      flake = lib.mkDefault config.me.flakePath;
     };
     ripgrep = {
       enable = true;
-      arguments = [
+      arguments = lib.mkDefault [
         "--smart-case"
         # --type-add 'foo:*.foo'
       ];

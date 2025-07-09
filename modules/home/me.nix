@@ -15,6 +15,9 @@
         type = lib.types.str;
         description = "Your email for use in Git config";
       };
+      publicKeys = lib.mkOption {
+        type = lib.types.lisOf lib.types.str;
+      };
 
       # TODO: Move to different namespace?
       flakePath = lib.mkOption {

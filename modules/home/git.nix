@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 {
   home.shellAliases = {
     g = "git";
@@ -8,21 +13,36 @@
   # https://nixos.asia/en/git
   programs = {
     git = {
-      delta.enable = true;
-      package = pkgs.gitFull;
-      lfs.enable = true;
+      delta.enable = lib.mkDefault true;
+      package = lib.mkDefault pkgs.gitFull;
+      lfs.enable = lib.mkDefault true;
       enable = true;
       userName = config.me.fullname;
       userEmail = config.me.email;
-      ignores = [
+      ignores = lib.mkDefault [
         "*~"
-        "*.swp"
+        # Emacs
+        "\#*\#"
+        "*.elc"
+        ".\#*"
+        # Org-mode
+        ".org-id-locations"
+        "*_archive"
+        # Intellij
+        "*.iml"
+        "*.ipr"
+        "*.iws"
+        ".idea/"
+        # VIM
+        ".*.s[a-w][a-z]"
+        "*.un~"
+        "Session.vim"
+        ".netrwhist"
+
       ];
-      aliases = {
-        ci = "commit";
-      };
+
       extraConfig = {
-        init.defaultBranch = "main";
+        init.defaultBranch = lib.mkDefault "main";
         core = {
           untrackedcache = true;
           fsmonitor = true;

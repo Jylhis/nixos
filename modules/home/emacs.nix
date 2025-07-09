@@ -1,8 +1,8 @@
-{ config, lib, ... }:
+{ lib, ... }:
 {
   home = {
     file = {
-      ".config/emacs/init.el".source = config.lib.file.mkOutOfStoreSymlink ../../configs/init.el;
+      ".config/emacs/init.el".source = ../../sources/emacs/init.el;
     };
     shellAliases = {
       emc = "emacsclient -t";
