@@ -447,10 +447,7 @@
 
 (use-package nix-ts-mode
     :ensure
-    :mode "\\.nix\\'"
-    :init
-    (add-to-list
-     'eglot-server-programs '((nix-ts-mode nix-mode) "nixd")))
+    :mode "\\.nix\\'")
 
 ;; (use-package csv-mode :ensure)
 (use-package cmake-mode :ensure
