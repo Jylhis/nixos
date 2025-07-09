@@ -13,7 +13,7 @@
     };
     _1password-gui = {
       enable = true;
-      package = pkgs._1password-gui;
+      package = lib.mkDefault pkgs._1password-gui;
       polkitPolicyOwners = lib.mkDefault config.myusers;
     };
   };
