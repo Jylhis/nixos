@@ -1,14 +1,20 @@
-{ pkgs, config, ... }:
 {
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+{
+
   programs = {
     _1password = {
       enable = true;
-      package = pkgs._1password-cli;
+      package = lib.mkDefault pkgs._1password-cli;
     };
     _1password-gui = {
       enable = true;
       package = pkgs._1password-gui;
-      polkitPolicyOwners = config.myusers;
+      polkitPolicyOwners = lib.mkDefault config.myusers;
     };
   };
 }

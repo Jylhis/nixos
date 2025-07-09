@@ -5,9 +5,6 @@
   ...
 }:
 {
-  imports = [
-    ./users.nix
-  ];
   security.rtkit.enable = true; # TODO: What is this?
   programs.nix-ld.enable = true;
   hardware = {
@@ -17,40 +14,25 @@
     };
     bluetooth.enable = true;
   };
-  nix.daemonCPUSchedPolicy = "idle";
+  #nix.daemonCPUSchedPolicy = "idle";
 
   # TODO: Organize
 
+  services.earlyoom.enable = true;
   boot.plymouth.theme = lib.mkIf config.boot.plymouth.enable (lib.mkDefault "breeze");
   boot.kernelParams = [ "mitigations=off" ];
   time.timeZone = lib.mkDefault "Europe/Zurich";
   i18n = {
-    defaultLocale = "en_US.UTF-8";
+    defaultLocale = "en_GB.UTF-8";
     supportedLocales = [
       "all"
     ];
-    # extraLocaleSettings = {
-    #   LC_ADDRESS = "en_US.UTF-8";
-    #   LC_IDENTIFICATION = "de_CH.UTF-8";
-    #   LC_MEASUREMENT = "de_CH.UTF-8";
-    #   LC_MONETARY = "de_CH.UTF-8";
-    #   LC_NAME = "de_CH.UTF-8";
-    #   LC_NUMERIC = "de_CH.UTF-8";
-    #   LC_PAPER = "de_CH.UTF-8";
-    #   LC_TELEPHONE = "de_CH.UTF-8";
-    #   LC_TIME = "de_CH.UTF-8";
-    # };
   };
 
-  documentation = lib.mkIf config.documentation.enable {
+  documentation = {
     doc.enable = true;
-    nixos = {
-      enable = true;
-      #includeAllModules = true;
-    };
-    man = {
-      enable = true;
-    };
+    nixos.enable = true;
+    man.enable = true;
     dev.enable = true;
     info.enable = true;
   };
@@ -73,8 +55,10 @@
     "de"
     "fr"
   ];
+
   # REVIEW: Is this needed?
   services.udev.extraRules = lib.mkDefault ''ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"'';
+
   environment.gnome.excludePackages =
     lib.optionals config.services.xserver.desktopManager.gnome.enable
       [
