@@ -736,6 +736,14 @@
 ;;                    :preview-key "M-.")
 
 
+(use-package zoxide
+  :ensure
+  :bind
+  ("M-g z" . zoxide-find-file)
+  ("M-g M-z" . zoxide-find-file)
+  :hook
+  (find-file . zoxide-add)
+  )
 
 ;; (use-package dired
 ;;   ;; REVIEW(package): diredfl, peep-dired, dired-narrow
