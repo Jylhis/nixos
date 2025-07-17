@@ -4,7 +4,7 @@
 }:
 (emacsWithPackagesFromUsePackage {
   package = emacs;
-  config = ../configs/init.el;
+  config = ../sources/emacs/init.el;
   defaultInitFile = true;
   extraEmacsPackages =
     epkgs: with epkgs; [
