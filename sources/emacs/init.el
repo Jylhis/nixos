@@ -770,4 +770,6 @@
   :bind
   ("M-g z" . zoxide-find-file)
   ("M-g M-z" . zoxide-find-file)
+  :hook
+  (find-file . zoxide-add)
   )
