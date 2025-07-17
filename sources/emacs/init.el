@@ -37,19 +37,6 @@
   (ffap-machine-p-known 'reject)) ; Don’t attempt to ping unknown hostnames
 
 
-;; Garbage Collector Magic Hack
-(use-package gcmh
-  :ensure
-  :diminish
-  :init
-  (gcmh-mode t)
-  (setq gcmh-idle-delay 'auto
-        gcmh-auto-idle-delay-factor 10
-        gcmh-high-cons-threshold #x1000000)) ; 16MB
-
-
-
-
 (use-package emacs
   :custom
   ;;   (scroll-margin 15 "Keep 15 line margin from top and bottom")
@@ -81,6 +68,8 @@
    ("C-z" . nil)
    ("C-x C-z" . nil)
    ("M-o" . other-window)
+   ("M-p" . scroll-down-line)
+   ("M-n" . scroll-up-line)
    )
   :init
   (load-theme 'leuven t t)
@@ -288,8 +277,7 @@
                 (with-selected-frame frame (auto-dark-mode 1))))))
 
 (use-package all-the-icons
-  :ensure
-  :if (display-graphic-p))
+  :ensure)
 
 (use-package all-the-icons-completion
   :ensure
@@ -321,6 +309,7 @@
   (super-save-auto-save-when-idle t)
   (super-save-remote-files nil)
   (super-save-silent t)
+  (save-delete-trailing-whitespace 'except-current-line)
   :config
   (super-save-mode 1))
 
@@ -381,7 +370,7 @@
   :ensure
   :diminish
   :autoload drag-stuff-define-keys
-  :hook (after-init . drag-stuff-global-mode)
+  :hook ((text-mode prog-mode) . drag-stuff-mode)
   :config
   (add-to-list 'drag-stuff-except-modes 'org-mode)
   (drag-stuff-define-keys))
@@ -492,15 +481,16 @@
 (use-package magit
   :ensure
   :bind (("C-c g" . magit-status))
-  ;;  :custom
-  ;; (magit-diff-refine-hunk t "Show word-granularity differences within diff hunks")
-  ;; (magit-diff-refine-ignore-whitespace t "Ignore whitespace changes in word-granularity differences")
-  ;; (magit-diff-hide-trailing-cr-characters t "Hide trailing ^M")
+   :custom
+   (magit-diff-refine-hunk t "Show word-granularity differences within diff hunks")
+   (magit-diff-refine-ignore-whitespace t "Ignore whitespace changes in word-granularity differences")
+   (magit-diff-hide-trailing-cr-characters t "Hide trailing ^M")
   )
 
-(use-package magit-delta
-  :ensure
-  :hook (magit-mode . magit-delta-mode))
+;; Disable due to: https://github.com/dandavison/magit-delta/issues/9
+;; (use-package magit-delta
+;;   :ensure
+;;   :hook (magit-mode . magit-delta-mode))
 
 (use-package treesit-auto
   :ensure
@@ -741,25 +731,23 @@
    (dired-omit-verbose nil)
    (dired-recursive-copies 'always)
    (dired-recursive-deletes 'top)
-;;   (dired-vc-rename-file t)
+   (dired-vc-rename-file t)
 ;;   (image-dired-thumb-size 150)
-;;   (dired-omit-files
-;;    (concat
-;;     "\\`[.]?#\\|\\`[.][.]?\\'"
-;;     "\\|\\(?:\\.js\\)?\\.meta\\'"
-;;     "\\|\\.\\(?:elc|a\\|o\\|pyc\\|pyo\\|swp\\|class\\)\\'"
-;;     "\\|^\\.DS_Store\\'"
-;;     "\\|^\\.\\(?:svn\\|git\\)\\'"
-;;     "\\|^\\.ccls-cache\\'"
-;;     "\\|^__pycache__\\'"
-;;     "\\|^\\.project\\(?:ile\\)?\\'"
-;;     "\\|^flycheck_.*"
-;;     "\\|^flymake_.*"))
+    (dired-omit-files
+     (concat
+      "\\`[.]?#\\|\\`[.][.]?\\'"
+      ;; Syncthing
+      "\\|^[a-zA-Z0-9]\\.syncthing-enc\\'"
+      "\\|^\\.stfolder\\'"
+      "\\|^\\.stversions\\'"
+      ;; Python
+      "\\|^__pycache__\\'"
+      ))
    )
 
-;; (use-package dired-x
-;;   :after dired
-;;   :hook (dired-mode . dired-omit-mode))
+(use-package dired-x
+  :after dired
+  :hook (dired-mode . dired-omit-mode))
 
 ;; (use-package dired-hacks-utils
 ;;   :ensure
@@ -777,3 +765,9 @@
 ;;   (show-paren-when-point-inside-paren t)
 ;;   )
 
+(use-package zoxide
+  :ensure
+  :bind
+  ("M-g z" . zoxide-find-file)
+  ("M-g M-z" . zoxide-find-file)
+  )
