@@ -7,17 +7,19 @@
   ];
 
   perSystem =
-    { system, ... }:
+    { system, config, ... }:
     {
+      pkgsDirectory = ../../packages;
       _module.args.pkgs = import inputs.nixpkgs {
         inherit system;
         overlays = [
-          inputs.self.overlays.default
+          (_final: _prev: {
+            local = config.packages;
+          })
           inputs.emacs-overlay.overlays.emacs
           #				inputs.emacs-overlays.emacs
         ];
       };
-      pkgsDirectory = ../../packages;
     };
 
   flake = {

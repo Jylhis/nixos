@@ -17,6 +17,7 @@
       delta.enable = lib.mkDefault true;
       package = lib.mkDefault pkgs.gitFull;
       lfs.enable = lib.mkDefault true;
+
       userName = config.me.fullname;
       userEmail = config.me.email;
       ignores = lib.mkDefault [

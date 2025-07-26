@@ -5,6 +5,9 @@
   ...
 }:
 {
+  imports = [
+    ./users.nix
+  ];
   security.rtkit.enable = true; # TODO: What is this?
   programs.nix-ld.enable = true;
   hardware = {
@@ -14,7 +17,7 @@
     };
     bluetooth.enable = true;
   };
-  #nix.daemonCPUSchedPolicy = "idle";
+  nix.daemonCPUSchedPolicy = "idle";
 
   # TODO: Organize
 
@@ -45,6 +48,17 @@
     # Couldn't create directory monitor on wsdd:///. Error: Automount failed: Failed to spawn the underlying wsdd daemon.
     # Source: https://forums.linuxmint.com/viewtopic.php?p=2526298&sid=1221d1580704693bbaaf3be6de57f10c#p2526298
     pkgs.wsdd
+
+    # Documentation
+    pkgs.man-pages
+    pkgs.man-pages-posix
+    pkgs.linux-doc
+    pkgs.devhelp
+    #    pkgs.devdocs-desktop
+    pkgs.zeal
+    #    pkgs.wikiman
+    pkgs.manix
+    pkgs.xorg-docs
   ];
   environment.pathsToLink = [ "share/thumbnailers" ];
 
@@ -58,18 +72,5 @@
 
   # REVIEW: Is this needed?
   services.udev.extraRules = lib.mkDefault ''ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"'';
-
-  environment.gnome.excludePackages =
-    lib.optionals config.services.xserver.desktopManager.gnome.enable
-      [
-        pkgs.epiphany
-        pkgs.geary
-        pkgs.gnome-maps
-        pkgs.gnome-music
-        pkgs.gnome-weather
-        pkgs.rhythmbox
-        pkgs.totem
-        pkgs.gnome-tour
-      ];
 
 }

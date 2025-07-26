@@ -6,10 +6,10 @@
   ...
 }:
 {
-  imports = [
-    #    flake.inputs.self.nixosModules.common
-  ];
-  services.openssh.enable = true;
+  services = {
+    openssh.enable = true;
+    earlyoom.enable = true;
+  };
 
   # TODO: organize stuff to sub folders
   boot.loader.systemd-boot.configurationLimit = lib.mkIf config.boot.loader.systemd-boot.enable (
@@ -23,12 +23,15 @@
       randomizedDelaySec = lib.mkDefault "45m";
     };
 
+    optimise.automatic = true;
+
     settings = {
       download-attempts = lib.mkDefault 2;
       connect-timeout = lib.mkDefault 5;
       fallback = lib.mkDefault true;
       tarball-ttl = lib.mkDefault 604800;
       keep-outputs = lib.mkDefault true;
+      download-buffer-size = "256M";
       experimental-features = [
         "nix-command"
         "flakes"

@@ -10,6 +10,7 @@
   # Search for packages here: https://search.nixos.org/packages
   home.packages = with pkgs; [
     omnix
+    just
 
     # Unix tools
     ripgrep # Better `grep`

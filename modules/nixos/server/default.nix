@@ -6,6 +6,10 @@
   ...
 }:
 {
+
+  imports = [
+    ./users.nix
+  ];
   config = {
     boot.growPartition = true;
 
