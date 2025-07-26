@@ -72,8 +72,8 @@
    ("M-n" . scroll-up-line)
    )
   :init
-  (load-theme 'leuven t t)
-  (load-theme 'leuven-dark t)
+  (load-theme 'leuven t)
+  (load-theme 'leuven-dark t t)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)  
   )
@@ -115,6 +115,7 @@
   :config
   (copy-face 'font-lock-constant-face 'calendar-iso-week-face)
   (set-face-attribute 'calendar-iso-week-face nil :height 0.7)
+  (setq calendar-week-start-day 1)
   (setq calendar-intermonth-text
         '(propertize (format "%2d" (car (calendar-iso-from-absolute
                                          (calendar-absolute-from-gregorian (list month day year)))))
@@ -212,8 +213,25 @@
   (treesit-font-lock-level 4)
   )
 
+(use-package elisp-mode
+  :dash "Emacs_Lisp"
+  )
+
 
 ;; QOL stuff
+
+(use-package dash-docs
+  :ensure
+  :custom
+  (dash-docs-docsets-path "~/.local/share/Zeal/Zeal/docsets/")
+  )
+
+(use-package consult-dash
+  :bind (("M-s d" . consult-dash))
+  :after dash-docs
+  :config
+  ;; Use the symbol at point as initial search term
+  (consult-customize consult-dash :initial (thing-at-point 'symbol)))
 
 (use-package avy 
   :ensure
@@ -262,19 +280,6 @@
 (use-package rainbow-delimiters
   :ensure
   :hook((lisp-mode emacs-lisp-mode) . rainbow-delimiters-mode))
-
-(use-package auto-dark
-  :diminish
-  :ensure
-  :after leuven-theme
-  :custom
-  (auto-dark-themes '((leuven-dark) (leuven)))
-  :config
-  (auto-dark-mode 1)
-  (add-hook 'after-make-frame-functions
-            (lambda (frame)
-              (when (display-graphic-p frame)
-                (with-selected-frame frame (auto-dark-mode 1))))))
 
 (use-package all-the-icons
   :ensure)
@@ -419,6 +424,7 @@
  )
 
 (use-package haskell-mode
+  :dash "Haskell"
   :ensure
   )
 
@@ -441,6 +447,7 @@
   :ensure
   )
 (use-package go-mode
+  :dash (go-ts-mode "Go")
   :ensure  )
 
 
@@ -450,6 +457,7 @@
 
 ;; (use-package csv-mode :ensure)
 (use-package cmake-mode :ensure
+  :dash "CMake"
   :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
 (use-package mermaid-mode :ensure)
 (use-package yaml-mode :ensure)
