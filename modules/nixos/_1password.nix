@@ -6,7 +6,7 @@
 }:
 {
   imports = [
-    ./desktop/users.nix
+    ./users.nix
   ];
   config = {
 

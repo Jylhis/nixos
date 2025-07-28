@@ -5,9 +5,6 @@
   ...
 }:
 {
-  imports = [
-    ./users.nix
-  ];
   security.rtkit.enable = true; # TODO: What is this?
   programs.nix-ld.enable = true;
   hardware = {
@@ -53,12 +50,15 @@
     pkgs.man-pages
     pkgs.man-pages-posix
     pkgs.linux-doc
+    pkgs.linux-manual
+    pkgs.clang-manpages
+    pkgs.stdmanpages
     pkgs.devhelp
     #    pkgs.devdocs-desktop
     pkgs.zeal
     #    pkgs.wikiman
     pkgs.manix
-    pkgs.xorg-docs
+    # pkgs.xorg-docs
   ];
   environment.pathsToLink = [ "share/thumbnailers" ];
 
