@@ -13,6 +13,8 @@
       };
     };
 
+#   TODO: programs.emacs.package = self.packages.emacsJ
+
     services = {
       emacs = {
         enable = lib.mkDefault true;

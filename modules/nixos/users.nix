@@ -1,13 +1,13 @@
 # List of users for darwin or nixos system and their top-level configuration.
 {
-  flake,
-  pkgs,
   lib,
+  pkgs,
   config,
+  self,
   ...
 }:
 let
-  inherit (flake.inputs) self;
+
   mapListToAttrs =
     m: f:
     lib.listToAttrs (
@@ -19,7 +19,7 @@ let
 in
 {
   options = {
-    home-manager.enable = lib.mkEnableOption "home-manager manager users";
+   
     myusers = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       description = "List of usernames";
@@ -53,14 +53,18 @@ in
       }
     );
 
-    home-manager = lib.mkIf config.home-manager.enable {
-      useGlobalPkgs = true;
-      useUserPackages = true;
-      # Enable home-manager for our user
-      users = mapListToAttrs config.myusers (name: {
-        imports = [ (self + /configurations/home/${name}.nix) ];
-      });
-    };
+    # home-manager = {
+    #   useGlobalPkgs = true;
+    #   useUserPackages = true;
+    #   # Enable home-manager for our user
+    #   # users = mapListToAttrs config.myusers (name: {
+    #   #   imports =
+    #   #     let
+    #   #       pathToDefault = self + /configurations/home/${name}.nix;
+    #   #     in
+    #   #     lib.optionals (builtins.pathExists pathToDefault) [ pathToDefault ];
+    #   # });
+    # };
 
     # All users can add Nix caches.
     nix.settings.trusted-users = [
