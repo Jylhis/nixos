@@ -1,5 +1,4 @@
-_:
-{
+_: {
   programs = {
     ccache.enable = true;
     nix-ld.enable = true;

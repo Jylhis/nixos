@@ -1,8 +1,7 @@
-{ config, ... }:
+{ config, lib, ... }:
 {
   # https://nixos.asia/en/direnv
-  programs.direnv = {
-    enable = true;
+  programs.direnv = lib.mkIf config.programs.direnv.enable {
     silent = true;
     nix-direnv = {
       enable = true;

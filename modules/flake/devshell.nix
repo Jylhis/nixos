@@ -3,14 +3,18 @@
     { pkgs, ... }:
     {
       devShells.default = pkgs.mkShellNoCC {
-        name = "nixos-unified-template-shell";
+        name = "jylhis-devshell";
         meta.description = "Shell environment for modifying this Nix configuration";
         packages = with pkgs; [
           just
           nixd
-
-          # Other tools
-          dconf2nix
+          # Deployment tools
+          deploy-rs
+          #   pkgs.nixos-anywhere
+          age
+          sops
+          ssh-to-age
+          git-agecrypt
 
           # SEC
           vulnix

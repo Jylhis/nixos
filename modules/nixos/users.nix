@@ -7,6 +7,7 @@
   ...
 }:
 let
+  inherit (flake.inputs) self;
   mapListToAttrs =
     m: f:
     lib.listToAttrs (
@@ -18,15 +19,23 @@ let
 in
 {
   options = {
+    home-manager.enable = lib.mkEnableOption "home-manager manager users";
     myusers = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       description = "List of usernames";
+      defaultText = "All users under ./configuration/users are included by default";
+      default =
+        let
+          dirContents = builtins.readDir (self + /configurations/home);
+          fileNames = builtins.attrNames dirContents; # Extracts keys: [ "jylhis.nix" ]
+          regularFiles = builtins.filter (name: dirContents.${name} == "regular") fileNames; # Filters for regular files
+          baseNames = map (name: builtins.replaceStrings [ ".nix" ] [ "" ] name) regularFiles; # Removes .nix extension
+        in
+        baseNames;
     };
   };
 
   config = {
-    # For home-manager to work.
-    # https://github.com/nix-community/home-manager/issues/4026#issuecomment-1565487545
     users.users = mapListToAttrs config.myusers (
       name:
       lib.optionalAttrs pkgs.stdenv.isDarwin {
@@ -34,24 +43,24 @@ in
       }
       // lib.optionalAttrs pkgs.stdenv.isLinux {
         isNormalUser = true;
-        openssh.authorizedKeys.keys = config.home-manager.users.${name}.me.publicKeys;
+        openssh.authorizedKeys.keys =
+          let
+            pathToKey = self + /secrets/${name}.pub;
+          in
+          config.home-manager.users.${name}.me.publicKeys
+            or (lib.optionals (builtins.pathExists pathToKey) [ pathToKey ]);
 
-        # openssh.authorizedKeys.keyFiles =
-        # let
-        #   pathToKey = self + /secrets/${name}.pub;
-        # in
-        # lib.optionals (builtins.pathExists pathToKey) [ pathToKey ];
       }
     );
 
-    home-manager = {
+    home-manager = lib.mkIf config.home-manager.enable {
       useGlobalPkgs = true;
       useUserPackages = true;
+      # Enable home-manager for our user
+      users = mapListToAttrs config.myusers (name: {
+        imports = [ (self + /configurations/home/${name}.nix) ];
+      });
     };
-    # Enable home-manager for our user
-    home-manager.users = mapListToAttrs config.myusers (_name: {
-      # imports = [ (self + /configurations/home/${name}.nix) ];
-    });
 
     # All users can add Nix caches.
     nix.settings.trusted-users = [

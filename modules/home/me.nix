@@ -17,6 +17,7 @@
       };
       publicKeys = lib.mkOption {
         type = lib.types.listOf lib.types.str;
+        default = [ ];
       };
 
       # TODO: Move to different namespace?

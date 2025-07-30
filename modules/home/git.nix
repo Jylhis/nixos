@@ -12,8 +12,7 @@
 
   # https://nixos.asia/en/git
   programs = {
-    git = {
-      enable = true;
+    git = lib.mkIf config.programs.git.enable {
       delta.enable = lib.mkDefault true;
       package = lib.mkDefault pkgs.gitFull;
       lfs.enable = lib.mkDefault true;

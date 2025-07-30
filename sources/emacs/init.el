@@ -4,6 +4,9 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
+;; https://github.com/svaante/dape?tab=readme-ov-file#performance
+(setq gc-cons-threshold most-positive-fixnum)
+(setq read-process-output-max (* 1024 1024)) ; 1MB
 
 ;; Ideas:
 ;; https://github.com/mohkale/compile-multi
@@ -78,6 +81,11 @@
   (scroll-bar-mode -1)  
   )
 
+(use-package window
+  :custom
+  ;; Prefer side by side splitting
+  (split-width-threshold 170)
+  (split-height-threshold nil))
 
 (use-package which-key
   :diminish
@@ -280,6 +288,19 @@
 (use-package rainbow-delimiters
   :ensure
   :hook((lisp-mode emacs-lisp-mode) . rainbow-delimiters-mode))
+
+;; (use-package auto-dark
+;;   :diminish
+;;   :ensure
+;;   :after leuven-theme
+;;   :custom
+;;   (auto-dark-themes '((leuven-dark) (leuven)))
+;;   :config
+;;   (auto-dark-mode 1)
+;;   (add-hook 'after-make-frame-functions
+;;             (lambda (frame)
+;;               (when (display-graphic-p frame)
+;;                 (with-selected-frame frame (auto-dark-mode 1))))))
 
 (use-package all-the-icons
   :ensure)
@@ -519,9 +540,20 @@
   (flymake-suppress-zero-counters t "Suppress the display of Flymake error counters when there are no errors.")
   )
 
+(use-package gdb-mi
+  :custom
+  (gdb-many-windows t)
+  (gdb-show-main t)
+  (gdb-debuginfod-en)
+  (gdb-debuginfod-enable-setting t)
+  )
+
 ;; REVIEW: https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-dap.el#L36
 (use-package dape
   :ensure
+  :config
+  (dape-breakpoint-global-mode)
+  (add-hook 'dape-compile-hook 'kill-buffer)
   :custom
   ;; Info buffers like gud (gdb-mi)
   (dape-buffer-window-arrangement 'gud)
@@ -537,8 +569,7 @@
                           (eglot-ensure))))
          ((markdown-mode yaml-mode yaml-ts-mode) . eglot-ensure))
   :init
-  ;; REVIEW: Working/needed?
-  (setq read-process-output-max (* 1024 1024)) ; 1MB
+
   (setq eglot-autoshutdown t
         eglot-send-changes-idle-time 0.5)
   :custom

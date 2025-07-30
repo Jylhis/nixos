@@ -1,8 +1,13 @@
-_: {
+{ lib, config, ... }:
+{
+  home.shellAliases = {
+    open = "xdg-open";
+    tree = "eza -T";
+  };
   programs = {
     # on macOS, you probably don't need this
-    bash = {
-      enable = true;
+    bash = lib.mkIf config.programs.bash.enable {
+
       enableCompletion = true;
       enableVteIntegration = true;
       historyControl = [
@@ -67,8 +72,7 @@ _: {
         	    '';
     };
     #  };
-    readline = {
-      enable = true;
+    readline = lib.mkIf config.programs.readline.enable {
       bindings = {
         # Up and down arrows search through the history for the characters before the cursor
         "\\e[A" = "history-search-backward";

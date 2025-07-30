@@ -1,101 +1,77 @@
 {
   emacs,
+  pkgs,
 }:
 emacs.pkgs.withPackages (
   epkgs: with epkgs; [
-
-    # # Tree sitter
-    tree-sitter-langs
-    treesit-grammars.with-all-grammars
-    treesit-auto
-    #
-    # # QOL Nix
-    pretty-sha-path
-    #
-    # # From config
-    gcmh
-    diminish
-
     all-the-icons
     all-the-icons-completion
     all-the-icons-dired
-    wgrep
-    breadcrumb
-    rainbow-delimiters
-    auto-dark
-    super-save
-    # dired-hacks-utils
-    # dired-git-info
-    # fd-dired
-    #
-    # # Org-mode
-    org-appear
-    mermaid-mode
-    # ob-mermaid
-    org-modern
-    # htmlize
-    #
-    # # Major modes
-    gnuplot
-    markdown-mode
-    dtrt-indent
-    # google-c-style
-    haskell-mode
-    terraform-mode
-    dockerfile-mode
-    docker-compose-mode
-    # web-mode
-    adoc-mode
-    go-mode
-    nix-ts-mode
-    # ruff-format
-    csv-mode
-    cmake-mode
-    gitlab-ci-mode
     ansible
-    ssh-config-mode
-    # yaml-mode
-    # protobuf-mode
-    #
-    #
-    helpful
-    marginalia
-    vertico
-    orderless
-    # avy
-    # goto-chg
-    direnv
+    auto-dark
+    avy
+    awk-ts-mode
+    bitbake-ts-mode
+    breadcrumb
+    cape
+    cmake-mode
     consult
-    embark
-    embark-consult
     consult-eglot
     consult-eglot-embark
-    corfu
-    cape
-    # eglot-tempel
-    # tempel-collection
-    multiple-cursors
-    expand-region
-    vundo
-    # easy-kill
-    drag-stuff
-    diff-hl
-    hl-todo
-    magit-delta
-    magit
-    # magit-lfs
-    # magit-todos
-    treesit-fold
-    dape
-    # flymake-ruff
-    # flymake-yamllint
-    # flymake-elisp-config
-    # flymake-ansible-lint
-    # flymake-hadolint
-    # flymake-json
     consult-flyspell
-    # hledger-mode
-    vterm
+    corfu
+    csv-mode
+    dash-docs
+    consult-dash
+    dape
+    devicetree-ts-mode
+    diff-hl
+    diminish
+    direnv
+    docker-compose-mode
+    dockerfile-mode
+    drag-stuff
+    dtrt-indent
+    embark
+    embark-consult
+    expand-region
+    git-commit-ts-mode
+    gitlab-ci-mode
+    gnuplot
+    go-mode
+    haskell-mode
+    haskell-ts-mode
+    helpful
+    hl-todo
+    jq-ts-mode
+    just-ts-mode
+    magit
+    magit-delta
+    marginalia
+    markdown-mode
+    mermaid-mode
+    mermaid-ts-mode
+    multiple-cursors
+    nix-mode
+    nix-ts-mode
+    orderless
+    org-appear
+    org-modern
+    pretty-sha-path
+    rainbow-delimiters
     sr-speedbar
+    ssh-config-mode
+    super-save
+    terraform-mode
+    tree-sitter-langs
+    treesit-auto
+    treesit-fold
+    treesit-grammars.with-all-grammars
+    vertico
+    vterm
+    vundo
+    wgrep
+    zoxide
+    adoc-mode
   ]
 )
