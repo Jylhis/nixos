@@ -6,9 +6,19 @@
   ...
 }:
 {
+
+  # A module that automatically imports everything else in the parent folder.
+  # imports =
+  #   with builtins;
+  #   map (fn: ./${fn}) (filter (fn: fn != "default.nix") (attrNames (readDir ./.)));
+
+  # Set base system locale to English
+  i18n.defaultLocale = lib.mkDefault "en_GB.UTF-8";
+
   services = {
     openssh.enable = true;
     earlyoom.enable = true;
+    tailscale.enable = true;
   };
 
   # TODO: organize stuff to sub folders
