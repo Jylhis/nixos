@@ -19,7 +19,7 @@ let
   );
 in
 {
-  config = lib.mkIf config.boot.zfs.enabled {
+  config = lib.mkIf config.boot.supportedFilesystems.zfs {
     boot = {
       zfs = {
         devNodes = lib.mkDefault "/dev";

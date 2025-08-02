@@ -9,6 +9,7 @@
     ./users.nix
   ];
   config = {
+
     programs = {
       _1password = {
         enable = true;

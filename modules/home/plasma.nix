@@ -1,14 +1,10 @@
 {
-  flake,
   lib,
   config,
   ...
 }:
-let
-  inherit (flake) inputs;
-in
 {
-  imports = [ inputs.plasma-manager.homeManagerModules.plasma-manager ];
+
   config = lib.mkIf config.programs.plasma.enable {
     programs = {
       plasma = {
@@ -154,7 +150,6 @@ in
               "org.kde.plasma.digitalclock"
             ];
           }
-
         ];
       };
     };
