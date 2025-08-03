@@ -611,7 +611,9 @@ color codes."
   (ansi-color-apply-on-region (point-min) (point-max)))
 
 (use-package vterm
-  :ensure)
+  :ensure
+  :custom
+  (vterm-always-compile-module t))
 
 ;;; TODO: eglot, flymake, flyspell, cape
 
