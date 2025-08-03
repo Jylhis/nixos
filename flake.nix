@@ -1,12 +1,15 @@
 {
-  description = "Jylhis configs";
+  description = "j10s monorepo";
 
   inputs = {
+
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nix-darwin = {
       url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
     plasma-manager = {
       url = "github:nix-community/plasma-manager";
@@ -19,10 +22,33 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    srvos = {
+      url = "github:nix-community/srvos";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nix-index-database.url = "github:nix-community/nix-index-database";
+    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
+
+    deploy-rs = {
+      url = "github:serokell/deploy-rs";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        utils.follows = "flake-utils";
+      };
+    };
+
     flake-parts.url = "github:hercules-ci/flake-parts";
-
-    nixos-unified.url = "github:srid/nixos-unified";
-
+    flake-compat.url = "github:nix-community/flake-compat";
+    nixos-anywhere = {
+      url = "github:nix-community/nixos-anywhere";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        disko.follows = "disko";
+        nixos-stable.follows = "nixpkgs";
+        treefmt-nix.follows = "treefmt-nix";
+      };
+    };
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs = {
@@ -45,16 +71,35 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    systems.url = "github:nix-systems/default";
+    disko = {
+      url = "github:nix-community/disko/latest";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
+    nil-lsp = {
+      url = "github:oxalica/nil";
+    };
+    systems.url = "github:nix-systems/default";
+    musnix = {
+      url = "github:musnix/musnix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     pkgs-by-name-for-flake-parts.url = "github:drupol/pkgs-by-name-for-flake-parts";
   };
 
   outputs =
-    inputs:
-    inputs.nixos-unified.lib.mkFlake {
-      inherit inputs;
-      root = ./.;
-    };
-
+    inputs@{ flake-parts, ... }:
+    # https://flake.parts/module-arguments.html
+    flake-parts.lib.mkFlake { inherit inputs; } (
+      { ... }:
+      {
+        imports = [
+          ./modules/flake/default.nix
+        ];
+        systems = [
+          # systems for which you want to build the `perSystem` attributes
+          "x86_64-linux"
+        ];
+      }
+    );
 }
