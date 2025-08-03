@@ -3,7 +3,7 @@
     { pkgs, ... }:
     {
       devShells.default = pkgs.mkShellNoCC {
-        name = "jylhis-devshell";
+        name = "j10s-devshell";
         meta.description = "Shell environment for modifying this Nix configuration";
         packages = with pkgs; [
           just

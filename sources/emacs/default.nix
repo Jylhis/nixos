@@ -4,9 +4,10 @@
 }:
 emacs.pkgs.withPackages (
   epkgs: with epkgs; [
-    all-the-icons
-    all-the-icons-completion
-    all-the-icons-dired
+    nerd-icons-ibuffer
+    nerd-icons-dired
+    nerd-icons-completion
+    nerd-icons-corfu
     ansible
     auto-dark
     avy
@@ -15,6 +16,7 @@ emacs.pkgs.withPackages (
     breadcrumb
     cape
     cmake-mode
+    modern-cpp-font-lock
     consult
     consult-eglot
     consult-eglot-embark
@@ -26,6 +28,7 @@ emacs.pkgs.withPackages (
     dape
     devicetree-ts-mode
     diff-hl
+    copilot
     diminish
     direnv
     docker-compose-mode
@@ -73,5 +76,10 @@ emacs.pkgs.withPackages (
     wgrep
     zoxide
     adoc-mode
+    aidermacs
+    compile-multi
+    compile-multi-nerd-icons
+    consult-compile-multi
+    compile-multi-embark
   ]
 )

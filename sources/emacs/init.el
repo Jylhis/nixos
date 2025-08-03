@@ -1,40 +1,60 @@
-;; -*- lexical-binding: t; -*-
+;;; init.el --- Emacs configuration file -*- lexical-binding: t; -*-
+
+;; Author: Markus Jylhänkangas <markus@jylhis.com>
+;; URL: https://github.com/jylhis/nixos
+;; Version: 1.0
+;; Package-Requires: ((emacs "29.1"))
+
+;;; Commentary:
+;; This is the main configuration file for Emacs. It sets up packages,
+;; customizations, and keybindings for an enhanced development experience.
+
+;;; Code:
+
 (require 'package)
+
+;; Ensure Emacs version is 29.1 or higher
+(when (version< emacs-version "29.1")
+  (error "This configuration requires Emacs 29.1 or higher"))
 
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
-;; https://github.com/svaante/dape?tab=readme-ov-file#performance
+;;; https://github.com/svaante/dape?tab=readme-ov-file#performance
+;;; Optimize garbage collection during startup
 (setq gc-cons-threshold most-positive-fixnum)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold (* 50 1024 1024)))) ;; Reset to 50MB after startup
 (setq read-process-output-max (* 1024 1024)) ; 1MB
 
-;; Ideas:
-;; https://github.com/mohkale/compile-multi
-;; https://github.com/dash-docs-el/dash-docs OR https://github.com/astoff/devdocs.el
-;; https://github.com/mclear-tools/consult-notes
-;; https://github.com/org-roam/org-roam
-;; https://github.com/Qkessler/consult-project-extra/
-;; https://github.com/emacs-citar/citar
+;;; Ideas:
+;;; https://github.com/mohkale/compile-multi
+;;; https://github.com/dash-docs-el/dash-docs OR https://github.com/astoff/devdocs.el
+;;; https://github.com/mclear-tools/consult-notes
+;;; https://github.com/org-roam/org-roam
+;;; https://github.com/Qkessler/consult-project-extra/
+;;; https://github.com/emacs-citar/citar
 
-;; DEBUGGING:
-;; Start debugger on specific message
-;; (setq debug-on-message "standard-indent adjusted")
+;;; DEBUGGING:
+;;; Start debugger on specific message
+;;; (setq debug-on-message "standard-indent adjusted")
 
-;; Explicitly set the prefered coding systems to avoid annoying prompt
-;; from emacs (especially on Microsoft Windows)
+;;; Explicitly set the preferred coding systems to avoid annoying prompt
+;;; from Emacs (especially on Microsoft Windows)
 (prefer-coding-system 'utf-8)
 
+;;; Always load the newest version of a file
 (setq load-prefer-newer t)
 
-;; Store automatic customisation options elsewhere
+;;; Store automatic customization options elsewhere
 (setq custom-file (locate-user-emacs-file "custom.el"))
-(when (file-exists-p custom-file)
-  (load custom-file))
+(when (file-exists-p custom-file) (load custom-file))
 
-;; Hide minor modes from modeline
+;;; Hide minor modes from modeline
 (use-package diminish :ensure)
 
-;; Builtin stuff
+;;; Builtin stuff
 (use-package ffap
   :custom
   (ffap-machine-p-known 'reject)) ; Don’t attempt to ping unknown hostnames
@@ -72,14 +92,12 @@
    ("C-x C-z" . nil)
    ("M-o" . other-window)
    ("M-p" . scroll-down-line)
-   ("M-n" . scroll-up-line)
-   )
+   ("M-n" . scroll-up-line))
   :init
   (load-theme 'leuven t)
   (load-theme 'leuven-dark t t)
   (tool-bar-mode -1)
-  (scroll-bar-mode -1)  
-  )
+  (scroll-bar-mode -1))
 
 (use-package window
   :custom
@@ -106,7 +124,7 @@
   :custom
   (xterm-mouse-mode 1 "Enable mouse in terminal"))
 
-;; Persist history over Emacs restarts. Vertico sorts by history position.
+;;; Persist history over Emacs restarts. Vertico sorts by history position.
 (use-package savehist
   :init
   (savehist-mode))
@@ -139,12 +157,11 @@
   (make-backup-files nil "Disable auto backup files")
   (find-file-visit-truename t "Resolve symlinks")
   (confirm-kill-processes nil "when quitting emacs, just kill processes")
-  (enable-local-variables t "ask if local variables are safe once")
-  )
+  (enable-local-variables t "ask if local variables are safe once"))
 
 (use-package autorevert
   :custom
-  (global-auto-revert-mode t "Automatically refrech buffer if changed on disk")
+  (global-auto-revert-mode t "Automatically refresh buffer if changed on disk")
   (global-auto-revert-non-file-buffers t "Revert also non-file buffers"))
 
 
@@ -162,8 +179,7 @@
   :init
   ;; Use faster search tool
   (when (executable-find "rg")
-    (setq xref-search-program 'ripgrep))
-  )
+    (setq xref-search-program 'ripgrep)))
 
 (use-package simple
   :custom
@@ -171,9 +187,7 @@
    #'command-completion-default-include-p "Hide commands in M-x which do not work in the current mode")
   (kill-do-not-save-duplicates t "Remove duplicates from the kill ring to reduce clutter")
   (line-number-mode t "Show line number in modeline")
-  (column-number-mode t "Show column number")
-
-  )
+  (column-number-mode t "Show column number"))
 
 
 ;; (use-package elec-pair
@@ -185,10 +199,7 @@
 (use-package org
   :custom
   (org-directory "~/Documents")
-  (org-default-notes-file (concat org-directory "/notes.org"))
-  (org-startup-with-inline-images t)
-  (org-html-html5-fancy t)
-  (org-hide-emphasis-markers t)
+  ;; Other customizations...
   (org-pretty-entities t)
   :config
   (setq org-agenda-files (mapcar 'file-truename (file-expand-wildcards (concat org-directory "/**/*.org"))))
@@ -197,9 +208,8 @@
   (org-clock-persistence-insinuate)
   :hook (org-mode . visual-line-mode)
   :bind (
-    	 ("C-c a" . org-agenda)
-    	 ("C-c c" . org-capture))
-  )
+         ("C-c a" . org-agenda)
+         ("C-c c" . org-capture)))
 
 (use-package org-appear
   :ensure
@@ -212,27 +222,24 @@
   :ensure
   :after org
   :hook
-  (org-mode . global-org-modern-mode)
-  )
+  (org-mode . global-org-modern-mode))
 
 
 (use-package treesit
   :custom
-  (treesit-font-lock-level 4)
-  )
+  (treesit-font-lock-level 4))
 
 (use-package elisp-mode
-  :dash "Emacs_Lisp"
-  )
+  :dash "Emacs_Lisp")
 
 
 ;; QOL stuff
 
 (use-package dash-docs
   :ensure
+  :defines dash-docs-docsets-path
   :custom
-  (dash-docs-docsets-path "~/.local/share/Zeal/Zeal/docsets/")
-  )
+  (dash-docs-docsets-path "~/.local/share/Zeal/Zeal/docsets/"))
 
 (use-package consult-dash
   :bind (("M-s d" . consult-dash))
@@ -241,15 +248,13 @@
   ;; Use the symbol at point as initial search term
   (consult-customize consult-dash :initial (thing-at-point 'symbol)))
 
-(use-package avy 
+(use-package avy
   :ensure
   :bind (
-   	 ("M-g c"   . avy-goto-char) ;; Orig: goto-char; other options -2 and -timer
-   	 ("M-g l" . avy-goto-line)
-   	 ("M-g w" . avy-goto-word-1) ;; Other options -1 nad -0
-   		 )
-  :custom (avy-all-windows 'all-frames)
-  )
+         ("M-g c"   . avy-goto-char) ;; Orig: goto-char; other options -2 and -timer
+         ("M-g l" . avy-goto-line)
+         ("M-g w" . avy-goto-word-1)) ;; Other options -1 nad -0
+  :custom (avy-all-windows 'all-frames))
 
 (use-package breadcrumb
   :ensure
@@ -267,8 +272,7 @@
 (use-package marginalia
   :ensure
   :init
-  (marginalia-mode)
-  )
+  (marginalia-mode))
 
 (use-package hl-todo
   :ensure
@@ -289,35 +293,46 @@
   :ensure
   :hook((lisp-mode emacs-lisp-mode) . rainbow-delimiters-mode))
 
-;; (use-package auto-dark
-;;   :diminish
-;;   :ensure
-;;   :after leuven-theme
-;;   :custom
-;;   (auto-dark-themes '((leuven-dark) (leuven)))
-;;   :config
-;;   (auto-dark-mode 1)
-;;   (add-hook 'after-make-frame-functions
-;;             (lambda (frame)
-;;               (when (display-graphic-p frame)
-;;                 (with-selected-frame frame (auto-dark-mode 1))))))
+(use-package auto-dark
+  :diminish
+  :ensure
+  :after leuven-theme
+  :custom
+  (auto-dark-themes '((leuven-dark) (leuven)))
+  :config
+  (auto-dark-mode 1)
+  (add-hook 'after-make-frame-functions
+            (lambda (frame)
+              (when (display-graphic-p frame)
+                (with-selected-frame frame (auto-dark-mode 1))))))
 
-(use-package all-the-icons
+(use-package nerd-icons
   :ensure)
 
-(use-package all-the-icons-completion
+(use-package nerd-icons-corfu
   :ensure
-  :after all-the-icons
-  :init
-  (all-the-icons-completion-mode)
-  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
-  )
-(use-package all-the-icons-dired
+  :after nerd-icons corfu
+  :config
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+
+(use-package nerd-icons-ibuffer
   :ensure
-  :after all-the-icons dired
-  :hook (dired-mode . all-the-icons-dired-mode)
-  :custom (all-the-icons-dired-monochrome nil)
-  )
+  :after nerd-icons
+  :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
+
+(use-package nerd-icons-dired
+  :ensure
+  :after nerd-icons
+  :hook
+  (dired-mode . nerd-icons-dired-mode))
+
+(use-package nerd-icons-completion
+  :after marginalia nerd-icons
+  :config
+  (nerd-icons-completion-mode)
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+
+;;; Removed unused packages: all-the-icons
 
 (use-package wgrep
   :ensure
@@ -326,7 +341,7 @@
    wgrep-auto-save-buffer t
    wgrep-change-readonly-file t))
 
-;; auto save based on event
+;;; Auto save based on event
 ;; For built-in timer based alternative: (auto-save-visited-mode t)
 (use-package super-save
   :diminish
@@ -335,7 +350,7 @@
   (super-save-auto-save-when-idle t)
   (super-save-remote-files nil)
   (super-save-silent t)
-  (save-delete-trailing-whitespace 'except-current-line)
+  (super-save-delete-trailing-whitespace 'except-current-line)
   :config
   (super-save-mode 1))
 
@@ -358,8 +373,7 @@
 
 (use-package help-at-pt
   :custom
-  (help-at-pt-display-when-idle t) ; Display messages when idle, without prompting
-  )
+  (help-at-pt-display-when-idle t)) ; Display messages when idle, without prompting
 
 ;;; Indication of local VCS changes
 (use-package diff-hl
@@ -370,8 +384,7 @@
   :hook ((after-init . global-diff-hl-mode)
          (after-init . global-diff-hl-show-hunk-mouse-mode)
          (dired-mode . diff-hl-dired-mode)
-    	 (magit-post-refresh . diff-hl-magit-post-refresh)
-    	 )
+         (magit-post-refresh . diff-hl-magit-post-refresh))
   :after magit
   :config
   ;; Highlight on-the-fly
@@ -383,7 +396,7 @@
   :ensure
   :bind
   (("C->" . mc/mark-next-like-this)
-   ("C-<" . mc/mark-previous-like-this)       ))
+   ("C-<" . mc/mark-previous-like-this)))
 
 
 (use-package expand-region
@@ -401,18 +414,17 @@
   (add-to-list 'drag-stuff-except-modes 'org-mode)
   (drag-stuff-define-keys))
 
-;; Major mode stuff
+;;; Major mode stuff
 
 
 (use-package prog-mode
   :hook
-  (prog-mode . display-line-numbers-mode) ; Display line numbers only when in programming modes
-  )
+  (prog-mode . display-line-numbers-mode)) ; Display line numbers only when in programming modes
+  
 
 (use-package gnuplot
   :ensure
-  :mode ("\\.plt\\'" . gnuplot-mode)
-  )
+  :mode ("\\.plt\\'" . gnuplot-mode))
 
 
 (use-package markdown-mode
@@ -423,31 +435,19 @@
   :init (setq markdown-command "multimarkdown")
   :hook (markdown-mode . visual-line-mode)
   :bind (:map markdown-mode-map
-    	      ("C-c C-e" . markdown-do)))
+              ("C-c C-e" . markdown-do)))
 
 
 (use-package conf-mode
   :mode
   (("/.dockerignore\\'" . conf-unix-mode)
-   ("/.gitignore\\'" . conf-unix-mode)
-   ))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages nil))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+   ("/.gitignore\\'" . conf-unix-mode)))
+(custom-set-variables '(package-selected-packages nil))
+(custom-set-faces)
 
 (use-package haskell-mode
   :dash "Haskell"
-  :ensure
-  )
+  :ensure)
 
 (use-package diff-mode :mode "\\.patch[0-9]*\\'")
 
@@ -465,16 +465,15 @@
 
 (use-package ssh-config-mode :ensure)
 (use-package adoc-mode
-  :ensure
-  )
+  :ensure)
 (use-package go-mode
   :dash (go-ts-mode "Go")
-  :ensure  )
+  :ensure)
 
 
 (use-package nix-ts-mode
-    :ensure
-    :mode "\\.nix\\'")
+  :ensure
+  :mode "\\.nix\\'")
 
 ;; (use-package csv-mode :ensure)
 (use-package cmake-mode :ensure
@@ -482,17 +481,35 @@
   :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
 (use-package mermaid-mode :ensure)
 (use-package yaml-mode :ensure)
-(use-package protobuf-mode
-  :disabled
-  :ensure
-  :hook (protobuf-mode . (lambda ()
-                           (setq imenu-generic-expression
-                                 '((nil "^[[:space:]]*\\(message\\|service\\|enum\\)[[:space:]]+\\([[:alnum:]]+\\)" 2))))))
+;;; Removed unused package: protobuf-mode
+
+(use-package modern-cpp-font-lock
+  :ensure t)
 
 
-;; Tooling
+;;; Tooling
 
+(use-package compile-multi
+  :ensure)
 
+(use-package consult-compile-multi
+  :ensure t
+  :after compile-multi
+  :demand t
+  :config (consult-compile-multi-mode))
+
+(use-package compile-multi-nerd-icons
+  :ensure t
+  :after nerd-icons-completion
+  :after compile-multi
+  :demand t)
+
+(use-package compile-multi-embark
+  :ensure t
+  :after embark
+  :after compile-multi
+  :demand t
+  :config (compile-multi-embark-mode +1))
 
 (use-package subword
   :diminish
@@ -504,17 +521,15 @@
   :ensure
   :config
   (direnv-mode)
-  (add-to-list 'warning-suppress-types '(direnv))
-  )
+  (add-to-list 'warning-suppress-types '(direnv)))
 
 (use-package magit
   :ensure
   :bind (("C-c g" . magit-status))
-   :custom
-   (magit-diff-refine-hunk t "Show word-granularity differences within diff hunks")
-   (magit-diff-refine-ignore-whitespace t "Ignore whitespace changes in word-granularity differences")
-   (magit-diff-hide-trailing-cr-characters t "Hide trailing ^M")
-  )
+  :custom
+  (magit-diff-refine-hunk t "Show word-granularity differences within diff hunks")
+  (magit-diff-refine-ignore-whitespace t "Ignore whitespace changes in word-granularity differences")
+  (magit-diff-hide-trailing-cr-characters t "Hide trailing ^M"))
 
 ;; Disable due to: https://github.com/dandavison/magit-delta/issues/9
 ;; (use-package magit-delta
@@ -537,18 +552,16 @@
 (use-package flymake
   :custom
   (flymake-fringe-indicator-position 'right-fringe)
-  (flymake-suppress-zero-counters t "Suppress the display of Flymake error counters when there are no errors.")
-  )
+  (flymake-suppress-zero-counters t "Suppress the display of Flymake error counters when there are no errors."))
 
 (use-package gdb-mi
   :custom
   (gdb-many-windows t)
   (gdb-show-main t)
   (gdb-debuginfod-en)
-  (gdb-debuginfod-enable-setting t)
-  )
+  (gdb-debuginfod-enable-setting t))
 
-;; REVIEW: https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-dap.el#L36
+;;; REVIEW: https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-dap.el#L36
 (use-package dape
   :ensure
   :config
@@ -557,10 +570,8 @@
   :custom
   ;; Info buffers like gud (gdb-mi)
   (dape-buffer-window-arrangement 'gud)
-  ( dape-info-hide-mode-line nil)
-
-  ( dape-inlay-hints t "Showing inlay hints")
-  )
+  (dape-info-hide-mode-line nil)
+  (Dape-inlay-hints t "Showing inlay hints"))
 
 
 (use-package eglot
@@ -569,36 +580,47 @@
                           (eglot-ensure))))
          ((markdown-mode yaml-mode yaml-ts-mode) . eglot-ensure))
   :init
-
-  (setq eglot-autoshutdown t
-        eglot-send-changes-idle-time 0.5)
+  ;; Reduce idle time before sending changes to the language server
+  (setq eglot-send-changes-idle-time 0.5)
+  ;; Automatically shutdown the language server when the last file is closed
+  (setq eglot-autoshutdown t)
   :custom
-  (eglot-report-progress nil "Prevent Eglot minibuffer spam")
-  (eglot-extend-to-xref t "Activate Eglot in cross-referenced non-project files")
-  (eglot-autoshutdown t "shutdown language server after closing last file")
-  ;;  (eglot-confirm-server-initiated-edits nil "allow edits without confirmation")
-  )
+  ;; Prevent Eglot from spamming the minibuffer with progress messages
+  (eglot-report-progress nil)
+  ;; Extend Eglot functionality to cross-referenced files
+  (eglot-extend-to-xref t)
+  :config
+  ;; Integrate with Flymake for diagnostics
+  (add-hook 'eglot-managed-mode-hook
+            (lambda ()
+              (flymake-mode 1))))
 
 
-;; Custom stuff
-;; Display ansi colors in buffer
+;;; Custom stuff
+;;; Display ANSI colors in buffer
 (require 'ansi-color)
+
 (defun display-ansi-colors ()
+  "Apply ANSI color codes to the current buffer.
+This function processes the entire buffer and interprets any ANSI
+escape sequences, rendering the corresponding colors in the buffer.
+
+Useful for viewing logs or other text files that include ANSI
+color codes."
   (interactive)
   (ansi-color-apply-on-region (point-min) (point-max)))
 
 (use-package vterm
   :ensure)
 
-;; TODO: eglot, flymake, flyspell, cape
+;;; TODO: eglot, flymake, flyspell, cape
 
-;; REVIEW: FIDO, winner-mode, Icomplete
+;;; REVIEW: FIDO, winner-mode, Icomplete
 
 (use-package flyspell
   :hook
   (prog-mode . flyspell-prog-mode)
-  (text-mode . flyspell-mode)
-  )
+  (text-mode . flyspell-mode))
 
 
 (use-package consult
@@ -627,7 +649,7 @@
          ("M-y" . consult-yank-pop)                ;; orig. yank-pop
          ;; M-g bindings in `goto-map'
          ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)             
+         ("M-g f" . consult-flymake)
          ("M-g g" . consult-goto-line)             ;; orig. goto-line
          ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
          ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
@@ -637,7 +659,7 @@
          ("M-g I" . consult-imenu-multi)
          ;; M-s bindings in `search-map'
          ("M-s d" . consult-fd)
-         ("M-s f" . consult-find)               
+         ("M-s f" . consult-find)
          ("M-s c" . consult-locate)
          ("M-s g" . consult-grep)
          ("M-s G" . consult-git-grep)
@@ -662,8 +684,7 @@
   ;;  (setq completion-in-region-function #'consult-completion-in-region)
   ;; Use Consult to select xref locations with preview
   (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
-  )
+        xref-show-definitions-function #'consult-xref))
 
 (use-package consult-eglot
   :ensure
@@ -674,8 +695,8 @@
 (use-package embark
   :ensure
   :bind
-  (("C-." . embark-act)         
-   ("C-;" . embark-dwim)        
+  (("C-." . embark-act)
+   ("C-;" . embark-dwim)
    ("C-h B" . embark-bindings))
   :init
   (setq prefix-help-command #'embark-prefix-help-command)
@@ -693,7 +714,7 @@
   :after (embark consult)
   :hook (embark-collect-mode . consult-preview-at-point-mode)
   :bind (:map minibuffer-mode-map
-      	      ("C-c C-o" . embark-export)))
+              ("C-c C-o" . embark-export)))
 
 (use-package consult-eglot-embark
   :ensure
@@ -721,7 +742,7 @@
 
 
 
-;; todo: Use consult-ripgrep instead of project-find-regexp in project.el
+;;; TODO: Use consult-ripgrep instead of project-find-regexp in project.el
 ;; (require 'keymap) ;; keymap-substitute requires emacs version 29.1?
 ;; (require 'cl-seq)
 
@@ -731,14 +752,12 @@
 ;;   (pcase-lambda (`(,cmd _)) (eq cmd #'project-find-regexp))
 ;;   project-switch-commands)
 
-;; NOTE: M-x describe-keymap corfu-map
+;;; NOTE: M-x describe-keymap corfu-map
 (use-package corfu
   :ensure
   :init
   (global-corfu-mode)
-  (corfu-history-mode)
-  
-  )
+  (corfu-history-mode))
 
 
 ;; TODO: https://github.com/minad/consult/wiki#org-clock
@@ -755,34 +774,29 @@
 
 
 
- (use-package dired
-;;   ;; REVIEW(package): diredfl, peep-dired, dired-narrow
-;;   :bind (:map dired-mode-map
-;;   			  ("C-c C-p" . wdired-change-to-wdired-mode))
-   :custom
-   (dired-auto-revert-buffer #'dired-buffer-stale-p "Revert the Dired buffer without prompting.")
-   (dired-clean-confirm-killing-deleted-buffers nil "Disable the prompt about killing the Dired buffer for a deleted directory.")
-   (dired-create-destination-dirs 'ask)
-   (dired-dwim-target t "Propose a target for intelligent moving or copying.")
-   (dired-filter-verbose nil)
-   (dired-free-space nil)
-   (dired-listing-switches "-alh --group-directories-first" "In dired, show hidden files and human readable sizes")
-   (dired-omit-verbose nil)
-   (dired-recursive-copies 'always)
-   (dired-recursive-deletes 'top)
-   (dired-vc-rename-file t)
-;;   (image-dired-thumb-size 150)
-    (dired-omit-files
-     (concat
-      "\\`[.]?#\\|\\`[.][.]?\\'"
-      ;; Syncthing
-      "\\|^[a-zA-Z0-9]\\.syncthing-enc\\'"
-      "\\|^\\.stfolder\\'"
-      "\\|^\\.stversions\\'"
-      ;; Python
-      "\\|^__pycache__\\'"
-      ))
-   )
+(use-package dired
+  ;;   ;; REVIEW(package): diredfl, peep-dired, dired-narrow
+  ;;   :bind (:map dired-mode-map
+  ;;                      ("C-c C-p" . wdired-change-to-wdired-mode))
+  :custom
+  (dired-auto-revert-buffer #'dired-buffer-stale-p "Revert the Dired buffer without prompting.")
+  (dired-clean-confirm-killing-deleted-buffers nil "Disable the prompt about killing the Dired buffer for a deleted directory.")
+  (dired-create-destination-dirs 'ask)
+  (dired-dwim-target t "Propose a target for intelligent moving or copying.")
+  (dired-filter-verbose nil)
+  (dired-free-space nil)
+  (dired-listing-switches "-alh --group-directories-first" "In dired, show hidden files and human readable sizes")
+  (dired-omit-verbose nil)
+  (dired-recursive-copies 'always)
+  (dired-recursive-deletes 'top)
+  (dired-vc-rename-file t)
+  ;;   (image-dired-thumb-size 150)
+  (dired-omit-files (concat
+                     "\\`[.]?#\\|\\`[.][.]?\\'"
+                     "\\|^[a-zA-Z0-9]\\.syncthing-enc\\'"
+                     "\\|^\\.stfolder\\'"
+                     "\\|^\\.stversions\\'"
+                     "\\|^__pycache__\\'")))
 
 (use-package dired-x
   :after dired
@@ -792,7 +806,8 @@
 ;;   :ensure
 ;;   :after dired)
 
-
+(use-package aidermacs
+  :ensure)
 
 ;; (use-package paren
 ;;   :custom
@@ -810,5 +825,17 @@
   ("M-g z" . zoxide-find-file)
   ("M-g M-z" . zoxide-find-file)
   :hook
-  (find-file . zoxide-add)
+  (find-file . zoxide-add))
+
+(use-package copilot
+  :ensure
+  ;; :hook (prog-mode . copilot-mode)
+  ;; :bind (:map copilot-completion-map
+  ;;             ("C-TAB" . 'copilot-accept-completion)
+  ;;             ("C-<tab>" . 'copilot-accept-completion)
+  ;;             ("M-f" . 'copilot-accept-completion-by-word)
+  ;;             ("M-<return>" . 'copilot-accept-completion-by-line))
   )
+
+(provide 'init)
+;;; init.el ends here

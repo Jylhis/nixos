@@ -12,6 +12,7 @@
       pkgsDirectory = ../../packages;
       _module.args.pkgs = import inputs.nixpkgs {
         inherit system;
+        config.allowUnfree = true;
         overlays = [
           (_final: _prev: {
             local = config.packages;
@@ -28,7 +29,7 @@
       withSystem prev.stdenv.hostPlatform.system (
         { config, ... }:
         {
-          jylhis = config.packages;
+          local = config.packages;
         }
       );
   };

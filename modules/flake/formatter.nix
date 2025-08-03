@@ -10,6 +10,7 @@
     {
       treefmt = {
         projectRootFile = "flake.nix";
+
         programs.nixfmt.enable = pkgs.lib.meta.availableOn pkgs.stdenv.buildPlatform pkgs.nixfmt-rfc-style.compiler;
         programs.nixfmt.package = pkgs.nixfmt-rfc-style;
         programs.actionlint.enable = true;
@@ -30,7 +31,11 @@
             "bash"
           ];
         };
+        programs.hlint.enable = true;
+        programs.cabal-gild.enable = true;
+        programs.cabal-fmt.enable = true;
         programs.dhall.enable = true;
+
         programs.statix.enable = true;
         programs.yamlfmt.enable = true;
         programs.gofmt.enable = true;

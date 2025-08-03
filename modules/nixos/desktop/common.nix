@@ -5,6 +5,7 @@
   ...
 }:
 {
+  imports = [ ../users.nix ];
   security.rtkit.enable = true; # TODO: What is this?
   programs.nix-ld.enable = true;
   hardware = {
