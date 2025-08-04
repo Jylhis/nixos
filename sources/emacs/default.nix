@@ -81,5 +81,7 @@ emacs.pkgs.withPackages (
     compile-multi-nerd-icons
     consult-compile-multi
     compile-multi-embark
+    elisp-lint
+    package-lint
   ]
 )

@@ -6,7 +6,7 @@
 ;; Package-Requires: ((emacs "29.1"))
 
 ;;; Commentary:
-;; This is the main configuration file for Emacs. It sets up packages,
+;; This is the main configuration file for Emacs.  It sets up packages,
 ;; customizations, and keybindings for an enhanced development experience.
 
 ;;; Code:
@@ -201,15 +201,19 @@
   (org-directory "~/Documents")
   ;; Other customizations...
   (org-pretty-entities t)
+  (org-clock-persist 'history) ;; Properly declare and set the variable
   :config
   (setq org-agenda-files (mapcar 'file-truename (file-expand-wildcards (concat org-directory "/**/*.org"))))
-  ;; REVIEW: (setq org-agenda-files (directory-files-recursively "~/Documents/org" "\\.org$"))
-  (setq org-clock-persist 'history)
   (org-clock-persistence-insinuate)
   :hook (org-mode . visual-line-mode)
   :bind (
          ("C-c a" . org-agenda)
          ("C-c c" . org-capture)))
+
+(use-package elisp-lint
+  :ensure)
+(use-package package-lint
+  :ensure)
 
 (use-package org-appear
   :ensure
@@ -229,17 +233,46 @@
   :custom
   (treesit-font-lock-level 4))
 
-(use-package elisp-mode
-  :dash "Emacs_Lisp")
-
-
 ;; QOL stuff
 
 (use-package dash-docs
   :ensure
-  :defines dash-docs-docsets-path
+  :defines (dash-docs-docsets dash-docs-docsets-path)
   :custom
-  (dash-docs-docsets-path "~/.local/share/Zeal/Zeal/docsets/"))
+  (dash-docs-docsets-path "~/.local/share/Zeal/Zeal/docsets/")
+  :config
+  (defun setup-dash-docs-for-emacs-lisp ()
+    (setq-local dash-docs-docsets '("Emacs Lisp")))
+
+  (defun setup-dash-docs-for-python ()
+    (setq-local dash-docs-docsets '("Python 3")))
+
+  (defun setup-dash-docs-for-javascript ()
+    (setq-local dash-docs-docsets '("JavaScript" "NodeJS")))
+
+  (defun setup-dash-docs-for-go ()
+    (setq-local dash-docs-docsets '("Go")))
+
+  (defun setup-dash-docs-for-cpp ()
+    (setq-local dash-docs-docsets '("C++")))
+
+  (defun setup-dash-docs-for-java ()
+    (setq-local dash-docs-docsets '("Java SE")))
+
+  (defun setup-dash-docs-for-ruby ()
+    (setq-local dash-docs-docsets '("Ruby")))
+
+  (defun setup-dash-docs-for-haskell ()
+    (setq-local dash-docs-docsets '("Haskell")))
+  :hook
+  ((emacs-lisp-mode . setup-dash-docs-for-emacs-lisp)
+   (python-mode . setup-dash-docs-for-python)
+   (js-mode . setup-dash-docs-for-javascript)
+   (go-mode . setup-dash-docs-for-go)
+   (c++-mode . setup-dash-docs-for-cpp)
+   (java-mode . setup-dash-docs-for-java)
+   (ruby-mode . setup-dash-docs-for-ruby)
+   (haskell-mode . setup-dash-docs-for-haskell)))
 
 (use-package consult-dash
   :bind (("M-s d" . consult-dash))
@@ -420,7 +453,7 @@
 (use-package prog-mode
   :hook
   (prog-mode . display-line-numbers-mode)) ; Display line numbers only when in programming modes
-  
+
 
 (use-package gnuplot
   :ensure
@@ -446,7 +479,6 @@
 (custom-set-faces)
 
 (use-package haskell-mode
-  :dash "Haskell"
   :ensure)
 
 (use-package diff-mode :mode "\\.patch[0-9]*\\'")
@@ -467,7 +499,6 @@
 (use-package adoc-mode
   :ensure)
 (use-package go-mode
-  :dash (go-ts-mode "Go")
   :ensure)
 
 
@@ -477,7 +508,6 @@
 
 ;; (use-package csv-mode :ensure)
 (use-package cmake-mode :ensure
-  :dash "CMake"
   :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
 (use-package mermaid-mode :ensure)
 (use-package yaml-mode :ensure)
