@@ -7,5 +7,6 @@
     ../default.nix
     ../logitech.nix
     ../users.nix
+    ../plymouth.nix
   ];
 }

@@ -80,14 +80,8 @@
           "kwin"."Kill Window" = "Meta+Ctrl+Esc";
           "kwin"."Overview" = "Meta+W";
           "kwin"."Switch One Desktop Down" = "Meta+Ctrl+Down";
-          "kwin"."Walk Through Windows (Reverse)" = [
-            "Meta+Shift+Tab"
-            "Alt+Shift+Tab"
-          ];
-          "kwin"."Walk Through Windows" = [
-            "Meta+Tab"
-            "Alt+Tab"
-          ];
+          "kwin"."Walk Through Windows (Reverse)" = "Alt+Shift+Tab";
+          "kwin"."Walk Through Windows" = "Alt+Tab";
           "kwin"."Window Close" = "Alt+F4";
           "kwin"."Window Maximize" = "Meta+PgUp";
         };

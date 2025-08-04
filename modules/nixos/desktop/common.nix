@@ -20,7 +20,7 @@
   # TODO: Organize
 
   services.earlyoom.enable = true;
-  boot.plymouth.theme = lib.mkIf config.boot.plymouth.enable (lib.mkDefault "breeze");
+
   boot.kernelParams = [ "mitigations=off" ];
   time.timeZone = lib.mkDefault "Europe/Zurich";
   i18n = {

@@ -20,13 +20,20 @@
     gnumake
     unzip
     moreutils
+    file
+    lsof
+    iotop
+
+    # Other stuff
+    openssl
 
     # Nix dev
     cachix
     nil # Nix language server
     nix-info
     nixpkgs-fmt
-
+    nix-diff
+    nix-output-monitor
     # On ubuntu, we need this less for `man home-configuration.nix`'s pager to
     # work.
     less
