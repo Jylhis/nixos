@@ -42,7 +42,7 @@
       ];
 
       aliases = {
-        pclean = "clean --exclude='**/.dir-locals-2.el' --exclude='**/.envrc.private' --exclude='.pre-commit-config.yaml' -dxf";
+        pclean = "clean --exclude='.aider*' --exclude='**/.dir-locals-2.el' --exclude='**/.envrc.private' --exclude='.pre-commit-config.yaml' -dxf";
       };
 
       extraConfig = {
