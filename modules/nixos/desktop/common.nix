@@ -51,10 +51,9 @@
     pkgs.man-pages
     pkgs.man-pages-posix
     pkgs.linux-doc
-    pkgs.linux-manual
     pkgs.clang-manpages
     pkgs.stdmanpages
-    pkgs.devhelp
+    #pkgs.devhelp
     #    pkgs.devdocs-desktop
     pkgs.zeal
     #    pkgs.wikiman
