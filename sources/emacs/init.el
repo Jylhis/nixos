@@ -361,6 +361,7 @@
 
 (use-package nerd-icons-completion
   :after marginalia nerd-icons
+  :ensure
   :config
   (nerd-icons-completion-mode)
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
