@@ -275,7 +275,8 @@
    (haskell-mode . setup-dash-docs-for-haskell)))
 
 (use-package consult-dash
-  :bind (("M-s d" . consult-dash))
+  :ensure
+  ;; :bind (("M-s d" . consult-dash))
   :after dash-docs
   :config
   ;; Use the symbol at point as initial search term
