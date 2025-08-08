@@ -18,7 +18,6 @@
             local = config.packages;
           })
           inputs.emacs-overlay.overlays.emacs
-          #				inputs.emacs-overlays.emacs
         ];
       };
     };

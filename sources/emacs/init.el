@@ -11,6 +11,9 @@
 
 ;;; Code:
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Bootstrap
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'package)
 
 ;; Ensure Emacs version is 29.1 or higher
@@ -59,7 +62,9 @@
   :custom
   (ffap-machine-p-known 'reject)) ; Don’t attempt to ping unknown hostnames
 
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Core Emacs enhancements
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package emacs
   :custom
   ;;   (scroll-margin 15 "Keep 15 line margin from top and bottom")
@@ -129,13 +134,6 @@
   :init
   (savehist-mode))
 
-(use-package ibuffer
-  :bind
-  (([remap list-buffers] . ibuffer)))
-
-(use-package repeat
-  :config
-  (repeat-mode))
 
 (use-package calendar
   :config
@@ -171,10 +169,6 @@
   (recentf-mode t "Keep track of open files"))
 
 
-(use-package delsel
-  :hook (after-init . delete-selection-mode))
-
-
 (use-package xref
   :init
   ;; Use faster search tool
@@ -189,6 +183,62 @@
   (line-number-mode t "Show line number in modeline")
   (column-number-mode t "Show column number"))
 
+(use-package subword
+  :diminish
+  :hook ((prog-mode . subword-mode)
+         (minibuffer-setup . subword-mode)))
+
+(use-package repeat
+  :config
+  (repeat-mode))
+
+(use-package delsel
+  :hook (after-init . delete-selection-mode))
+
+(use-package dired
+  ;;   ;; REVIEW(package): diredfl, peep-dired, dired-narrow
+  ;;   :bind (:map dired-mode-map
+  ;;                      ("C-c C-p" . wdired-change-to-wdired-mode))
+  :custom
+  (dired-auto-revert-buffer #'dired-buffer-stale-p "Revert the Dired buffer without prompting.")
+  (dired-clean-confirm-killing-deleted-buffers nil "Disable the prompt about killing the Dired buffer for a deleted directory.")
+  (dired-create-destination-dirs 'ask)
+  (dired-dwim-target t "Propose a target for intelligent moving or copying.")
+  (dired-filter-verbose nil)
+  (dired-free-space nil)
+  (dired-listing-switches "-alh --group-directories-first" "In dired, show hidden files and human readable sizes")
+  (dired-omit-verbose nil)
+  (dired-recursive-copies 'always)
+  (dired-recursive-deletes 'top)
+  (dired-vc-rename-file t)
+  ;;   (image-dired-thumb-size 150)
+  (dired-omit-files (concat
+                     "\\`[.]?#\\|\\`[.][.]?\\'"
+                     "\\|^[a-zA-Z0-9]\\.syncthing-enc\\'"
+                     "\\|^\\.stfolder\\'"
+                     "\\|^\\.stversions\\'"
+                     "\\|^__pycache__\\'")))
+
+(use-package dired-x
+  :after dired
+  :hook (dired-mode . dired-omit-mode))
+
+(use-package ibuffer
+  :bind
+  (([remap list-buffers] . ibuffer)))
+
+;;; Auto save based on event
+;; For built-in timer based alternative: (auto-save-visited-mode t)
+(use-package super-save
+  :diminish
+  :ensure
+  :custom
+  (super-save-auto-save-when-idle t)
+  (super-save-remote-files nil)
+  (super-save-silent t)
+  (super-save-delete-trailing-whitespace 'except-current-line)
+  :config
+  (super-save-mode 1))
 
 ;; (use-package elec-pair
 ;;   ;; REVIEW(alternative): paren
@@ -303,11 +353,6 @@
   :bind ("C-x u" . vundo)
   :config (setq vundo-glyph-alist vundo-unicode-symbols))
 
-(use-package marginalia
-  :ensure
-  :init
-  (marginalia-mode))
-
 (use-package hl-todo
   :ensure
   ;; Highlight comments
@@ -367,27 +412,12 @@
   (nerd-icons-completion-mode)
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 
-;;; Removed unused packages: all-the-icons
-
 (use-package wgrep
   :ensure
   :init
   (setq
    wgrep-auto-save-buffer t
    wgrep-change-readonly-file t))
-
-;;; Auto save based on event
-;; For built-in timer based alternative: (auto-save-visited-mode t)
-(use-package super-save
-  :diminish
-  :ensure
-  :custom
-  (super-save-auto-save-when-idle t)
-  (super-save-remote-files nil)
-  (super-save-silent t)
-  (super-save-delete-trailing-whitespace 'except-current-line)
-  :config
-  (super-save-mode 1))
 
 (use-package dtrt-indent
   :ensure
@@ -543,11 +573,6 @@
   :demand t
   :config (compile-multi-embark-mode +1))
 
-(use-package subword
-  :diminish
-  :hook ((prog-mode . subword-mode)
-         (minibuffer-setup . subword-mode)))
-
 
 (use-package direnv
   :ensure
@@ -657,6 +682,71 @@ color codes."
   (text-mode . flyspell-mode))
 
 
+
+
+(use-package consult-eglot
+  :ensure
+  :after (consult eglot)
+  :bind (:map eglot-mode-map
+              ("C-M-." . consult-eglot-symbols)))
+;; TODO: https://github.com/oantolin/embark/wiki/Additional-Configuration
+(use-package embark
+  :ensure
+  :bind
+  (("C-." . embark-act)
+   ("C-;" . embark-dwim)
+   ("C-h B" . embark-bindings))
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command)
+  :config
+
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+;; Consult users will also want the embark-consult package.
+(use-package embark-consult
+  :ensure ; only need to install it, embark loads it after consult if found
+  :after (embark consult)
+  :hook (embark-collect-mode . consult-preview-at-point-mode)
+  :bind (:map minibuffer-mode-map
+              ("C-c C-o" . embark-export)))
+
+(use-package consult-eglot-embark
+  :ensure
+  :after (consult eglot embark))
+
+(use-package consult-flyspell
+  :ensure
+  :after (consult flyspell))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Completion
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; This configuration uses `vertico` as the completion UI. It is a modern
+;;; alternative to the built-in `icomplete-mode`.
+(use-package vertico
+  :ensure
+  :init
+  (vertico-mode))
+
+;;; NOTE: M-x describe-keymap corfu-map
+(use-package corfu
+  :ensure
+  :init
+  (global-corfu-mode)
+  (corfu-history-mode))
+
+(use-package cape
+  :init
+  ;; Add `completion-at-point` to the list of completion functions
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-keyword))
+
 (use-package consult
   :ensure
   :hook (completion-list-mode . consult-preview-at-point-mode)
@@ -720,49 +810,6 @@ color codes."
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref))
 
-(use-package consult-eglot
-  :ensure
-  :after (consult eglot)
-  :bind (:map eglot-mode-map
-              ("C-M-." . consult-eglot-symbols)))
-;; TODO: https://github.com/oantolin/embark/wiki/Additional-Configuration
-(use-package embark
-  :ensure
-  :bind
-  (("C-." . embark-act)
-   ("C-;" . embark-dwim)
-   ("C-h B" . embark-bindings))
-  :init
-  (setq prefix-help-command #'embark-prefix-help-command)
-  :config
-
-  ;; Hide the mode line of the Embark live/completions buffers
-  (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                 nil
-                 (window-parameters (mode-line-format . none)))))
-
-;; Consult users will also want the embark-consult package.
-(use-package embark-consult
-  :ensure ; only need to install it, embark loads it after consult if found
-  :after (embark consult)
-  :hook (embark-collect-mode . consult-preview-at-point-mode)
-  :bind (:map minibuffer-mode-map
-              ("C-c C-o" . embark-export)))
-
-(use-package consult-eglot-embark
-  :ensure
-  :after (consult eglot embark))
-
-(use-package consult-flyspell
-  :ensure
-  :after (consult flyspell))
-
-(use-package vertico
-  :ensure
-  :init
-  (vertico-mode))
-
 (use-package orderless
   :ensure
   :custom
@@ -774,7 +821,10 @@ color codes."
   (completion-category-defaults nil)
   (completion-category-overrides '((file (styles partial-completion)))))
 
-
+(use-package marginalia
+  :ensure
+  :init
+  (marginalia-mode))
 
 ;;; TODO: Use consult-ripgrep instead of project-find-regexp in project.el
 ;; (require 'keymap) ;; keymap-substitute requires emacs version 29.1?
@@ -786,12 +836,7 @@ color codes."
 ;;   (pcase-lambda (`(,cmd _)) (eq cmd #'project-find-regexp))
 ;;   project-switch-commands)
 
-;;; NOTE: M-x describe-keymap corfu-map
-(use-package corfu
-  :ensure
-  :init
-  (global-corfu-mode)
-  (corfu-history-mode))
+
 
 
 ;; TODO: https://github.com/minad/consult/wiki#org-clock
@@ -808,33 +853,7 @@ color codes."
 
 
 
-(use-package dired
-  ;;   ;; REVIEW(package): diredfl, peep-dired, dired-narrow
-  ;;   :bind (:map dired-mode-map
-  ;;                      ("C-c C-p" . wdired-change-to-wdired-mode))
-  :custom
-  (dired-auto-revert-buffer #'dired-buffer-stale-p "Revert the Dired buffer without prompting.")
-  (dired-clean-confirm-killing-deleted-buffers nil "Disable the prompt about killing the Dired buffer for a deleted directory.")
-  (dired-create-destination-dirs 'ask)
-  (dired-dwim-target t "Propose a target for intelligent moving or copying.")
-  (dired-filter-verbose nil)
-  (dired-free-space nil)
-  (dired-listing-switches "-alh --group-directories-first" "In dired, show hidden files and human readable sizes")
-  (dired-omit-verbose nil)
-  (dired-recursive-copies 'always)
-  (dired-recursive-deletes 'top)
-  (dired-vc-rename-file t)
-  ;;   (image-dired-thumb-size 150)
-  (dired-omit-files (concat
-                     "\\`[.]?#\\|\\`[.][.]?\\'"
-                     "\\|^[a-zA-Z0-9]\\.syncthing-enc\\'"
-                     "\\|^\\.stfolder\\'"
-                     "\\|^\\.stversions\\'"
-                     "\\|^__pycache__\\'")))
 
-(use-package dired-x
-  :after dired
-  :hook (dired-mode . dired-omit-mode))
 
 ;; (use-package dired-hacks-utils
 ;;   :ensure

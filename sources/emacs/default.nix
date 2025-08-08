@@ -4,10 +4,8 @@
 }:
 emacs.pkgs.withPackages (
   epkgs: with epkgs; [
-    nerd-icons-ibuffer
-    nerd-icons-dired
-    nerd-icons-completion
-    nerd-icons-corfu
+    adoc-mode
+    aidermacs
     ansible
     auto-dark
     avy
@@ -16,25 +14,29 @@ emacs.pkgs.withPackages (
     breadcrumb
     cape
     cmake-mode
-    modern-cpp-font-lock
+    compile-multi
+    compile-multi-embark
+    compile-multi-nerd-icons
     consult
+    consult-compile-multi
+    consult-dash
     consult-eglot
     consult-eglot-embark
     consult-flyspell
+    copilot
     corfu
     csv-mode
-    dash-docs
-    consult-dash
     dape
+    dash-docs
     devicetree-ts-mode
     diff-hl
-    copilot
     diminish
     direnv
     docker-compose-mode
     dockerfile-mode
     drag-stuff
     dtrt-indent
+    elisp-lint
     embark
     embark-consult
     expand-region
@@ -49,17 +51,23 @@ emacs.pkgs.withPackages (
     jq-ts-mode
     just-ts-mode
     magit
-    magit-delta
     marginalia
     markdown-mode
     mermaid-mode
     mermaid-ts-mode
+    modern-cpp-font-lock
     multiple-cursors
+    nerd-icons
+    nerd-icons-completion
+    nerd-icons-corfu
+    nerd-icons-dired
+    nerd-icons-ibuffer
     nix-mode
     nix-ts-mode
     orderless
     org-appear
     org-modern
+    package-lint
     pretty-sha-path
     rainbow-delimiters
     sr-speedbar
@@ -74,14 +82,7 @@ emacs.pkgs.withPackages (
     vterm
     vundo
     wgrep
+    yaml-mode
     zoxide
-    adoc-mode
-    aidermacs
-    compile-multi
-    compile-multi-nerd-icons
-    consult-compile-multi
-    compile-multi-embark
-    elisp-lint
-    package-lint
   ]
 )
