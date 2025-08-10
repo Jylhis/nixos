@@ -1,4 +1,17 @@
-# Top-level flake glue to get our configuration working
+# Treefmt configuration module for multi-language code formatting.
+#
+# This module integrates treefmt-nix to provide consistent formatting
+# across multiple programming languages including Nix, Go, Python,
+# JavaScript, C/C++, Haskell, and shell scripts.
+#
+# Features:
+# - Language-specific formatters with appropriate configurations
+# - Exclusion rules for files that shouldn't be formatted
+# - Priority ordering for multiple formatters on the same files
+#
+# Usage:
+# The formatting is automatically available through `nix fmt` command
+# when this module is imported in the flake.
 { inputs, ... }:
 
 {

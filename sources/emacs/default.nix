@@ -1,3 +1,15 @@
+# Custom Emacs package configuration.
+#
+# This package provides a customized Emacs distribution with a curated
+# set of packages and configurations optimized for software development.
+# The configuration uses a modular structure with separate files for
+# different concerns (core, UI, completion, programming, etc.).
+#
+# Features:
+# - Modern IDE-like features with LSP support
+# - Comprehensive package collection for development
+# - Modular configuration for maintainability
+# - Optimized for performance and usability
 {
   emacs,
   pkgs,
@@ -49,6 +61,7 @@ emacs.pkgs.withPackages (
     helpful
     hl-todo
     jq-ts-mode
+    just-mode
     just-ts-mode
     magit
     marginalia
@@ -70,6 +83,10 @@ emacs.pkgs.withPackages (
     package-lint
     pretty-sha-path
     rainbow-delimiters
+    sideline
+    sideline-eglot
+    sideline-flymake
+    sql-indent
     sr-speedbar
     ssh-config-mode
     super-save
@@ -81,6 +98,8 @@ emacs.pkgs.withPackages (
     vertico
     vterm
     vundo
+    web-server # For claude-code-ide
+    websocket # For claude-code-ide
     wgrep
     yaml-mode
     zoxide

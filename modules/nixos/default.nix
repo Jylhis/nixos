@@ -1,5 +1,17 @@
-# This is your nixos configuration.
-# For home configuration, see /modules/home/*
+# Default NixOS system configuration module.
+#
+# This module provides common system-wide configurations that apply
+# to all NixOS systems in the monorepo, including:
+# - Base system locale and services (SSH, tailscale, earlyoom)
+# - Nix configuration with garbage collection and optimization
+# - Binary cache configuration for faster builds
+# - System-wide Nix settings and experimental features
+#
+# For user-specific configuration, see /modules/home/*
+#
+# Example usage:
+# Import this module in your system configuration to get sensible
+# defaults for all NixOS systems.
 {
   config,
   lib,

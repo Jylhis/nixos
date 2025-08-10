@@ -1,3 +1,17 @@
+# Git configuration module for Home Manager.
+#
+# Provides comprehensive Git configuration with modern features including
+# delta for improved diffs, Git LFS support, and optimized performance settings.
+# Also includes lazygit for terminal-based Git interface.
+#
+# Features:
+# - Delta integration for enhanced diff viewing
+# - Performance optimizations (fsmonitor, commit graph)
+# - Comprehensive gitignore patterns for common editors
+# - Modern merge and rebase configurations
+# - SOPS integration for encrypted file diffs
+#
+# Configuration is conditional on programs.git.enable being set.
 {
   lib,
   config,

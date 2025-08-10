@@ -8,15 +8,23 @@
   config = lib.mkIf config.programs.emacs.enable {
     home = {
       file = {
-        ".config/emacs/init.el".source = ../../sources/emacs/init.el;
-        # Install compiled elisp files
-        # ".config/emacs" = {
-        #   source = pkgs.runCommand "emacs-config" {} ''
-        #     mkdir -p $out/config-lib
-        #     cp ${../../sources/emacs}/*.el* $out/
-        #     cp ${../../sources/emacs}/config-lib/*.el* $out/config-lib/
-        #   '';
-        #};
+        # Dynamically install all Emacs configuration files
+        ".config/emacs" = {
+          source = pkgs.runCommand "emacs-config" { } ''
+            mkdir -p $out/config $out/lisp
+
+            # Copy main configuration files
+            cp ${../../sources/emacs/early-init.el} $out/early-init.el
+            cp ${../../sources/emacs/init.el} $out/init.el
+
+            # Copy modular configuration
+            cp ${../../sources/emacs/config}/*.el $out/config/
+
+            # Copy utility functions
+            cp ${../../sources/emacs/lisp}/*.el $out/lisp/
+          '';
+          recursive = true;
+        };
       };
       shellAliases = {
         emc = "emacsclient -t -a emacs";
