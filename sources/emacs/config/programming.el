@@ -31,17 +31,17 @@
   (flymake-fringe-indicator-position 'right-fringe)
   (flymake-suppress-zero-counters t "Suppress the display of Flymake error counters when there are no errors."))
 
-(use-package sideline
-  :ensure
-  :hook (prog-mode . sideline-mode))
+;; (use-package sideline
+;;   :ensure
+;;   :hook (prog-mode . sideline-mode))
 
-(use-package sideline-flymake
-  :ensure
-  :hook (flymake-mode . sideline-flymake-setup))
+;; (use-package sideline-flymake
+;;  :ensure
+;;   :hook (flymake-mode . sideline-flymake-setup))
 
-(use-package sideline-eglot
-  :ensure
-  :hook (eglot-managed-mode . sideline-eglot-setup))
+;; (use-package sideline-eglot
+;;   :ensure
+;;   :hook (eglot-managed-mode . sideline-eglot-setup))
 
 (use-package flyspell
   :hook
