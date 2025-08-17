@@ -3,186 +3,106 @@
 #+author: Jylhis
 #+TODO: Learn(r) Bug(r) InProgress(i) | Done(d)
 
-Goal of this configuration is to provide everything I need for text editing/programming.
+* What is this?
 
-- Prefer built-in things, but if 3rd-party is clearly better, it's okay to use it, *but it should integrate well with emacs*
-- Things should work with standalone emacs and also client/server
+This is a modern, modular Emacs configuration designed for software development and text editing. It provides an IDE-like experience while staying true to Emacs principles.
 
-* Keybindings
+* Why this configuration?
 
-Most used stuff should be at the "root" prefix.
-Each prefix should have category that make sense.
+**Goals:**
+- Prefer built-in functionality, but use third-party packages when they clearly improve the experience
+- Everything should integrate well with Emacs and work in both standalone and client/server modes
+- Modern development features (LSP, completion, project management)
+- Clean, maintainable, and modular configuration structure
 
-To list personal keybinding: =describe-personal-keybindings=
-and to list all keybindings: =Ctrl-h b= (=describe-bindings=)
+**Key Features:**
+- Modern completion framework (Vertico + Consult + Corfu)
+- LSP integration with Eglot for intelligent code features
+- Git integration with Magit
+- Project-aware file and buffer management
+- Tree-sitter for better syntax highlighting and code understanding
+- Comprehensive package collection for multiple programming languages
 
-NOTE: Universal-argument: =ctrl-u=
+* How to discover keybindings
 
-https://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Keys.html
+Instead of memorizing long lists of keybindings, use these built-in discovery tools:
 
-** Built-in prefixes
-- Help: =Ctrl-h=
-- mode specific: =Ctrl-c=
-- goto: =Alt-g=
-- search: =Alt-s=
-- tab: =Ctrl-x t=
-- ctrl-x: =Ctrl-x=
-- project specific: =p=
-- Version control: =v=
-- window: =w=
-- buffer: =x=
-- =CTRL-x-4 4= (often do action for other-window)
-- =CTRL-x-5 5= (often do action for other-frame):
+** Essential discovery commands
+- =C-h b= (=describe-bindings=) - Show ALL current keybindings
+- =C-h k= (=describe-key=) - Describe what a specific key does
+- =C-h m= (=describe-mode=) - Show current mode's keybindings and features
+- =C-h f= (=describe-function=) - Describe any function
+- =C-h v= (=describe-variable=) - Describe any variable
 
+** Interactive help and completion
+- =M-x= (=execute-extended-command=) - Use completion to discover commands
+- =C-h C-q= - Quick help interface
+- =F10= - Open menu bar for mouse-driven discovery
+- =M-`= - Interactive keyboard-driven menu
 
-** General Useful Keybindings
+** Package-specific discovery
+- =C-h P= (=describe-package=) - Learn about installed packages
+- =C-c C-d= (=helpful-at-point=) - Context-aware help (requires =helpful= package)
 
-- =Ctrl-s= consult-line
-- =Ctrl-c m= consult-man
-- =Ctrl-c i= consult-info
-- =Ctrl-x b= consult-buffer
-- =Ctrl-x 5 b= consult-buffer-other-frame
-- =Ctrl-x p b= consult-project-buffer
-- =Ctrl-x r b= consult-bookmark
-- =Alt-y= consult-yank-pop
-- =Alt-g f= consult-flymake
-- =Alt-g Alt-g= consult-goto-line
-- =Alt-g m= consult-mark
-- =Alt-g k= consult-global-mark
-- =Alt-g i= consult-imenu
-- =Alt-s .= dn--consult-line-thing-at-point
-- =Alt-s d= consult-fd
-- =Ctrl-c Ctrl-d= helpful-at-point
-- =Alt-s f= consult-find
-- =Alt-s c= consult-locate
-- =Alt-s g= consult-grep
-- =Alt-s G= consult-git-grep
-- =Alt-s r= consult-ripgrep
-- =Alt-s k= consult-keep-lines
-- =Alt-s u= consult-focus-lines
-- =Ctrl-.= embark-act
-- =Ctrl-;= embark-dwim
-- =Ctrl-c g= magit-status
-- =Ctrl-== er/expand-region
+** Key prefix exploration
+When you press a prefix key (like =C-x=), wait a moment to see available completions, or press =C-h= after the prefix to see all options.
 
+* Configuration architecture
 
-** buffers, windows, tabs & frames
-- =Ctrl-x Ctrl-b=		list-buffers
-- =Ctrl-x b=		consult-buffer
-- =Ctrl-x 0=		delete-window
-- =Ctrl-x 1=		delete-other-windows
-- =Ctrl-x 2=		split-window-below
-- =Ctrl-x 3=		split-window-right
-- =Ctrl-x k=		kill-buffer
-- =Ctrl-x o=		other-window
-- =Ctrl-x {=		shrink-window-horizontally
-- =Ctrl-x }=		enlarge-window-horizontally
-- =Ctrl-x Ctrl-<left>=	previous-buffer
-- =Ctrl-x Ctrl-<right>=	next-buffer
-- =Ctrl-x <left>=	previous-buffer
-- =Ctrl-x <right>=	next-buffer
-- =Ctrl-x Ctrl-+=		text-scale-adjust
-- =Ctrl-x Ctrl--=		text-scale-adjust
-- =Ctrl-x Ctrl-0=		text-scale-adjust
+This configuration uses a modular Nix-based setup with clear separation of concerns:
 
-** filesystem
+** Package management
+- [[file:default.nix][sources/emacs/default.nix]] - Defines the Emacs package with all dependencies
+- 80+ carefully selected packages for development, completion, and productivity
+- Includes modern packages like =consult=, =vertico=, =corfu=, =magit=, =eglot=
 
-- =Ctrl-x Ctrl-d=		list-directory
-- =Ctrl-x d=		dired
-- =Ctrl-x Ctrl-j=		dired-jump
-- =Ctrl-x Ctrl-f=		find-file
-- =Ctrl-x Ctrl-w=		write-file
-- =Ctrl-x Ctrl-s=		save-buffer
-- =Ctrl-x [=		backward-page
-- =Ctrl-x ]=		forward-page
-- =Alt-s c=		consult-locate
-- =Alt-s d=		consult-fd
-- =Alt-s f=		consult-find
+** System integration  
+- [[file:../../modules/home/emacs.nix][modules/home/emacs.nix]] - Home Manager integration
+- Handles configuration deployment, shell aliases, fonts, and Emacs daemon service
+- Provides convenient aliases: =emc= (terminal client), =emcg= (GUI client)
+
+** Configuration structure
+- =init.el= and =early-init.el= - Main initialization files
+- =config/*.el= - Modular configuration files organized by feature
+- =lisp/*.el= - Custom utility functions and helpers
+
+* Getting started
+
+** First launch
+1. Start Emacs (the configuration will be automatically loaded via Nix)
+2. Use =M-x= and start typing to discover available commands
+3. Try =C-h m= to see what the current mode offers
+4. Explore with =C-h b= to see all available keybindings
+
+** Essential workflows
+- **File management**: =C-x C-f= to open files, =C-x p f= for project files
+- **Buffer switching**: =C-x b= with completion and recent files
+- **Search**: =C-s= for current buffer, =M-s r= for project-wide ripgrep
+- **Code navigation**: =M-.= for definitions, =M-,= to go back
+- **Git**: =C-x g= for Magit status
+
+** Learning more
+Use the discovery commands above rather than memorizing keybindings. The configuration is designed to be discoverable and self-documenting.
 
 
-** Text editing
+* Customization
 
-- =Ctrl-x Ctrl-;=		comment-line
-- =Alt-;=			comment-dwim
-- =Ctrl-x i=		insert-file
-- =Ctrl-x u=		undo
-- =Ctrl-/=		undo
-- =Alt-j=			default-indent-new-line
-- =Alt-u=			upcase-word
+Emacs provides powerful customization through the Customize interface:
 
-** file/content navigation
+** Main customize commands
+- =M-x customize= - Main Customize interface showing all groups
+- =M-x customize-browse= - Tree-based group browser
+- =M-x customize-mode= - Customize current major mode (recommended for each mode you use)
+- =M-x customize-group= - Customize specific group (e.g., =python=, =magit=)
+- =M-x customize-face= - Customize specific face (put cursor on face for auto-completion)
 
-- =Alt-,=			xref-go-back
-- =Alt-.=			xref-find-definitions
-- =Alt-?=			xref-find-references
-- =Ctrl-Alt-.=			xref-find-apropos
-- =Alt-s G=		consult-git-grep
-- =Alt-s g=		consult-grep
-- =Alt-s r=		consult-ripgrep
-- =Alt-s L=		consult-line-multi
-- =Alt-g i=		consult-imenu
-- =Alt-g g=		consult-goto-line
-- =Alt-g k=		consult-global-mark
-- =Alt-g m=		consult-mark
-- =Alt-g o=		consult-outline
+** Tracking changes
+- =M-x customize-customized= - Review changed but unsaved customizations
+- =M-x customize-saved= - View all saved customizations (useful for troubleshooting)
+- =M-x customize-changed= - See options changed since specific Emacs version
+- =M-x customize-themes= - Browse and switch between installed themes
 
-** Useful stuff
-
-- =Alt-X= execute-extended-command-for-buffer
-** menu bar
-=F10= open the menu bar
-
-=M-`= Interactive keyboard driven menu bar
-
-** Help
-
-=C-h C-q= Quick help
-
-
-* Questions
-- How does adaptive fill work?
-- FIDO
-- winner-mode
-- Icomplete
-- appt (appointment ments)
-
-* Tasks/TODO
-** Learn Info and help page navigation
-** Learn Efficient navigation
-** Learn Optimize autocomplete
-currently autocomplete suggest unrelated stuff
-
-* Customize
-
-=M-x customize= displays the Customize interface and all the
-groups.
-=M-x customize-browse= opens a tree group browser. Much
-like the regular Customize interface but without the
-group descriptions.
-=M-x customize-customized= customizes
-options and faces
-that you have changed but not saved. Useful if you
-want to tweak things.
-=M-x customize-changed= displays all options changed since a
-particular Emacs version. Good way to discover new
-features and options.
-=M-x customize-face= prompts for the name of a face to
-Customize. I recommend you put your point on
-the face you want to change. It’ll fill in the name
-automatically.
-=M-x customize-group= prompts
-for a group name (e.g.,
-python) to Customize.
-
-=M-x customize-mode= customizes the major mode of your
-current buffer. You should do this for every major
-mode you use. It’s a quick way to change things and
-gain an overview of what your major mode can do.
-=M-x customize-saved= Displays all your saved options and
-faces. Extremely handy if you want to track down
-and disable errant changes.
-=M-x customize-themes= Shows a list of installed themes you
-can switch to.
-
-
-
+** Tips
+- Use =M-x customize-mode= for every major mode you use regularly
+- Place point on faces/variables before calling customize commands for auto-completion
+- Use =customize-saved= to track down problematic settings

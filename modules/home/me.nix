@@ -9,11 +9,11 @@
       };
       fullname = lib.mkOption {
         type = lib.types.str;
-        description = "Your full name for use in Git config";
+        description = "Your full name";
       };
       email = lib.mkOption {
         type = lib.types.str;
-        description = "Your email for use in Git config";
+        description = "Your email address";
       };
       publicKeys = lib.mkOption {
         type = lib.types.listOf lib.types.str;

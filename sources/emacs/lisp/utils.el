@@ -19,10 +19,12 @@ color codes."
 
 ;; Org-mode utilities
 (defun my/find-org-files-recursively (directory)
-  "Find all .org files recursively in DIRECTORY."
+  "Find all .org files recursively in DIRECTORY, ignoring hidden folders."
   (when (and directory (file-exists-p directory) (file-directory-p directory))
     (let ((files '()))
-      (dolist (file (directory-files-recursively directory "\\.org\\'"))
+      (dolist (file (directory-files-recursively directory "\\.org\\'" t
+                                                 (lambda (dir)
+                                                   (not (string-match-p "\\(^\\|/\\)\\." (file-name-nondirectory dir))))))
         (when (file-regular-p file)
           (push (file-truename file) files)))
       (nreverse files))))

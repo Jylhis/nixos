@@ -18,6 +18,32 @@ default:
 check:
     emacs -Q --batch --eval "(progn (add-to-list 'load-path \"{{config_dir}}/config\") (add-to-list 'load-path \"{{config_dir}}/lisp\") (load-file \"{{config_dir}}/init.el\"))"
 
+# Run unit tests
+[group('check')]
+test:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "Running ERT unit tests..."
+    emacs -Q --batch \
+        --eval "(progn (add-to-list 'load-path \"{{config_dir}}/lisp\") (add-to-list 'load-path \"{{config_dir}}/tests\"))" \
+        --eval "(require 'ert)" \
+        --eval "(require 'cl-lib)" \
+        --load "{{config_dir}}/tests/test-utils.el" \
+        --eval "(ert-run-tests-batch-and-exit)"
+
+# Run unit tests with verbose output
+[group('check')]
+test-verbose:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "Running ERT unit tests (verbose)..."
+    emacs -Q --batch \
+        --eval "(progn (add-to-list 'load-path \"{{config_dir}}/lisp\") (add-to-list 'load-path \"{{config_dir}}/tests\"))" \
+        --eval "(require 'ert)" \
+        --eval "(require 'cl-lib)" \
+        --load "{{config_dir}}/tests/test-utils.el" \
+        --eval "(ert-run-tests-batch-and-exit t)"
+
 # Run elisp-lint on all Emacs Lisp files
 [group('check')]
 lint:
