@@ -11,8 +11,8 @@
 # - Modular configuration for maintainability
 # - Optimized for performance and usability
 {
-  emacs,
-  pkgs,
+  pkgs ? import <nixpkgs> { config.allowUnfree = true; },
+  emacs ? pkgs.emacs,
 }:
 emacs.pkgs.withPackages (
   epkgs: with epkgs; [

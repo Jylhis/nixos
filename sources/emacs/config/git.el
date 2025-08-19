@@ -29,9 +29,6 @@
   (diff-hl-flydiff-mode 1))
 
 (use-package smerge-mode
-  :hook (prog-mode . (lambda ()
-                      (when (and buffer-file-name (vc-backend buffer-file-name))
-                        (smerge-mode 1))))
   :bind (:map smerge-mode-map
               ("C-c ^ u" . smerge-keep-upper)
               ("C-c ^ l" . smerge-keep-lower)

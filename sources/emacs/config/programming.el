@@ -22,6 +22,7 @@
   (global-treesit-auto-mode))
 
 (use-package treesit-fold
+  :diminish
   :ensure
   :hook (after-init . global-treesit-fold-indicators-mode)
   :init (setq treesit-fold-indicators-priority -1))
@@ -88,6 +89,7 @@
 (use-package package-lint :ensure)
 
 (use-package dtrt-indent
+  :diminish
   :ensure
   :hook (prog-mode . dtrt-indent-mode))
 

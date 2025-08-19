@@ -30,6 +30,7 @@
           sops
           ssh-to-age
           git-agecrypt
+          opentofu
 
           # SEC
           vulnix
