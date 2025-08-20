@@ -2,7 +2,8 @@
 
 ;;; Commentary:
 ;; Programming tools including LSP, tree-sitter, debugging, and language modes.
-
+;; TODO: in HTML mode, Alt+o doesn't work for switching windows
+;; TODO: use web-mode
 ;;; Code:
 
 (use-package prog-mode
