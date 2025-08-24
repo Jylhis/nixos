@@ -29,6 +29,7 @@
         programs.actionlint.enable = true;
         programs.deadnix.enable = true;
         programs.jsonfmt.enable = true;
+        programs.toml-sort.enable = true;
         programs.terraform.enable = true;
         programs.terraform.package = pkgs.opentofu;
         settings.formatter.jsonfmt.excludes = [
