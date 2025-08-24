@@ -49,6 +49,13 @@
         treefmt-nix.follows = "treefmt-nix";
       };
     };
+    mcp-nixos = {
+      url = "github:utensils/mcp-nixos";
+      inputs = {
+        flake-utils.follows = "flake-utils";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs = {
