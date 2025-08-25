@@ -4,24 +4,24 @@
   pkgs,
   ...
 }:
+let
+  cfg = config.programs.emacs;
+in
 {
+  options = {
+    programs.emacs.userConfig = lib.mkOption {
+      type = lib.types.path;
+    };
+  };
   config = lib.mkIf config.programs.emacs.enable {
     home = {
       file = {
         # Dynamically install all Emacs configuration files
         ".config/emacs" = {
           source = pkgs.runCommand "emacs-config" { } ''
-            mkdir -p $out/config $out/lisp
-
+            mkdir -p $out
             # Copy main configuration files
-            cp ${../../sources/emacs/early-init.el} $out/early-init.el
-            cp ${../../sources/emacs/init.el} $out/init.el
-
-            # Copy modular configuration
-            cp ${../../sources/emacs/config}/*.el $out/config/
-
-            # Copy utility functions
-            cp ${../../sources/emacs/lisp}/*.el $out/lisp/
+            cp -r ${cfg.userConfig}/* $out/
           '';
           recursive = true;
         };
