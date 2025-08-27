@@ -1,7 +1,13 @@
-{ lib, config, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 {
   config = lib.mkIf config.boot.plymouth.enable {
     boot = {
+      plymouth.themePackages = [ pkgs.kdePackages.breeze-plymouth ];
       plymouth.theme = lib.mkDefault "breeze";
       # Enable "Silent Boot"
       initrd.verbose = false;

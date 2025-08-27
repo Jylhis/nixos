@@ -16,7 +16,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-
+    _1password-shell-plugins.url = "github:1Password/shell-plugins";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -40,22 +40,7 @@
 
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-compat.url = "github:nix-community/flake-compat";
-    nixos-anywhere = {
-      url = "github:nix-community/nixos-anywhere";
-      inputs = {
-        flake-parts.follows = "flake-parts";
-        disko.follows = "disko";
-        nixos-stable.follows = "nixpkgs";
-        treefmt-nix.follows = "treefmt-nix";
-      };
-    };
-    mcp-nixos = {
-      url = "github:utensils/mcp-nixos";
-      inputs = {
-        flake-utils.follows = "flake-utils";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
+
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs = {
