@@ -1,6 +1,5 @@
 { pkgs, lib, ... }:
 {
-  # Nerd fonts
   fonts = {
     enableDefaultPackages = true;
     fontDir.enable = true;
