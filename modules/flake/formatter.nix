@@ -36,6 +36,7 @@
           "**/tsconfig.json"
           "**/themes/**/index.json"
         ];
+        programs.dockerfmt.enable = true;
         programs.shellcheck.enable = true;
         settings.formatter.shellcheck = {
           excludes = [
