@@ -66,7 +66,7 @@
         settings.formatter.prettier = {
           excludes = [
             "**/*.min.*"
-            "**/*.html"
+            "**/*.html" # FIXME
             "**/*.json"
             "**/*-lock.json"
             ".github/**/*"
