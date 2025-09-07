@@ -7,5 +7,5 @@
 
   programs.info.enable = true;
   programs.man.enable = true;
-  programs.man.generateCaches = true;
+  programs.man.generateCaches = false;
 }

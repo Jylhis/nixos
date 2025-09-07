@@ -51,7 +51,7 @@ in
 
   home-manager = lib.mkIf config.home-manager.enable {
     users = mapListToAttrs config.myusers (_name: {
-      imports = [ inputs.plasma-manager.homeManagerModules.plasma-manager ];
+      imports = [ inputs.plasma-manager.homeModules.plasma-manager ];
     });
   };
 }

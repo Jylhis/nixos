@@ -7,6 +7,7 @@
   imports = [
     ./common.nix
     ./plasma.nix
+    ./hyprland.nix
     ./fonts.nix
     ../_1password.nix
     ../default.nix

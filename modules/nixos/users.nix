@@ -56,6 +56,7 @@ in
     home-manager = lib.mkIf config.home-manager.enable {
       useGlobalPkgs = true;
       useUserPackages = true;
+      backupFileExtension = "backup";
       # Enable home-manager for our user
       users = mapListToAttrs config.myusers (name: {
         imports = [ (self + /configurations/home/${name}.nix) ];
