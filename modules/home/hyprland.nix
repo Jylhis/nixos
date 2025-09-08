@@ -751,17 +751,18 @@
           disable_loading_bar = false;
           grace = 0;
           hide_cursor = true;
+          ignore_empty_input = true;
           no_fade_in = false;
         };
 
         background = [
           {
-            path = "screenshot";
+            path = ""; # TODO
             blur_passes = 0;
-            contrast = 0.8916;
-            brightness = 0.8916;
-            vibrancy = 0.8916;
-            vibrancy_darkness = 0.0;
+            # contrast = 0.8916;
+            # brightness = 0.8916;
+            # vibrancy = 0.8916;
+            # vibrancy_darkness = 0.0;
           }
         ];
 
