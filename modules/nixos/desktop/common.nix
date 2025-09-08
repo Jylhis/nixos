@@ -56,7 +56,7 @@
     pkgs.stdmanpages
     # pkgs.devhelp
     #    pkgs.devdocs-desktop
-    pkgs.zeal-qt6
+    pkgs.zeal
     #    pkgs.wikiman
     pkgs.manix
     # pkgs.xorg-docs

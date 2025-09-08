@@ -68,9 +68,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nil-lsp = {
-      url = "github:oxalica/nil";
-    };
     systems.url = "github:nix-systems/default";
     musnix = {
       url = "github:musnix/musnix";
