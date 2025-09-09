@@ -118,9 +118,9 @@
     wayland.windowManager.hyprland = {
       settings = {
         # Monitor configuration
-        monitor = [
-          ",preferred,auto,1"
-        ];
+        # monitor = [
+        #   ",preferred,auto,1"
+        # ];
 
         # Input configuration - matching Plasma setup
         input = {
@@ -259,10 +259,10 @@
           # "$mod, Page_Down, movetoworkspacesilent, special" # Window Minimize equivalent
 
           # Workspace switching
-          "$mod, 1, workspace, 1"
-          "$mod, 2, workspace, 2"
-          "$mod, 3, workspace, 3"
-          "$mod, 4, workspace, 4"
+          "$mod, 1, focusworkspaceoncurrentmonitor, 1"
+          "$mod, 2, focusworkspaceoncurrentmonitor, 2"
+          "$mod, 3, focusworkspaceoncurrentmonitor, 3"
+          "$mod, 4, focusworkspaceoncurrentmonitor, 4"
 
           # Move windows to workspaces
           "$mod SHIFT, 1, movetoworkspace, 1"
@@ -320,10 +320,10 @@
 
         # Workspace configuration
         workspace = [
-          "1, monitor:eDP-1, default:true"
-          "2, monitor:eDP-1"
-          "3, monitor:eDP-1"
-          "4, monitor:eDP-1"
+          "1, default:true"
+          "2"
+          "3"
+          "4"
         ];
 
         # Environment variables
