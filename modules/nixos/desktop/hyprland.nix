@@ -17,21 +17,81 @@ in
 {
   imports = [ ../users.nix ];
 
-  # Enable Hyprland (disabled by default - can be enabled per-machine)
   programs.hyprland = {
     enable = lib.mkDefault true;
     withUWSM = true;
     xwayland.enable = true;
   };
 
-  # XDG Desktop Portal - only add Hyprland portal if Hyprland is enabled
   xdg.portal = lib.mkIf config.programs.hyprland.enable {
+    # enable = true;
+    # wlr.enable = true;
     extraPortals = with pkgs; [
       xdg-desktop-portal-hyprland
+      # xdg-desktop-portal-gtk
     ];
+    # configPackages = [ pkgs.xdg-desktop-portal-hyprland ];
   };
 
-  # System packages for Hyprland - only install when Hyprland is enabled
+  # Audio with PipeWire
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    wireplumber.enable = true;
+  };
+
+  # Network management
+  networking.networkmanager.enable = true;
+
+  # Bluetooth
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings = {
+      General = {
+        Enable = "Source,Sink,Media,Socket";
+        Experimental = true;
+      };
+    };
+  };
+
+  # Power management
+  services = {
+    power-profiles-daemon.enable = true;
+    upower.enable = true;
+    thermald.enable = true;
+  };
+
+  # GPU optimizations
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+
+    # Intel specific
+    extraPackages =
+      with pkgs;
+      lib.optionals config.hardware.graphics.enable [
+        intel-media-driver
+        intel-vaapi-driver
+        vaapiVdpau
+        intel-compute-runtime
+      ];
+  };
+
+  # Environment variables for Wayland
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+    MOZ_ENABLE_WAYLAND = "1";
+    ELECTRON_OZONE_PLATFORM_HINT = "wayland";
+    XDG_CURRENT_DESKTOP = "Hyprland";
+    XDG_SESSION_DESKTOP = "Hyprland";
+    XDG_SESSION_TYPE = "wayland";
+  };
+
+  # Required packages for the complete ecosystem
   environment.systemPackages = lib.mkIf config.programs.hyprland.enable (
     with pkgs;
     [
@@ -40,54 +100,63 @@ in
       hyprcursor
       hyprpaper
 
-      # Application launcher and bar
-      rofi-wayland
-      # waybar
+      # Modern panel and notifications
+      hyprpanel
+      swaynotificationcenter
 
-      # Screenshot and screen sharing
+      # Launcher alternatives
+      fuzzel
+      rofi-wayland
+
+      # Wallpaper and theming
+      swww
+      wallust
+      pywal
+
+      # Monitor management
+      kanshi
+      wlr-randr
+
+      # Screenshots and recording
       grim
       slurp
       wf-recorder
 
-      # Clipboard manager
+      # Clipboard
+      cliphist
       wl-clipboard
+      wl-clip-persist
 
-      # Notification daemon
-      # mako
-
-      # Terminal (keeping current preference)
-      # kitty
-
-      # Audio control
+      # System utilities
+      brightnessctl
+      playerctl
       pavucontrol
-
-      # Network management GUI
+      pwvucontrol
       networkmanagerapplet
+      blueman
 
-      # Blue light filter
-      # gammastep
+      # Performance tools
+      btop
 
-      # Wallpaper setter
-      # swww
+      # File management
+      xdg-utils
+      mimeo
 
-      # Authentication agent
+      # Authentication
       kdePackages.polkit-kde-agent-1
 
-      # Keep KDE packages that are useful in any DE
-      # filelight
-      # partitionmanager
-      # ksystemlog
-      # isoimagewriter
-      # skanlite
-      # skanpage
-      # kcachegrind
-      # arianna
-      # francis
-      # kalk
-      # kcalc
-      # kalgebra
+      # Fonts
+      nerd-fonts.jetbrains-mono
+      nerd-fonts.fira-code
+      nerd-fonts.iosevka
     ]
   );
+
+  # Security
+  security = {
+    polkit.enable = true;
+    pam.services.hyprlock = { };
+  };
 
   # Home Manager integration - only enable Hyprland home config when system Hyprland is enabled
   home-manager = lib.mkIf (config.home-manager.enable && config.programs.hyprland.enable) {

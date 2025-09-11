@@ -5,7 +5,7 @@
 # - Darkmode/lightmode
 # - Autostart: 1password
 # - windows to fix:
-#   - Firefox calendar detail popup
+#   - thunderbird calendar detail popup
 {
   lib,
   config,
@@ -18,14 +18,24 @@
     programs.rofi = {
       enable = true;
       package = pkgs.rofi-wayland;
+      plugins = with pkgs; [
+        rofi-calc
+        rofi-emoji
+        rofi-systemd
+      ];
       extraConfig = {
-        modi = "drun";
-        font = "HarmonyOS Sans SC bold 12";
+        modi = "drun,run,window,ssh,filebrowser";
         show-icons = true;
-        icon-theme = "Reversal-dark";
-        display-drun = "";
-        drun-display-format = "{name}";
-        sidebar-mode = false;
+        display-drun = "󰀻";
+        display-run = "";
+        display-window = "";
+        display-ssh = "󰢹";
+        display-filebrowser = "󰉋";
+        sidebar-mode = true;
+        hover-select = true;
+        me-select-entry = "";
+        me-accept-entry = "MousePrimary";
+        window-format = "{w} · {c} · {t}";
       };
       theme = {
         "*" = {
@@ -117,61 +127,52 @@
     };
     wayland.windowManager.hyprland = {
       settings = {
-        # Monitor configuration
-        # monitor = [
-        #   ",preferred,auto,1"
-        # ];
 
-        # Input configuration - matching Plasma setup
+        # Enhanced input configuration
         input = {
           kb_layout = "us,fi";
           kb_options = "ctrl:swapcaps,grp:win_space_toggle";
-
           follow_mouse = 1;
           accel_profile = "flat";
+          force_no_accel = true;
+          sensitivity = 0;
           touchpad = {
             natural_scroll = true;
             disable_while_typing = true;
+            tap-to-click = true;
+            scroll_factor = 0.5;
           };
-
-          sensitivity = 0;
-        };
-
-        gestures = {
-          workspace_swipe = false;
         };
 
         misc = {
           force_default_wallpaper = lib.mkDefault false;
           disable_hyprland_logo = lib.mkDefault false;
         };
-
-        # General settings
+        # Performance-optimized general settings
         general = {
           gaps_in = 6;
           gaps_out = 12;
           border_size = 2;
-          "col.active_border" = "rgba(ff00ffcc) rgba(00ffffcc) 135deg";
-          "col.inactive_border" = "rgba(00000000)";
+          "col.active_border" = "rgb(f38ba8) rgb(89b4fa) 45deg";
+          "col.inactive_border" = "rgb(313244)";
           resize_on_border = true;
-          no_border_on_floating = true;
-
           layout = "dwindle";
-          allow_tearing = false;
+          allow_tearing = true;
         };
 
-        # Decoration
+        # Modern decorations with performance considerations
         decoration = {
           rounding = 12;
-
           active_opacity = 1.0;
-          inactive_opacity = 1.0;
+          inactive_opacity = 0.95;
+          fullscreen_opacity = 1.0;
 
           shadow = {
             enabled = false;
-            range = 12;
-            render_power = 6;
-            color = "rgba(00000088)";
+            range = 15;
+            render_power = 3;
+            color = "rgba(00000080)";
+            offset = "3 3";
           };
 
           blur = {
@@ -179,34 +180,59 @@
             size = 8;
             passes = 2;
             new_optimizations = true;
-            ignore_opacity = false;
-            vibrancy = 0.25;
+            ignore_opacity = true;
+            vibrancy = 0.1696;
+            vibrancy_darkness = 0.0;
+            noise = 0.0117;
+            contrast = 0.8916;
+            brightness = 1.0;
+            xray = false;
           };
         };
 
-        # Animations
+        # Smooth, professional animations
         animations = {
           enabled = true;
 
           bezier = [
-            "myBezier, 0.05, 0.9, 0.1, 1.05"
-            "overshot, 0.13, 0.99, 0.29, 1.1"
+            "fluent_decel, 0, 0.2, 0.4, 1"
+            "easeOutCirc, 0, 0.55, 0.45, 1"
+            "easeOutCubic, 0.33, 1, 0.68, 1"
+            "easeinoutsine, 0.37, 0, 0.63, 1"
           ];
 
           animation = [
-            "windows, 1, 3, myBezier"
-            "windowsOut, 1, 5, myBezier, popin 80%"
-            "windowsMove, 1, 5, myBezier"
-            "border, 1, 10, default"
-            "fade, 1, 5, default"
-            "workspaces, 1, 4, overshot, slidevert"
+            # Windows
+            "windowsIn, 1, 3, easeOutCubic, popin 30%"
+            "windowsOut, 1, 3, fluent_decel, popin 70%"
+            "windowsMove, 1, 2, easeinoutsine, slide"
+
+            # Fading
+            "fadeIn, 1, 3, easeOutCubic"
+            "fadeOut, 1, 2, easeOutCubic"
+            "fadeSwitch, 1, 2, easeOutCirc"
+            "fadeShadow, 1, 2, easeOutCirc"
+            "fadeDim, 1, 3, fluent_decel"
+
+            # Borders
+            "border, 1, 2.7, easeOutCirc"
+
+            # Workspaces
+            "workspaces, 1, 2, fluent_decel, slide"
+            "specialWorkspace, 1, 3, fluent_decel, slidevert"
           ];
         };
 
-        # Layout configuration
+        # Enhanced dwindle layout
         dwindle = {
           pseudotile = true;
           preserve_split = true;
+          smart_split = false;
+          smart_resizing = true;
+          force_split = 0;
+          special_scale_factor = 0.9;
+          split_width_multiplier = 1.2;
+          use_active_for_splits = true;
         };
 
         master = {
@@ -219,25 +245,23 @@
           "nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0"
         ];
 
-        # Key bindings - matching Plasma shortcuts where possible
+        # Modern keybinding system with submaps
         "$mod" = "SUPER";
 
+        # Main keybinds
         bind = [
-          # Basic applications
-          "$mod, Return, exec, kitty"
+          # Quick access applications
           "$mod, B, exec, brave"
-          "$mod, M, exec, emacsclient -c -a emacs"
+          "$mod, E, exec, emacsclient -c -a emacs"
           "$mod, T, exec, kitty"
-          "$mod, E, exec, dolphin"
+          "$mod, F, exec, dolphin"
           "$mod, G, exec, emacsclient -cF '((visibility . nil))' -e '(emacs-run-launcher)'"
 
           # Application launcher - matching Plasma's Meta key
           "$mod, R, exec, rofi -show drun"
 
-          # Window management - matching Plasma shortcuts
+          # Window management
           "$mod, Q, killactive"
-          "ALT, F4, killactive"
-          "$mod CTRL, Escape, exec, hyprctl kill"
           "$mod, V, togglefloating"
           "$mod, P, pseudo"
           "$mod, J, togglesplit"
@@ -264,6 +288,12 @@
           "$mod, 3, focusworkspaceoncurrentmonitor, 3"
           "$mod, 4, focusworkspaceoncurrentmonitor, 4"
 
+          # Window resizing
+          # "$mod CTRL, H, resizeactive, -20 0"
+          # "$mod CTRL, L, resizeactive, 20 0"
+          # "$mod CTRL, K, resizeactive, 0 -20"
+          # "$mod CTRL, J, resizeactive, 0 20"
+
           # Move windows to workspaces
           "$mod SHIFT, 1, movetoworkspace, 1"
           "$mod SHIFT, 2, movetoworkspace, 2"
@@ -273,6 +303,10 @@
           # Special workspace (scratchpad)
           "$mod, S, togglespecialworkspace, magic"
           "$mod ALT, S, movetoworkspace, special:magic"
+          # "$mod, grave, togglespecialworkspace, magic"
+          # "$mod SHIFT, grave, movetoworkspace, special:magic"
+          # "$mod, minus, togglespecialworkspace, term"
+          # "$mod SHIFT, minus, movetoworkspace, special:term"
 
           # Scroll through workspaces with scroll
           "$mod, mouse_down, workspace, e+1"
@@ -286,14 +320,11 @@
           "$mod, L, exec, hyprlock"
           "CTRL ALT, Delete, exec, systemctl poweroff"
 
-          # Clipboard history
-          "$mod SHIFT, V, exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy"
-
-          # Screenshots
-          "$mod SHIFT, S, exec, grim -g \"$(slurp)\" ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png"
-          "ALT, Print, exec, grim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png"
-          ", Print, exec, grim -g \"$(slurp)\" ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png"
-          "SHIFT, Print, exec, grim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png"
+          # Monitor focus
+          "$mod, comma, focusmonitor, -1"
+          "$mod, period, focusmonitor, +1"
+          "$mod SHIFT, comma, movewindow, mon:-1"
+          "$mod SHIFT, period, movewindow, mon:+1"
 
           # Volume control
           ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"
@@ -324,25 +355,33 @@
           "2"
           "3"
           "4"
+
+          # Special workspaces
+          # "special:magic, gapsout:50"
+          # "special:term, gapsout:30, gapsin:10"
         ];
 
-        # Environment variables
+        # Environment variables for optimal performance
         env = [
           "XCURSOR_SIZE,24"
           "HYPRCURSOR_SIZE,24"
-          "QT_QPA_PLATFORMTHEME,qt5ct"
+          "QT_QPA_PLATFORMTHEME,qt6ct"
+          "MOZ_ENABLE_WAYLAND,1"
+          "ELECTRON_OZONE_PLATFORM_HINT,wayland"
         ];
 
-        # Autostart
+        # Startup applications
         exec-once = [
+          # Essential services
           "hyprpanel"
-          # "waybar"
-          # "mako"
           "hypridle"
-          "hyprpaper"
+          "kanshi"
+
+          # Clipboard
           "wl-paste --type text --watch cliphist store"
           "wl-paste --type image --watch cliphist store"
-          # "gammastep -l 60.1699:24.9384"
+
+          # Authentication and system
           "/usr/lib/polkit-kde-authentication-agent-1"
           "nm-applet"
           "1password --silent"
@@ -743,26 +782,29 @@
 
     };
 
-    # Hyprlock screen locker
+    # Hyprlock configuration with blur background
     programs.hyprlock = {
       enable = true;
       settings = {
         general = {
-          disable_loading_bar = false;
-          grace = 0;
+          disable_loading_bar = true;
+          grace = 10;
           hide_cursor = true;
           ignore_empty_input = true;
           no_fade_in = false;
+          no_fade_out = false;
         };
 
         background = [
           {
-            path = ""; # TODO
-            blur_passes = 0;
-            # contrast = 0.8916;
-            # brightness = 0.8916;
-            # vibrancy = 0.8916;
-            # vibrancy_darkness = 0.0;
+            path = "screenshot";
+            blur_passes = 3;
+            blur_size = 8;
+            noise = 0.0117;
+            contrast = 0.8916;
+            brightness = 0.8172;
+            vibrancy = 0.1696;
+            vibrancy_darkness = 0.0;
           }
         ];
 
@@ -841,35 +883,61 @@
 
     # Additional packages for Hyprland
     home.packages = with pkgs; [
-      # Screen brightness
-      brightnessctl
-
-      # Media control
-      playerctl
-
-      # Clipboard manager
-      cliphist
+      # Core Wayland tools
       wl-clipboard
+      wl-clip-persist
+      cliphist
 
-      # Screenshots
+      # Wallpaper and theming
+      swww
+      wallust
+      pywal
+
+      # Screenshots and screen recording
       grim
       slurp
+      wf-recorder
 
-      # System monitoring
-      lm_sensors
+      # System monitoring and control
+      brightnessctl
+      playerctl
       pavucontrol
+      pwvucontrol
 
-      # Additional utilities
-      hyprpicker
-      hyprcursor
-      hyprpaper
-      hyprlock
+      # File management
+      xdg-utils
+      mimeo
 
       # Fonts
-      nerd-fonts.caskaydia-cove
+      nerd-fonts.jetbrains-mono
+
+      # Utilities
+      killall
+      pciutils
+      usbutils
+
+      # Development tools integration
+      git-cliff
+      lazygit
+
+      # System integration
+      libnotify
+      kanshi
+
+      # Performance monitoring
+      btop
+
+      # Network
+      networkmanagerapplet
+
+      # Audio
+      wireplumber
+
+      # Power management
+      power-profiles-daemon
     ];
 
-    # Hypridle configuration
+    # Hypridle for power management
     services.hypridle = {
       enable = true;
       settings = {
@@ -881,6 +949,11 @@
 
         listener = [
           {
+            timeout = 150;
+            on-timeout = "brightnessctl -s set 10";
+            on-resume = "brightnessctl -r";
+          }
+          {
             timeout = 300;
             on-timeout = "loginctl lock-session";
           }
@@ -888,6 +961,10 @@
             timeout = 330;
             on-timeout = "hyprctl dispatch dpms off";
             on-resume = "hyprctl dispatch dpms on";
+          }
+          {
+            timeout = 1800;
+            on-timeout = "systemctl suspend";
           }
         ];
       };
