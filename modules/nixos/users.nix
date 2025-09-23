@@ -27,11 +27,20 @@ in
       default =
         let
           dirContents = builtins.readDir (self + /configurations/home);
-          fileNames = builtins.attrNames dirContents; # Extracts keys: [ "jylhis.nix" ]
-          regularFiles = builtins.filter (name: dirContents.${name} == "regular") fileNames; # Filters for regular files
-          baseNames = map (name: builtins.replaceStrings [ ".nix" ] [ "" ] name) regularFiles; # Removes .nix extension
+          fileNames = builtins.attrNames dirContents;
+
+          # Get users from .nix files
+          regularFiles = builtins.filter (name: dirContents.${name} == "regular") fileNames;
+          nixFiles = builtins.filter (name: lib.hasSuffix ".nix" name) regularFiles;
+          usersFromFiles = map (name: builtins.replaceStrings [ ".nix" ] [ "" ] name) nixFiles;
+
+          # Get users from directories
+          directories = builtins.filter (name: dirContents.${name} == "directory") fileNames;
+
+          # Combine both lists
+          allUsers = usersFromFiles ++ directories;
         in
-        baseNames;
+        allUsers;
     };
   };
 
@@ -57,9 +66,20 @@ in
       useGlobalPkgs = true;
       useUserPackages = true;
       backupFileExtension = "backup";
+      extraSpecialArgs = {
+        inherit (flake) inputs;
+      };
       # Enable home-manager for our user
       users = mapListToAttrs config.myusers (name: {
-        imports = [ (self + /configurations/home/${name}.nix) ];
+        imports = [
+          (self + /modules/home)
+        ]
+        ++ lib.optional (builtins.pathExists (self + /configurations/home/${name}.nix)) (
+          self + /configurations/home/${name}.nix
+        )
+        ++ lib.optional (builtins.pathExists (self + /configurations/home/${name})) (
+          self + /configurations/home/${name}
+        );
       });
     };
 
