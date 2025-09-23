@@ -45,9 +45,9 @@
         "shift_verbose"
         "cmdhist" # Save multi-line commands as one command
       ];
-      sessionVariables = {
-        PROMPT_DIRTRIM = 2; # # Automatically trim long paths in the prompt (requires Bash 4.x)
-      };
+      # sessionVariables = {
+      #   PROMPT_DIRTRIM = 2; # # Automatically trim long paths in the prompt (requires Bash 4.x)
+      # };
 
       initExtra = ''
         		  # Enable history expansion with space
