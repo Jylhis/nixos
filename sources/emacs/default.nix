@@ -16,9 +16,16 @@
 }:
 emacs.pkgs.withPackages (
   epkgs: with epkgs; [
+
+    # TOOD: Package: https://github.com/flymake/flymake-elsa
     adoc-mode
+    modus-themes
+    sideline
+    sideline-flymake
+    sideline-eglot
     aidermacs
     ansible
+    auth-source-1password
     auto-dark
     avy
     awk-ts-mode
@@ -38,8 +45,10 @@ emacs.pkgs.withPackages (
     copilot
     corfu
     csv-mode
+    cuda-mode
     dape
     dash-docs
+    demangle-mode
     devicetree-ts-mode
     diff-hl
     diminish
@@ -48,10 +57,17 @@ emacs.pkgs.withPackages (
     dockerfile-mode
     drag-stuff
     dtrt-indent
+    editorconfig
     elisp-lint
+    elsa
     embark
     embark-consult
+    emojify
     expand-region
+    projection
+    projection-multi-embark
+    projection-multi
+    projection-dape
     git-commit-ts-mode
     gitlab-ci-mode
     gnuplot
@@ -63,7 +79,10 @@ emacs.pkgs.withPackages (
     jq-ts-mode
     just-mode
     just-ts-mode
+    ligature
+    logview
     magit
+    magit-todos
     marginalia
     markdown-mode
     mermaid-mode
@@ -81,15 +100,17 @@ emacs.pkgs.withPackages (
     org-appear
     org-jira
     org-modern
+    ox-gfm
+    ox-hugo
     ox-jira
+    ox-slack
     package-lint
+    pkgs.sqlite # consult-dash dependency
     pretty-sha-path
     rainbow-delimiters
-    sideline
-    sideline-eglot
-    sideline-flymake
+    smartparens
+    sops
     sql-indent
-    sr-speedbar
     ssh-config-mode
     super-save
     terraform-mode
@@ -100,6 +121,7 @@ emacs.pkgs.withPackages (
     vertico
     vterm
     vundo
+    web-mode
     web-server # For claude-code-ide
     websocket # For claude-code-ide
     wgrep

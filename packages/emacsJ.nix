@@ -1,64 +1,11 @@
-{
-  emacs,
-}:
-emacs.pkgs.withPackages (
-  epkgs: with epkgs; [
-    tree-sitter-langs
-    treesit-grammars.with-all-grammars
-    treesit-auto
-    pretty-sha-path
-    gcmh
-    diminish
-    all-the-icons
-    all-the-icons-completion
-    all-the-icons-dired
-    wgrep
-    breadcrumb
-    rainbow-delimiters
-    auto-dark
-    super-save
-    org-appear
-    mermaid-mode
-    org-modern
-    gnuplot
-    markdown-mode
-    dtrt-indent
-    haskell-mode
-    terraform-mode
-    dockerfile-mode
-    docker-compose-mode
-    adoc-mode
-    go-mode
-    nix-ts-mode
-    csv-mode
-    cmake-mode
-    gitlab-ci-mode
-    ansible
-    ssh-config-mode
-    helpful
-    marginalia
-    vertico
-    orderless
-    direnv
-    consult
-    embark
-    embark-consult
-    consult-eglot
-    consult-eglot-embark
-    corfu
-    cape
-    multiple-cursors
-    expand-region
-    vundo
-    drag-stuff
-    diff-hl
-    hl-todo
-    magit-delta
-    magit
-    treesit-fold
-    dape
-    consult-flyspell
-    vterm
-    sr-speedbar
-  ]
-)
+# Custom Emacs package configuration.
+#
+# This package provides a customized Emacs distribution with a curated
+# set of packages and configurations optimized for software development.
+# The actual configuration is defined in ../sources/emacs/default.nix.
+#
+# Features:
+# - Modern IDE-like features with LSP support
+# - Comprehensive package collection for development
+# - Optimized for performance and usability
+import ../sources/emacs

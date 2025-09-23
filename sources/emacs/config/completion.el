@@ -10,6 +10,44 @@
   :init
   (vertico-mode))
 
+;; Configure directory extension.
+(use-package vertico-directory
+  :after vertico
+  :ensure nil
+  ;; More convenient directory navigation commands
+  :bind (:map vertico-map
+              ("RET" . vertico-directory-enter)
+              ("DEL" . vertico-directory-delete-char)
+              ("M-DEL" . vertico-directory-delete-word))
+  ;; Tidy shadowed file names
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+
+(use-package vertico-multiform
+  :requires vertico
+  :ensure nil
+  :custom
+  (vertico-multiform-categories
+   '((file buffer grid)
+     (imenu (:not indexed mouse))
+     (symbol (vertico-sort-function . vertico-sort-alpha))))
+  (vertico-multiform-commands
+   '((consult-line buffer)
+     (consult-git-grep buffer)
+     (consult-ripgrep buffer)
+     (consult-grep buffer)
+     (consult-fd grid)
+     (execute-extended-command 'vertical))
+   )
+  :config
+  (vertico-multiform-mode 1))
+
+(use-package vertico-buffer
+  :after vertico
+  :ensure nil
+  :custom
+  (vertico-buffer-hide-prompt nil)
+  (vertico-buffer-display-action '(display-buffer-reuse-window)))
+
 (use-package corfu
   :ensure
   :init
@@ -86,6 +124,9 @@
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref))
 
+
+;; prescient?
+;; https://github.com/Takishima/emacs-config/blob/main/.emacs_lisp/init-emacs.el#L253C14-L253C31
 (use-package orderless
   :ensure
   :custom

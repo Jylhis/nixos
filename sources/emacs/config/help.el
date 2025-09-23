@@ -30,6 +30,8 @@
   :defines (dash-docs-docsets dash-docs-docsets-path)
   :custom
   (dash-docs-docsets-path "~/.local/share/Zeal/Zeal/docsets/")
+  (dash-docs-enable-debugging nil)
+  (dash-docs-browser-func 'eww)
   :config
   (dolist (spec '((emacs-lisp-mode . ("Emacs Lisp"))
                   (python-mode . ("Python 3"))
@@ -44,9 +46,9 @@
                 (lambda () (setq-local dash-docs-docsets docsets))))))
 
 (use-package consult-dash
-  :after dash-docs
-  :config
-  (consult-customize consult-dash :initial (thing-at-point 'symbol)))
+  :ensure
+  :after consult
+  )
 
 (provide 'help)
 ;;; help.el ends here

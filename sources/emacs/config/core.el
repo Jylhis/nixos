@@ -6,6 +6,7 @@
 ;;; Code:
 
 (use-package emacs
+  :init
   :custom
   (text-mode-ispell-word-completion nil "Emacs 30 and newer: Disable Ispell completion function.")
   (context-menu-mode t "Enable context menu for vertico")
@@ -19,8 +20,11 @@
   (ring-bell-function #'ignore "No beeping")
   (scroll-preserve-screen-position 1 "keep the cursor in the same position while scrolling")
   (enable-recursive-minibuffers t "Support opening new minibuffers from inside existing minibuffers")
+  (minibuffer-depth-indicate-mode t "Show minibuffer depth to prevent confusion")
+  (minibuffer-follows-selected-frame t "Minibuffer follows the selected frame")
   (minibuffer-prompt-properties
    '(read-only t cursor-intangible t face minibuffer-prompt) "Do not allow the cursor in the minibuffer prompt")
+  (mouse-yank-at-point t "Make middle mouse paste at cursor position instead of click location")
   ;; Ignore case
   (completion-ignore-case t "Don't consider case significant in completion")
   (read-buffer-completion-ignore-case t "Ignore case when reading buffer name")
@@ -46,7 +50,7 @@
   ;; Disable autosave and backups
   (auto-save-default nil "Disable separate autosave files")
   (make-backup-files nil "Disable auto backup files")
-  (find-file-visit-truename t "Resolve symlinks")
+  ;; (find-file-visit-truename t "Resolve symlinks")
   (confirm-kill-processes nil "when quitting emacs, just kill processes")
   (enable-local-variables t "ask if local variables are safe once"))
 
@@ -100,6 +104,7 @@
   (dired-omit-files (concat
                      "\\`[.]?#\\|\\`[.][.]?\\'"
                      "\\|^[a-zA-Z0-9]\\.syncthing-enc\\'"
+		     "\\|^\\.git\\'"
                      "\\|^\\.stfolder\\'"
                      "\\|^\\.stversions\\'"
                      "\\|^__pycache__\\'")))

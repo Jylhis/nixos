@@ -14,6 +14,13 @@
   (magit-diff-context-lines 5 "Show more context lines for better understanding")
   )
 
+(use-package
+ magit-todos
+ :ensure
+ :after magit
+ :config (magit-todos-mode 1))
+
+
 (use-package diff-hl
   :ensure
   :custom

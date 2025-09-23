@@ -7,10 +7,38 @@
 
 (use-package emacs
   :init
-  (load-theme 'leuven t)
-  (load-theme 'leuven-dark t t)
+  ;; Trust all themes by default without prompting
+  (setq custom-safe-themes t)
+  ;; (load-theme 'leuven t)
+  ;; (load-theme 'leuven-dark t t)
+  (load-theme 'modus-vivendi-tinted t)
   (tool-bar-mode -1)
   (scroll-bar-mode -1))
+
+(use-package modus-themes
+  :ensure
+  :custom
+  (modus-themes-italic-constructs t)
+  (modus-themes-bold-constructs nil)
+  (modus-themes-mixed-fonts t)
+  (modus-themes-variable-pitch-ui nil)
+  :bind ("C-c t" . modus-themes-toggle)
+  :config
+  (setq modus-themes-to-toggle '(modus-operandi-tinted modus-vivendi-tinted))
+  )
+
+(use-package auto-dark
+  :ensure
+  :diminish
+  :after modus-themes
+  :custom
+  (auto-dark-themes '((modus-operandi-tinted) (modus-vivendi-tinted)))
+  :config
+  (auto-dark-mode 1)
+  (add-hook 'after-make-frame-functions
+            (lambda (frame)
+              (when (display-graphic-p frame)
+                (with-selected-frame frame (auto-dark-mode 1))))))
 
 (use-package diminish :ensure)
 
@@ -29,19 +57,6 @@
   :ensure
   :hook((lisp-mode emacs-lisp-mode) . rainbow-delimiters-mode))
 
-(use-package auto-dark
-  :ensure
-  :diminish
-  :after leuven-theme
-  :custom
-  (auto-dark-themes '((leuven-dark) (leuven)))
-  :config
-  (auto-dark-mode 1)
-  (add-hook 'after-make-frame-functions
-            (lambda (frame)
-              (when (display-graphic-p frame)
-                (with-selected-frame frame (auto-dark-mode 1))))))
-
 (use-package calendar
   :config
   (copy-face 'font-lock-constant-face 'calendar-iso-week-face)
@@ -54,8 +69,7 @@
 
 (use-package breadcrumb
   :ensure
-  :init
-  (breadcrumb-mode))
+  :hook (prog-mode . breadcrumb-mode))
 
 (use-package nerd-icons :ensure)
 
@@ -97,7 +111,41 @@
      ("NOTE" success bold)
      ("DEPRECATED" font-lock-doc-face bold))))
 
-(use-package sr-speedbar :ensure)
+;; Essential built-in enhancements
+(use-package winner
+  :bind (("C-c u" . winner-undo)
+         ("C-c r" . winner-redo))
+  :config
+  (winner-mode 1))
+
+ (use-package pixel-scroll
+   :when (display-graphic-p)
+   :config
+   (pixel-scroll-precision-mode 1)) ;; TODO: Does this work with server-client. Check auto-dark config
+
+(use-package emojify
+  :ensure
+  :custom
+   (emojify-inhibit-major-modes '(dired-mode
+                                 doc-view-mode
+                                 debugger-mode
+                                 pdf-view-mode
+                                 image-mode
+                                 help-mode
+                                 ibuffer-mode
+                                 magit-popup-mode
+                                 magit-diff-mode
+                                 nix-mode
+                                 ert-results-mode
+                                 compilation-mode
+                                 proced-mode
+                                 mu4e-headers-mode
+                                 deft-mode
+                                 yaml-mode
+                                 prog-mode))
+
+  ;; :hook (after-init . global-emojify-mode)
+   )
 
 (provide 'ui)
 ;;; ui.el ends here
