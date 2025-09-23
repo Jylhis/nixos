@@ -7,8 +7,16 @@
 {
   config = lib.mkIf config.boot.plymouth.enable {
     boot = {
-      plymouth.themePackages = [ pkgs.kdePackages.breeze-plymouth ];
-      plymouth.theme = lib.mkDefault "breeze";
+      plymouth.themePackages = lib.mkDefault (
+        [
+          pkgs.nixos-bgrt-plymouth
+        ]
+        ++ (lib.optionals config.services.desktopManager.plasma6.enable [
+          pkgs.kdePackages.breeze-plymouth
+        ])
+      );
+      plymouth.theme = lib.mkIf config.services.desktopManager.plasma6.enable (lib.mkDefault "breeze");
+
       # Enable "Silent Boot"
       initrd.verbose = false;
       loader.timeout = 5;
