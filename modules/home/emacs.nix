@@ -48,7 +48,6 @@ in
           symbols-only
         ]
         ++ (with pkgs; [
-          # Essential fonts only (4 instead of 10)
           jetbrains-mono
           inter
           source-code-pro
