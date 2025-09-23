@@ -5,50 +5,49 @@
   ...
 }:
 {
-  config = lib.mkIf config.services.xserver.desktopManager.gnome.enable {
+  config = lib.mkIf config.services.desktopManager.gnome.enable {
     services = {
       udev.packages = [
         pkgs.gnome-settings-daemon
       ];
+      desktopManager.gnome = {
+        extraGSettingsOverridePackages = [ pkgs.mutter ];
 
-      xserver = {
-        displayManager = {
-          gdm = {
-            enable = true;
-            wayland = true;
-          };
+        extraGSettingsOverrides = ''
+          	  [org.gnome.mutter]
+                    experimental-features=['scale-monitor-framebuffer']
+
+                    [org.gnome.desktop.input-sources]
+                    sources=[('xkb', 'us'), ('xkb', 'fi')]
+
+                    [org.freedesktop.ibus.panel.emoji]
+                    hotkey="[]"
+        '';
+      };
+
+      displayManager = {
+        gdm = {
+          # enable = true;
+          wayland = true;
         };
-        desktopManager.gnome = {
-          enable = false;
-          extraGSettingsOverridePackages = [ pkgs.mutter ];
 
-          extraGSettingsOverrides = ''
-            	  [org.gnome.mutter]
-                      experimental-features=['scale-monitor-framebuffer']
-
-                      [org.gnome.desktop.input-sources]
-                      sources=[('xkb', 'us'), ('xkb', 'fi')]
-
-                      [org.freedesktop.ibus.panel.emoji]
-                      hotkey="[]"
-          '';
-        };
+      };
+      gnome = {
+        games.enable = false;
       };
 
     };
 
-    environment.gnome.excludePackages =
-      lib.optionals config.services.xserver.desktopManager.gnome.enable
-        [
-          pkgs.epiphany
-          pkgs.geary
-          pkgs.gnome-maps
-          pkgs.gnome-music
-          pkgs.gnome-weather
-          pkgs.rhythmbox
-          pkgs.totem
-          pkgs.gnome-tour
-        ];
+    environment.gnome.excludePackages = [
+      pkgs.epiphany
+      pkgs.geary
+      pkgs.gnome-maps
+      pkgs.gnome-music
+      pkgs.gnome-weather
+      pkgs.rhythmbox
+      pkgs.totem
+      pkgs.gnome-tour
+    ];
     environment = {
       systemPackages = [
         pkgs.gnome-tweaks
