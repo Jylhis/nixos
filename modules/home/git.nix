@@ -1,17 +1,3 @@
-# Git configuration module for Home Manager.
-#
-# Provides comprehensive Git configuration with modern features including
-# delta for improved diffs, Git LFS support, and optimized performance settings.
-# Also includes lazygit for terminal-based Git interface.
-#
-# Features:
-# - Delta integration for enhanced diff viewing
-# - Performance optimizations (fsmonitor, commit graph)
-# - Comprehensive gitignore patterns for common editors
-# - Modern merge and rebase configurations
-# - SOPS integration for encrypted file diffs
-#
-# Configuration is conditional on programs.git.enable being set.
 {
   lib,
   config,
@@ -24,7 +10,6 @@
     lg = "lazygit";
   };
 
-  # https://nixos.asia/en/git
   programs = {
     git = lib.mkIf config.programs.git.enable {
       delta.enable = lib.mkDefault true;
@@ -62,39 +47,39 @@
       extraConfig = {
         init.defaultBranch = lib.mkDefault "main";
         core = {
-          untrackedcache = true;
-          fsmonitor = true;
+          untrackedcache = lib.mkDefault true;
+          fsmonitor = lib.mkDefault true;
         };
         merge = {
-          conflictStyle = "zdiff3";
+          conflictStyle = lib.mkDefault "zdiff3";
         };
         rebase = {
-          updateRefs = true;
+          updateRefs = lib.mkDefault true;
         };
         color = {
-          ui = true;
+          ui = lib.mkDefault true;
         };
         column = {
-          ui = "auto";
+          ui = lib.mkDefault "auto";
         };
         fetch = {
-          writeCommitGraph = true;
+          writeCommitGraph = lib.mkDefault true;
         };
         branch = {
-          sort = "-committerdate";
+          sort = lib.mkDefault "-committerdate";
         };
-        pull.rebase = true;
+        pull.rebase = lib.mkDefault true;
         diff = {
-          colorMoved = "zebra";
-          colorMovedWS = "ignore-space-at-eol";
-          "sops-decrypt".textconv = "sops decrypt";
+          colorMoved = lib.mkDefault "zebra";
+          colorMovedWS = lib.mkDefault "ignore-space-at-eol";
+          "sops-decrypt".textconv = lib.mkDefault "sops decrypt";
         };
         rerere = {
-          enabled = true;
+          enabled = lib.mkDefault true;
         };
       };
     };
-    lazygit.enable = true;
+    lazygit.enable = lib.mkDefault true;
   };
 
 }
