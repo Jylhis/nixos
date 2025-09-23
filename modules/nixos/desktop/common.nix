@@ -1,19 +1,14 @@
 {
   lib,
   pkgs,
-  config,
   ...
 }:
 {
   imports = [ ../users.nix ];
-  security.rtkit.enable = true; # TODO: What is this?
+
   programs.nix-ld.enable = true;
   hardware = {
-    graphics = {
-      enable = true;
-      enable32Bit = true;
-    };
-    bluetooth.enable = true;
+    enableAllFirmware = true;
   };
   nix.daemonCPUSchedPolicy = "idle";
 
@@ -23,12 +18,6 @@
 
   boot.kernelParams = [ "mitigations=off" ];
   time.timeZone = lib.mkDefault "Europe/Zurich";
-  i18n = {
-    defaultLocale = "en_GB.UTF-8";
-    supportedLocales = [
-      "all"
-    ];
-  };
 
   documentation = {
     doc.enable = true;
@@ -62,14 +51,6 @@
     # pkgs.xorg-docs
   ];
   environment.pathsToLink = [ "share/thumbnailers" ];
-
-  programs.firefox.languagePacks = lib.optionals config.programs.firefox.enable [
-    "en-US"
-    "en-GB"
-    "fi"
-    "de"
-    "fr"
-  ];
 
   # REVIEW: Is this needed?
   services.udev.extraRules = lib.mkDefault ''ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"'';

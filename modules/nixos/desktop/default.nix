@@ -6,11 +6,12 @@
 {
   imports = [
     ./common.nix
+    ./system.nix
     ./plasma.nix
+    ./gnome.nix
     ./hyprland.nix
     ./fonts.nix
     ../_1password.nix
-    ../default.nix
     ../logitech.nix
     ../users.nix
     ../plymouth.nix
