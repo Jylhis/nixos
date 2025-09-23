@@ -5,27 +5,22 @@ _: {
     # User-specific font preferences prioritizing programming fonts
     defaultFonts = {
       monospace = [
-        "JetBrainsMono Nerd Font"
-        "FiraCode Nerd Font"
-        "Iosevka Nerd Font"
-        "CascadiaCode Nerd Font"
+        "Caskaydia Mono Nerd Font"
       ];
       sansSerif = [
-        "Inter"
-        "Noto Sans CJK SC"
+        "Noto Sans"
       ];
       serif = [
-        "Source Serif Pro"
-        "Noto Serif CJK SC"
+        "Noto Serif"
       ];
     };
   };
 
-  # Session variables for consistent font sizing across applications
-  home.sessionVariables = {
-    # Standard font sizes for applications to reference
-    FONT_SIZE_SMALL = "9";
-    FONT_SIZE_NORMAL = "11";
-    FONT_SIZE_LARGE = "13";
-  };
+  # # Session variables for consistent font sizing across applications
+  # home.sessionVariables = {
+  #   # Standard font sizes for applications to reference
+  #   FONT_SIZE_SMALL = "9";
+  #   FONT_SIZE_NORMAL = "11";
+  #   FONT_SIZE_LARGE = "13";
+  # };
 }
