@@ -8,6 +8,7 @@
       url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-colors.url = "github:misterio77/nix-colors";
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
@@ -83,6 +84,8 @@
       { ... }:
       {
         imports = [
+          inputs.flake-parts.flakeModules.flakeModules
+          inputs.flake-parts.flakeModules.modules
           ./modules/flake/default.nix
         ];
         systems = [
