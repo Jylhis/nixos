@@ -49,30 +49,9 @@
     # Change dir widget: ALT-C
     # file widget: CTRL-T
     # history widget: CTRL-R
-    fzf.enable = true;
+    # fzf.enable = true;
     jq.enable = true;
-    # Install btop https://github.com/aristocratos/btop
-    btop = {
-      enable = true;
-      settings = {
-        color_theme = "Default";
-        theme_background = true;
-        truecolor = true;
-        vim_keys = false;
-        rounded_corners = false;
-        shown_boxes = "cpu mem net proc";
-        proc_tree = true;
-        proc_colors = true;
-        proc_gradient = true;
-        proc_per_core = false;
-        proc_cpu_graphs = true;
-        proc_aggregate = true;
-        show_uptime = true;
-        temp_scale = "celsius";
-        show_io_stat = true;
-        io_mode = true;
-      };
-    };
+
     rclone = {
       enable = true;
     };
