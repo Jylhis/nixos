@@ -7,14 +7,7 @@
         type = lib.types.str;
         description = "Your username as shown by `id -un`";
       };
-      fullname = lib.mkOption {
-        type = lib.types.str;
-        description = "Your full name";
-      };
-      email = lib.mkOption {
-        type = lib.types.str;
-        description = "Your email address";
-      };
+
       publicKeys = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [ ];
@@ -28,7 +21,7 @@
       };
     };
   };
-  config = {
-    home.username = config.me.username;
-  };
+  # config = {
+  #   home.username = config.me.username;
+  # };
 }

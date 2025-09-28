@@ -1,7 +1,6 @@
 _: {
   config = {
     programs.fastfetch = {
-      enable = true;
       settings = {
         "logo" = {
           "type" = "file";

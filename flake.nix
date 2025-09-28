@@ -2,8 +2,11 @@
   description = "j10s monorepo";
 
   inputs = {
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
 
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*";
+    fh.url = "https://flakehub.com/f/DeterminateSystems/fh/*";
+
     nix-darwin = {
       url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -12,11 +15,6 @@
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
-    plasma-manager = {
-      url = "github:nix-community/plasma-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
     _1password-shell-plugins.url = "github:1Password/shell-plugins";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -39,9 +37,13 @@
       };
     };
 
-    flake-parts.url = "github:hercules-ci/flake-parts";
+    marchyo = {
+      url = "https://flakehub.com/f/Jylhis/marchyo/0.1.*";
+    };
+    flake-parts.url = "https://flakehub.com/f/hercules-ci/flake-parts/0.1.*";
     flake-compat.url = "github:nix-community/flake-compat";
 
+    myemacs.url = "github:jylhis/.emacs.d";
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs = {
@@ -50,17 +52,17 @@
     };
 
     flake-utils = {
-      url = "github:numtide/flake-utils";
+      url = "https://flakehub.com/f/numtide/flake-utils/0.1.*";
       inputs.systems.follows = "systems";
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "https://flakehub.com/f/nix-community/home-manager/0.1.*";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     sops-nix = {
-      url = "github:Mic92/sops-nix";
+      url = "https://flakehub.com/f/Mic92/sops-nix/0.1.*";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -87,11 +89,13 @@
           inputs.flake-parts.flakeModules.flakeModules
           inputs.flake-parts.flakeModules.modules
           ./modules/flake/default.nix
+          inputs.marchyo.flakeModules.default
         ];
         systems = [
           # systems for which you want to build the `perSystem` attributes
           "x86_64-linux"
         ];
+
       }
     );
 }

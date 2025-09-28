@@ -66,6 +66,10 @@ in
       useGlobalPkgs = true;
       useUserPackages = true;
       backupFileExtension = "backup";
+      sharedModules = [
+        flake.inputs.marchyo.homeModules.default
+        flake.inputs.myemacs.homeModules.default
+      ];
       extraSpecialArgs = {
         inherit (flake) inputs;
       };
@@ -82,11 +86,5 @@ in
         );
       });
     };
-
-    # All users can add Nix caches.
-    nix.settings.trusted-users = [
-      "root"
-    ]
-    ++ config.myusers;
   };
 }
