@@ -10,7 +10,6 @@ let
   wallpaper-dark = "1-Pawel-Czerwinski-Abstract-Purple-Blue.jpg";
   wallpaper-light = "kanagawa-1.png";
   wallpaper = if enable-dark then wallpaper-dark else wallpaper-light;
-  wallpaper_path = "${config.home.homeDirectory}/Pictures/Wallpapers/${wallpaper}";
   generated = false;
   color-dark = inputs.nix-colors.lib.schemeFromYAML "modus-operandi-tinted" (
     builtins.readFile ../../theme/base16/modus_operandi_tinted.yaml
@@ -32,13 +31,6 @@ in
       colorScheme = lib.mkForce color-dark;
     };
 
-    home.file = {
-      "Pictures/Wallpapers" = {
-        source = ../../theme/wallpaper;
-        recursive = true;
-      };
-    };
-
     # Gnome stuff
     dconf.settings."org/gnome/desktop/background" = {
       picture-uri = "file://${config.home.homeDirectory}/Pictures/Wallpapers/${wallpaper-light}";
@@ -54,17 +46,5 @@ in
         color-dark
       else
         color-light;
-
-    services.hyprpaper = {
-      enable = true;
-      settings = {
-        preload = [
-          wallpaper_path
-        ];
-        wallpaper = [
-          ",${wallpaper_path}"
-        ];
-      };
-    };
   };
 }
